@@ -41,8 +41,11 @@
 
         # Output package
         packages = {
-          default = pkgs.callPackage ./nix { };
-          web = pkgs.callPackage ./nix { targetFlutterPlatform = "web"; };
+          default = pkgs.callPackage ./nix { inherit inputs; };
+          web = pkgs.callPackage ./nix {
+            targetFlutterPlatform = "web";
+            inherit inputs;
+          };
           apk = pkgs.callPackage ./nix {
             targetFlutterPlatform = "apk";
             inherit inputs system;
