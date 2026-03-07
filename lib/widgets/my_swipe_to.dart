@@ -113,12 +113,23 @@ class _MySwipeableState extends State<MySwipeable> with TickerProviderStateMixin
   }
 
   void _handleDragEnd(DragEndDetails details) {
-    _moveController.animateTo(0.0, duration: Duration(milliseconds: 200));
-    _dragExtent = 0.0;
+    final isEnoughSwipe = _dragExtent.abs() >= widget.threshold;
 
-    if (widget.onSwipeEnd != null) {
-      widget.onSwipeEnd!();
+    _moveController.animateTo(0.0, duration: const Duration(milliseconds: 200));
+
+    if (isEnoughSwipe) {
+      if (_dragExtent < 0) {
+        widget.onSwipeLeft?.call();
+      } else {
+        widget.onSwipeRight?.call();
+      }
+
+      widget.onSwipeEnd?.call(); // done
+    } else {
+      widget.onSwipeCancel?.call();
     }
+
+    _dragExtent = 0.0;
   }
 
   void _updateMoveAnimation() {
