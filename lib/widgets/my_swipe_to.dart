@@ -9,6 +9,8 @@ class MySwipeable extends StatefulWidget {
   final VoidCallback? onSwipeCancel;
   final VoidCallback? onSwipeEnd;
   final double threshold;
+  final bool enableSwipeLeft;
+  final bool enableSwipeRight;
 
   const MySwipeable({super.key, 
     required this.child,
@@ -18,6 +20,8 @@ class MySwipeable extends StatefulWidget {
     this.onSwipeCancel,
     this.onSwipeEnd,
     this.threshold = 64.0,
+    this.enableSwipeLeft = true,
+    this.enableSwipeRight = false,
   });
 
   @override
@@ -59,6 +63,13 @@ class _MySwipeableState extends State<MySwipeable> with TickerProviderStateMixin
 
   void _handleDragUpdate(DragUpdateDetails details) {
     final delta = details.primaryDelta ?? 0.0;
+
+    // right swipe block
+    if (!widget.enableSwipeRight && delta > 0) return;
+
+    // left swipe block
+    if (!widget.enableSwipeLeft && delta < 0) return;
+
     final oldDragExtent = _dragExtent;
     _dragExtent += delta;
 
