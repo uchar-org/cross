@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:go_router/go_router.dart';
 import 'package:language_picker/language_picker_dropdown.dart';
+import 'package:language_picker/languages.dart';
 import 'package:matrix/matrix.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:url_launcher/url_launcher_string.dart';
@@ -25,6 +26,8 @@ class SettingsView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final localeProvider = context.read<LocaleProvider>();
+
     final theme = Theme.of(context);
     final showChatBackupBanner = controller.showChatBackupBanner;
     final activeRoute = GoRouter.of(
@@ -161,6 +164,7 @@ class SettingsView extends StatelessWidget {
                 onChanged: controller.firstRunBootstrapAction,
               ),
             Divider(color: theme.dividerColor),
+
             ListTile(
               leading: const Icon(Icons.format_paint_outlined),
               title: Text(L10n.of(context).changeTheme),
@@ -201,6 +205,40 @@ class SettingsView extends StatelessWidget {
                   ? theme.colorScheme.surfaceContainerHigh
                   : null,
             ),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 5.0),
+              child: ButtonTheme(
+                alignedDropdown: true,
+                child: DropdownButtonFormField<Language>(
+                  decoration: InputDecoration(
+                    prefixIcon: const Icon(Icons.language),
+                    filled: false,
+                    border: InputBorder.none,
+                    focusedBorder: InputBorder.none,
+                    errorBorder: InputBorder.none,
+                  ),
+                  isExpanded: true,
+                  onChanged: (value) {
+                    if (value != null) {
+                      localeProvider.setLanguage(value);
+                    }
+                  },
+                  items: localeProvider.languages
+                      .map(
+                        (language) => DropdownMenuItem<Language>(
+                      value: language,
+                      child: Text(
+                        "${language.name} (${language.isoCode})",
+                        style: TextStyle(fontWeight: FontWeight.w400),
+                      ),
+                    ),
+                  )
+                      .toList(),
+                  value: localeProvider.language,
+                ),
+              ),
+            ),
+
             Divider(color: theme.dividerColor),
             ListTile(
               leading: const Icon(Icons.dns_outlined),
