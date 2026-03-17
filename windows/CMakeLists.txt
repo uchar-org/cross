@@ -1,4 +1,5 @@
 # Project-level configuration.
+set(CMAKE_POLICY_VERSION_MINIMUM 3.5)
 cmake_minimum_required(VERSION 3.14)
 project(fluffychat LANGUAGES CXX)
 
@@ -94,6 +95,14 @@ install(CODE "
   " COMPONENT Runtime)
 install(DIRECTORY "${PROJECT_BUILD_DIR}/${FLUTTER_ASSET_DIR_NAME}"
   DESTINATION "${INSTALL_BUNDLE_DATA_DIR}" COMPONENT Runtime)
+
+# Fix: copy sqlcipher DLL with the name the app expects at runtime
+install(FILES
+  "${CMAKE_CURRENT_BINARY_DIR}/plugins/sqlcipher_flutter_libs/Debug/sqlite3.dll"
+  DESTINATION "${INSTALL_BUNDLE_LIB_DIR}"
+  RENAME "libsqlcipher.dll"
+  COMPONENT Runtime
+)
 
 # Install the AOT library on non-Debug builds only.
 install(FILES "${AOT_LIBRARY}" DESTINATION "${INSTALL_BUNDLE_DATA_DIR}"
