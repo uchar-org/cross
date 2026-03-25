@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 import 'package:go_router/go_router.dart';
+import 'package:jailbreak_root_detection/jailbreak_root_detection.dart';
 import 'package:matrix/matrix.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -13,15 +16,16 @@ import 'package:fluffychat/config/locale_provide.dart';
 import 'package:fluffychat/widgets/app_lock.dart';
 import 'package:fluffychat/widgets/theme_builder.dart';
 import '../utils/custom_scroll_behaviour.dart';
+import 'check_root.dart';
 import 'matrix.dart';
 
-class FluffyChatApp extends StatelessWidget {
+class FluffyChatApp extends StatefulWidget {
   final Widget? testWidget;
   final List<Client> clients;
   final String? pincode;
   final SharedPreferences store;
 
-  const FluffyChatApp({
+  FluffyChatApp({
     super.key,
     this.testWidget,
     required this.clients,
@@ -42,40 +46,112 @@ class FluffyChatApp extends StatelessWidget {
   );
 
   @override
+  State<FluffyChatApp> createState() => _FluffyChatAppState();
+}
+
+class _FluffyChatAppState extends State<FluffyChatApp> {
+  String _result = '';
+  String text = '';
+  bool isRoot = false;
+
+  void processCheckJailbreakRoot() async {
+    _result = '';
+    final isNotTrust = await JailbreakRootDetection.instance.isNotTrust;
+    final isRealDevice = await JailbreakRootDetection.instance.isRealDevice;
+    print('isNotTrust: $isNotTrust');
+    print('isRealDevice: $isRealDevice');
+    _result += 'isNotTrust: $isNotTrust\n';
+    _result += 'isRealDevice: $isRealDevice\n';
+    if (Platform.isAndroid) {
+      try {
+        final isNotTrust = await JailbreakRootDetection.instance.isNotTrust;
+        final isJailBroken = await JailbreakRootDetection.instance.isJailBroken;
+        final isRealDevice = await JailbreakRootDetection.instance.isRealDevice;
+        final isOnExternalStorage =
+            await JailbreakRootDetection.instance.isOnExternalStorage;
+        final checkForIssues =
+            await JailbreakRootDetection.instance.checkForIssues;
+        final isDevMode = await JailbreakRootDetection.instance.isDevMode;
+        if (isJailBroken) {
+          isRoot = true;
+          text="Your phone is rooted.";
+        }
+      } catch (e) {
+        print(e);
+      }
+    }
+    if (Platform.isIOS) {
+      final isNotTrust = await JailbreakRootDetection.instance.isNotTrust;
+      final isJailBroken = await JailbreakRootDetection.instance.isJailBroken;
+      final isRealDevice = await JailbreakRootDetection.instance.isRealDevice;
+      final checkForIssues =
+          await JailbreakRootDetection.instance.checkForIssues;
+
+      final bundleId =
+          'uz.uzinfocom.uchar'; // Ex: final bundleId = 'com.w3conext.jailbreakRootDetectionExample'
+      final isTampered = await JailbreakRootDetection.instance.isTampered(
+        bundleId,
+      );
+      if (isJailBroken) {
+        print("################:$isJailBroken");
+        isRoot = true;
+        text="Your phone is rooted.";
+      }
+    }
+
+    final checkForIssues = await JailbreakRootDetection.instance.checkForIssues;
+    print('checkForIssues: $checkForIssues');
+    for (final issue in checkForIssues) {
+      print('issue: ${issue.toString()}');
+      _result += '$issue\n';
+    }
+
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    processCheckJailbreakRoot();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider<LocaleProvider>(
+    return isRoot
+        ? CheckRoot(text: '',)
+        : ChangeNotifierProvider<LocaleProvider>(
       create: (_) => LocaleProvider(),
       child: ThemeBuilder(
         builder: (context, themeMode, primaryColor) {
           return MaterialApp.router(
-            debugShowCheckedModeBanner: false,
-            title: AppSettings.applicationName.value,
-            themeMode: themeMode,
-            theme: FluffyThemes.buildTheme(
-              context,
-              Brightness.light,
-              primaryColor,
-            ),
-            darkTheme: FluffyThemes.buildTheme(
-              context,
-              Brightness.dark,
-              primaryColor,
-            ),
-            scrollBehavior: CustomScrollBehavior(),
-            locale: context.watch<LocaleProvider>().locale,
-            localizationsDelegates: L10n.localizationsDelegates,
-            supportedLocales: L10n.supportedLocales,
-            routerConfig: router,
-            builder: (context, child) => AppLockWidget(
-              pincode: pincode,
-              clients: clients,
-              child: Matrix(
-                clients: clients,
-                store: store,
-                child: testWidget ?? child,
-              ),
-            ),
-          );
+                  debugShowCheckedModeBanner: false,
+                  title: AppSettings.applicationName.value,
+                  themeMode: themeMode,
+                  theme: FluffyThemes.buildTheme(
+                    context,
+                    Brightness.light,
+                    primaryColor,
+                  ),
+                  darkTheme: FluffyThemes.buildTheme(
+                    context,
+                    Brightness.dark,
+                    primaryColor,
+                  ),
+                  scrollBehavior: CustomScrollBehavior(),
+                  locale: context.watch<LocaleProvider>().locale,
+                  localizationsDelegates: L10n.localizationsDelegates,
+                  supportedLocales: L10n.supportedLocales,
+                  routerConfig: FluffyChatApp.router,
+                  builder: (context, child) => AppLockWidget(
+                    pincode: widget.pincode,
+                    clients: widget.clients,
+                    child: Matrix(
+                      clients: widget.clients,
+                      store: widget.store,
+                      child: widget.testWidget ?? child,
+                    ),
+                  ),
+                );
         },
       ),
     );
