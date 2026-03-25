@@ -3138,5 +3138,7 @@
     "logs": "Logid",
     "advancedConfigs": "Täiendav seadistus",
     "advancedConfigurations": "Täiendavad seadistused",
-    "signInWithLabel": "Logi sisse kasutades:"
+    "signInWithLabel": "Logi sisse kasutades:",
+      "yourPhoneIsRooted":"Your phone is rooted"
+
 }

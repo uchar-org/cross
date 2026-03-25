@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import '../l10n/l10n.dart';
 
 class CheckRoot extends StatefulWidget {
-  const CheckRoot({super.key, required this.text});
+  const CheckRoot({super.key});
 
-  final String text;
 
   @override
   State<CheckRoot> createState() => _CheckRootState();
@@ -12,13 +12,17 @@ class CheckRoot extends StatefulWidget {
 class _CheckRootState extends State<CheckRoot> {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Colors.black,
-      child: Center(
-        child: Text(
-          "Your phone is rooted 🔒",
-          textDirection: TextDirection.ltr,
-          style: TextStyle(color: Colors.white),
+    return Material(
+      child: Scaffold(
+        body: Container(
+          color: Colors.black,
+          child: Center(
+            child: Text(
+              "${L10n.of(context).yourPhoneIsRooted} 🔒",
+              textDirection: TextDirection.ltr,
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
         ),
       ),
     );

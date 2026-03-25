@@ -51,7 +51,6 @@ class FluffyChatApp extends StatefulWidget {
 }
 
 class _FluffyChatAppState extends State<FluffyChatApp> {
-  String text = '';
   bool isRoot = false;
 
   void processCheckJailbreakRoot() async {
@@ -67,9 +66,8 @@ class _FluffyChatAppState extends State<FluffyChatApp> {
         final checkForIssues =
             await JailbreakRootDetection.instance.checkForIssues;
         final isDevMode = await JailbreakRootDetection.instance.isDevMode;
-        if (isJailBroken) {
+        if (!isJailBroken) {
           isRoot = true;
-          text="Your phone is rooted.";
         }
       } catch (e) {
         if (kDebugMode) {
@@ -91,7 +89,6 @@ class _FluffyChatAppState extends State<FluffyChatApp> {
       );
       if (isJailBroken) {
         isRoot = true;
-        text="Your phone is rooted.";
       }
     }
 
@@ -108,12 +105,47 @@ class _FluffyChatAppState extends State<FluffyChatApp> {
   @override
   Widget build(BuildContext context) {
     return isRoot
-        ? CheckRoot(text: '',)
-        : ChangeNotifierProvider<LocaleProvider>(
+        ? ChangeNotifierProvider<LocaleProvider>(
       create: (_) => LocaleProvider(),
       child: ThemeBuilder(
         builder: (context, themeMode, primaryColor) {
-          return MaterialApp.router(
+          return MaterialApp(
+            debugShowCheckedModeBanner: false,
+            title: AppSettings.applicationName.value,
+            themeMode: themeMode,
+            theme: FluffyThemes.buildTheme(
+              context,
+              Brightness.light,
+              primaryColor,
+            ),
+            darkTheme: FluffyThemes.buildTheme(
+              context,
+              Brightness.dark,
+              primaryColor,
+            ),
+            scrollBehavior: CustomScrollBehavior(),
+            locale: context.watch<LocaleProvider>().locale,
+            localizationsDelegates: L10n.localizationsDelegates,
+            supportedLocales: L10n.supportedLocales,
+            // builder: (context, child) => CheckRoot(),
+            builder: (context, child) {
+              return Overlay(
+                initialEntries: [
+                  OverlayEntry(
+                    builder: (context) => CheckRoot(),
+                  ),
+                ],
+              );
+            },
+          );
+        },
+      ),
+    )
+        : ChangeNotifierProvider<LocaleProvider>(
+            create: (_) => LocaleProvider(),
+            child: ThemeBuilder(
+              builder: (context, themeMode, primaryColor) {
+                return MaterialApp.router(
                   debugShowCheckedModeBanner: false,
                   title: AppSettings.applicationName.value,
                   themeMode: themeMode,
@@ -142,8 +174,8 @@ class _FluffyChatAppState extends State<FluffyChatApp> {
                     ),
                   ),
                 );
-        },
-      ),
-    );
+              },
+            ),
+          );
   }
 }

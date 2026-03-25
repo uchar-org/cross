@@ -3135,5 +3135,7 @@
     "logs": "Protokolle",
     "baseUrl": "Basis-URL",
     "advancedConfigs": "Erweiterte Konfigurationen",
-    "advancedConfigurations": "Erweiterte Konfigurationen"
+    "advancedConfigurations": "Erweiterte Konfigurationen",
+    "yourPhoneIsRooted":"Ifowuni yakho i-root"
+
 }
