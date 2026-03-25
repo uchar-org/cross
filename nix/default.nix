@@ -5,15 +5,7 @@
 , targetFlutterPlatform ? "linux", }:
 
 let
-  importYAML = path:
-    lib.importJSON (runCommand "converted.json" {
-      pname = "converted.json";
-      version = "0.0.1";
-      nativeBuildInputs = [ yj ];
-    } ''
-      yj < ${path} > $out
-    '');
-  pubspecLock = importYAML ../pubspec.lock;
+  pubspecLock = lib.importJSON ./pubspec.lock.json;
   libwebrtcRpath = lib.makeLibraryPath [ libgbm libdrm ];
   libwebrtc = fetchzip {
     url =
