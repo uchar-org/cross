@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'package:go_router/go_router.dart';
@@ -50,18 +51,12 @@ class FluffyChatApp extends StatefulWidget {
 }
 
 class _FluffyChatAppState extends State<FluffyChatApp> {
-  String _result = '';
   String text = '';
   bool isRoot = false;
 
   void processCheckJailbreakRoot() async {
-    _result = '';
     final isNotTrust = await JailbreakRootDetection.instance.isNotTrust;
     final isRealDevice = await JailbreakRootDetection.instance.isRealDevice;
-    print('isNotTrust: $isNotTrust');
-    print('isRealDevice: $isRealDevice');
-    _result += 'isNotTrust: $isNotTrust\n';
-    _result += 'isRealDevice: $isRealDevice\n';
     if (Platform.isAndroid) {
       try {
         final isNotTrust = await JailbreakRootDetection.instance.isNotTrust;
@@ -77,7 +72,9 @@ class _FluffyChatAppState extends State<FluffyChatApp> {
           text="Your phone is rooted.";
         }
       } catch (e) {
-        print(e);
+        if (kDebugMode) {
+          print(e);
+        }
       }
     }
     if (Platform.isIOS) {
@@ -93,19 +90,12 @@ class _FluffyChatAppState extends State<FluffyChatApp> {
         bundleId,
       );
       if (isJailBroken) {
-        print("################:$isJailBroken");
         isRoot = true;
         text="Your phone is rooted.";
       }
     }
 
     final checkForIssues = await JailbreakRootDetection.instance.checkForIssues;
-    print('checkForIssues: $checkForIssues');
-    for (final issue in checkForIssues) {
-      print('issue: ${issue.toString()}');
-      _result += '$issue\n';
-    }
-
     setState(() {});
   }
 
