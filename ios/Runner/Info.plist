@@ -113,5 +113,16 @@
 		<false/>
 		<key>io.flutter.embedded_views_preview</key>
 		<true/>
+
+        <key>LSApplicationQueriesSchemes</key>
+        <array>
+            <string>undecimus</string>
+            <string>sileo</string>
+            <string>zbra</string>
+            <string>filza</string>
+            <string>activator</string>
+            <string>cydia</string>
+        </array>
+
 	</dict>
 </plist>
