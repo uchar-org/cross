@@ -1,8 +1,6 @@
 {
   pkgs,
-  callPackage,
-  flutter338,
-  vodozemac ? callPackage ./vodozemac-wasm.nix {}, 
+  vodozemac ? pkgs.callPackage ./vodozemac-wasm.nix {}, 
   ...
 }:
 pkgs.writeScriptBin "init-vodozemac" ''

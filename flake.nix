@@ -20,11 +20,11 @@
   };
 
   outputs = { self, flake-parts, ... }@inputs:
-    flake-parts.lib.mkFlake { inherit inputs; } ({ ... }: {
+    flake-parts.lib.mkFlake { inherit inputs; } ({ ... }:  {
       systems =
         [ "x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin" ];
 
-      perSystem = { pkgs, system, ... }: {
+      perSystem = { pkgs, system, ... }: rec {
         _module.args.pkgs = import self.inputs.nixpkgs {
           inherit system;
           config.allowUnfree = true;
@@ -37,7 +37,7 @@
 
         # Development environment
         devShells.default =
-          import ./nix/shell.nix self { inherit pkgs inputs; };
+          import ./nix/shell.nix { inherit pkgs inputs system formatter; };
 
         # Output package
         packages = {
