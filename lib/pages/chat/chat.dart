@@ -354,6 +354,15 @@ class ChatController extends State<ChatPageWithRoom>
   }
 
   KeyEventResult _customEnterKeyHandling(FocusNode node, KeyEvent evt) {
+    // turn on latest message edit mode on Arrow up
+    if (evt.logicalKey == LogicalKeyboardKey.arrowUp &&
+        evt is KeyDownEvent &&
+        sendController.text.isEmpty &&
+        editEvent == null) {
+      _editLastSentMessage();
+      return KeyEventResult.handled;
+    }
+
     if (!HardwareKeyboard.instance.isShiftPressed &&
         evt.logicalKey.keyLabel == 'Enter' &&
         AppSettings.sendOnEnter.value) {
@@ -1175,6 +1184,36 @@ class ChatController extends State<ChatPageWithRoom>
             hideReply: true,
           );
       selectedEvents.clear();
+    });
+    inputFocus.requestFocus();
+  }
+
+  void _editLastSentMessage() {
+    final tl = timeline;
+    if (tl == null || isArchived) return;
+
+    final userId = sendingClient.userID;
+    final events = tl.events.filterByVisibleInGui(threadId: activeThreadId);
+
+    // find latest sent message
+    final lastOwnEvent = events.firstWhereOrNull(
+      (e) =>
+          e.senderId == userId &&
+          e.status.isSent &&
+          e.messageType == MessageTypes.Text,
+    );
+    if (lastOwnEvent == null) return;
+
+    setState(() {
+      pendingText = sendController.text;
+      editEvent = lastOwnEvent;
+      sendController.text = lastOwnEvent
+          .getDisplayEvent(tl)
+          .calcLocalizedBodyFallback(
+            MatrixLocals(L10n.of(context)),
+            withSenderNamePrefix: false,
+            hideReply: true,
+          );
     });
     inputFocus.requestFocus();
   }

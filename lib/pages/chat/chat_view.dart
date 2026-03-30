@@ -180,7 +180,7 @@ class ChatView extends StatelessWidget {
         actions: {
           EscapeIntent: CallbackAction<EscapeIntent>(
             onInvoke: (intent) {
-              if (controller.replyEvent != null) {
+              if (controller.editEvent != null || controller.replyEvent != null) {
                 controller.cancelReplyEventAction();
               }
               return null;
