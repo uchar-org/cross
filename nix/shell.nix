@@ -1,10 +1,29 @@
-flake:
-{ pkgs, inputs, ... }@attrs:
+{ pkgs, inputs, system, formatter ? pkgs.alejandra, ... }@attrs:
 let
   system = pkgs.hostPlatform.system;
   isDarwin = pkgs.stdenv.isDarwin;
   isLinux = pkgs.stdenv.isLinux;
   formatter = pkgs.alejandra;
+
+  pinnedFlutter = pkgs.flutter338;
+  pinnedJDK = pkgs.jdk17_headless;
+  androidCustomPackage = inputs.android-nixpkgs.sdk.${system} (
+    sdkPkgs:
+    with sdkPkgs; [
+      cmdline-tools-latest
+      cmake-3-22-1
+      build-tools-35-0-0
+      ndk-27-0-12077973
+      ndk-28-2-13676358
+      platform-tools
+      emulator
+      platforms-android-31
+      platforms-android-33
+      platforms-android-34
+      platforms-android-35
+      platforms-android-36
+      system-images-android-36-google-apis-playstore-x86-64
+    ]);
 
   androidEmulator = pkgs.androidenv.emulateApp {
     name = "emulator";
@@ -30,26 +49,6 @@ let
     };
   };
 
-  pinnedFlutter = pkgs.flutter338;
-  pinnedJDK = pkgs.jdk17_headless;
-  androidCustomPackage = inputs.android-nixpkgs.sdk.${system} (
-    sdkPkgs:
-    with sdkPkgs; [
-      cmdline-tools-latest
-      cmake-3-22-1
-      build-tools-35-0-0
-      ndk-27-0-12077973
-      ndk-28-2-13676358
-      platform-tools
-      emulator
-      platforms-android-31
-      platforms-android-33
-      platforms-android-34
-      platforms-android-35
-      platforms-android-36
-      system-images-android-36-google-apis-playstore-x86-64
-    ]);
-
 in pkgs.mkShell {
   packages = [
     pkgs.rustup
@@ -59,10 +58,12 @@ in pkgs.mkShell {
     pinnedFlutter
     androidCustomPackage
     pinnedJDK
+    pkgs.imagemagick
   ] ++ pkgs.lib.optionals isLinux [
     pkgs.webkitgtk_4_1
     pkgs.libsecret.dev
-    (pkgs.callPackage ./shell_vodozemac.nix {})
+    pkgs.copyDesktopItems
+    (import ./shell_vodozemac.nix attrs)
     (pkgs.writeScriptBin "android-emulator" ''
       ${androidEmulator}/bin/run-test-emulator
     '')
