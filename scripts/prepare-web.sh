@@ -1,5 +1,6 @@
 #!/bin/sh -ve
 
+rm -rf .vodozemac
 version=$(yq ".dependencies.flutter_vodozemac" < pubspec.yaml)
 version=$(expr "$version" : '\^*\(.*\)')
 git clone https://github.com/famedly/dart-vodozemac.git -b ${version} .vodozemac
@@ -12,4 +13,4 @@ mv .vodozemac/dart/web/pkg/vodozemac_bindings_dart* ./assets/vodozemac/
 rm -rf .vodozemac
 
 flutter pub get
-dart compile js ./web/native_executor.dart -o ./web/native_executor.js -m
+dart compile js ./web/native_executer.dart -o ./web/native_executer.js -m
