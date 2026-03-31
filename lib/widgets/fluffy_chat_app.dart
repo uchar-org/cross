@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'package:go_router/go_router.dart';
 import 'package:jailbreak_root_detection/jailbreak_root_detection.dart';
@@ -102,6 +103,9 @@ class _FluffyChatAppState extends State<FluffyChatApp> {
   @override
   void initState() {
     super.initState();
+    if (kIsWeb) {
+      BrowserContextMenu.disableContextMenu();
+    }
     processCheckJailbreakRoot();
   }
 
