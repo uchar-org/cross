@@ -21,8 +21,10 @@ import 'package:fluffychat/utils/string_color.dart';
 import 'package:fluffychat/widgets/avatar.dart';
 import 'package:fluffychat/widgets/matrix.dart';
 import 'package:fluffychat/widgets/member_actions_popup_menu_button.dart';
+import 'package:fluffychat/pages/chat/chat.dart';
 import '../../../config/app_config.dart';
 import 'message_content.dart';
+import 'message_context_menu.dart';
 import 'message_reactions.dart';
 import 'reply_content.dart';
 import 'state_message.dart';
@@ -53,6 +55,7 @@ class Message extends StatelessWidget {
   final List<Color> colors;
   final void Function()? onExpand;
   final bool isCollapsed;
+  final ChatController controller;
 
   const Message(
     this.event, {
@@ -78,6 +81,7 @@ class Message extends StatelessWidget {
     this.onExpand,
     required this.enterThread,
     this.isCollapsed = false,
+    required this.controller,
     super.key,
   });
 
@@ -373,13 +377,10 @@ class Message extends StatelessWidget {
                                         Container(
                                           alignment: alignment,
                                           padding: const EdgeInsets.only(left: 8),
-                                          child: GestureDetector(
-                                            onLongPress: longPressSelect
-                                                ? null
-                                                : () {
-                                                    HapticFeedback.heavyImpact();
-                                                    onSelect(event);
-                                                  },
+                                          child: MessageContextMenu(
+                                            event: event,
+                                            controller: controller,
+                                            timeline: timeline,
                                             child: AnimatedOpacity(
                                               opacity: animateIn
                                                   ? 0

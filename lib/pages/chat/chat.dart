@@ -200,6 +200,8 @@ class ChatController extends State<ChatPageWithRoom>
 
   List<Event> selectedEvents = [];
 
+  VoidCallback? closeContextMenu;
+
   final Set<String> unfolded = {};
 
   Event? replyEvent;
@@ -617,6 +619,8 @@ class ChatController extends State<ChatPageWithRoom>
 
   @override
   void dispose() {
+    closeContextMenu?.call();
+    closeContextMenu = null;
     timeline?.cancelSubscriptions();
     timeline = null;
     inputFocus.removeListener(_inputFocusListener);
@@ -1261,6 +1265,14 @@ class ChatController extends State<ChatPageWithRoom>
         (a, b) => a.originServerTs.compareTo(b.originServerTs),
       );
     }
+  }
+
+  void selectSingleEvent(Event event) {
+    setState(() {
+      selectedEvents
+        ..clear()
+        ..add(event);
+    });
   }
 
   int? findChildIndexCallback(Key key, Map<String, int> thisEventsKeyMap) {

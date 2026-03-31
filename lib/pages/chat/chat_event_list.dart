@@ -48,6 +48,8 @@ class ChatEventList extends StatelessWidget {
         controller.room.client.applicationAccountConfig.wallpaperUrl != null;
 
     return SelectionArea(
+      contextMenuBuilder: (context, selectableRegionState) =>
+          const SizedBox.shrink(),
       child: ListView.custom(
         padding: EdgeInsets.only(
           top: 16,
@@ -144,6 +146,7 @@ class ChatEventList extends StatelessWidget {
               controller: controller.scrollController,
               child: Message(
                 event,
+                controller: controller,
                 animateIn: animateIn,
                 resetAnimateIn: () {
                   controller.animateInEventIndex = null;
