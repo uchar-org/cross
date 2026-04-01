@@ -5,7 +5,8 @@ import 'package:matrix/matrix.dart';
 
 class StartPollBottomSheet extends StatefulWidget {
   final Room room;
-  const StartPollBottomSheet({required this.room, super.key});
+  final Event? inReplyTo;
+  const StartPollBottomSheet({required this.room, this.inReplyTo, super.key});
 
   @override
   State<StartPollBottomSheet> createState() => _StartPollBottomSheetState();
@@ -30,19 +31,36 @@ class _StartPollBottomSheetState extends State<StartPollBottomSheet> {
     try {
       var id = 0;
       _txid ??= widget.room.client.generateUniqueTransactionId();
-      await widget.room.startPoll(
-        question: _bodyController.text.trim(),
-        answers: _answers
-            .map(
-              (answerController) => PollAnswer(
-                id: (++id).toString(),
-                mText: answerController.text.trim(),
-              ),
-            )
-            .toList(),
-        kind: _pollKind,
-        maxSelections: _allowMultipleAnswers ? _answers.length : 1,
+      final question = _bodyController.text.trim();
+      final answers = _answers
+          .map(
+            (answerController) => PollAnswer(
+              id: (++id).toString(),
+              mText: answerController.text.trim(),
+            ),
+          )
+          .toList();
+
+      var body = question;
+      for (var i = 0; i < answers.length; i++) {
+        body = '$body\n$i. ${answers[i].mText}';
+      }
+
+      final newPollEvent = PollEventContent(
+        mText: body,
+        pollStartContent: PollStartContent(
+          kind: _pollKind,
+          maxSelections: _allowMultipleAnswers ? _answers.length : 1,
+          question: PollQuestion(mText: question),
+          answers: answers,
+        ),
+      );
+
+      await widget.room.sendEvent(
+        newPollEvent.toJson(),
+        type: PollEventContent.startType,
         txid: _txid,
+        inReplyTo: widget.inReplyTo,
       );
       if (!mounted) return;
       Navigator.of(context).pop();

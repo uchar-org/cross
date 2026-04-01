@@ -721,6 +721,7 @@ class ChatController extends State<ChatPageWithRoom>
   }
 
   Future<void> sendFileAction({FileType type = FileType.any}) async {
+    final reply = replyEvent;
     final files = await selectFiles(context, allowMultiple: true, type: type);
     if (files.isEmpty) return;
     if (!mounted) return;
@@ -730,24 +731,33 @@ class ChatController extends State<ChatPageWithRoom>
         files: files,
         room: room,
         outerContext: context,
+        inReplyTo: reply,
         threadRootEventId: activeThreadId,
         threadLastEventId: threadLastEventId,
       ),
     );
+    if (reply != null) {
+      setState(() => replyEvent = null);
+    }
   }
 
   Future<void> sendImageFromClipBoard(Uint8List? image) async {
     if (image == null) return;
+    final reply = replyEvent;
     await showAdaptiveDialog(
       context: context,
       builder: (c) => SendFileDialog(
         files: [XFile.fromData(image)],
         room: room,
         outerContext: context,
+        inReplyTo: reply,
         threadRootEventId: activeThreadId,
         threadLastEventId: threadLastEventId,
       ),
     );
+    if (reply != null) {
+      setState(() => replyEvent = null);
+    }
   }
 
   Future<void> openCameraAction() async {
@@ -757,16 +767,21 @@ class ChatController extends State<ChatPageWithRoom>
     if (file == null) return;
     if (!mounted) return;
 
+    final reply = replyEvent;
     await showAdaptiveDialog(
       context: context,
       builder: (c) => SendFileDialog(
         files: [file],
         room: room,
         outerContext: context,
+        inReplyTo: reply,
         threadRootEventId: activeThreadId,
         threadLastEventId: threadLastEventId,
       ),
     );
+    if (reply != null) {
+      setState(() => replyEvent = null);
+    }
   }
 
   Future<void> openVideoCameraAction() async {
@@ -779,16 +794,21 @@ class ChatController extends State<ChatPageWithRoom>
     if (file == null) return;
     if (!mounted) return;
 
+    final reply = replyEvent;
     await showAdaptiveDialog(
       context: context,
       builder: (c) => SendFileDialog(
         files: [file],
         room: room,
         outerContext: context,
+        inReplyTo: reply,
         threadRootEventId: activeThreadId,
         threadLastEventId: threadLastEventId,
       ),
     );
+    if (reply != null) {
+      setState(() => replyEvent = null);
+    }
   }
 
   Future<void> onVoiceMessageSend(
@@ -1337,7 +1357,7 @@ class ChatController extends State<ChatPageWithRoom>
     FocusScope.of(context).requestFocus(inputFocus);
   }
 
-  void onAddPopupMenuButtonSelected(AddPopupMenuActions choice) {
+  Future<void> onAddPopupMenuButtonSelected(AddPopupMenuActions choice) async {
     room.client.getConfig();
 
     switch (choice) {
@@ -1351,10 +1371,17 @@ class ChatController extends State<ChatPageWithRoom>
         sendFileAction();
         return;
       case AddPopupMenuActions.poll:
-        showAdaptiveBottomSheet(
+        final reply = replyEvent;
+        await showAdaptiveBottomSheet(
           context: context,
-          builder: (context) => StartPollBottomSheet(room: room),
+          builder: (context) => StartPollBottomSheet(
+            room: room,
+            inReplyTo: reply,
+          ),
         );
+        if (reply != null) {
+          setState(() => replyEvent = null);
+        }
         return;
       case AddPopupMenuActions.photoCamera:
         openCameraAction();

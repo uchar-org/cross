@@ -24,6 +24,7 @@ class SendFileDialog extends StatefulWidget {
   final List<XFile> files;
   final BuildContext outerContext;
   final String? threadLastEventId, threadRootEventId;
+  final Event? inReplyTo;
 
   const SendFileDialog({
     required this.room,
@@ -31,6 +32,7 @@ class SendFileDialog extends StatefulWidget {
     required this.outerContext,
     required this.threadLastEventId,
     required this.threadRootEventId,
+    this.inReplyTo,
     super.key,
   });
 
@@ -108,13 +110,25 @@ class SendFileDialogState extends State<SendFileDialog> {
         }
 
         final label = _labelTextController.text.trim();
+        final replyTo = widget.inReplyTo;
+
+        final extraContent = <String, dynamic>{
+          if (label.isNotEmpty) 'body': label,
+          if (replyTo != null)
+            'm.relates_to': {
+              'm.in_reply_to': {
+                'event_id': replyTo.eventId,
+              },
+            },
+        };
 
         try {
           await widget.room.sendFileEvent(
             file,
             thumbnail: thumbnail,
             shrinkImageMaxDimension: compress ? 1600 : null,
-            extraContent: label.isEmpty ? null : {'body': label},
+            extraContent: extraContent.isEmpty ? null : extraContent,
+            inReplyTo: replyTo,
             threadRootEventId: widget.threadRootEventId,
             threadLastEventId: widget.threadLastEventId,
           );
@@ -142,7 +156,8 @@ class SendFileDialogState extends State<SendFileDialog> {
             file,
             thumbnail: thumbnail,
             shrinkImageMaxDimension: compress ? 1600 : null,
-            extraContent: label.isEmpty ? null : {'body': label},
+            extraContent: extraContent.isEmpty ? null : extraContent,
+            inReplyTo: replyTo,
           );
         }
       }
