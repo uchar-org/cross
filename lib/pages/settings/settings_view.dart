@@ -1,3 +1,4 @@
+import 'package:fluffychat/config/locale_provide.dart';
 import 'package:fluffychat/config/setting_keys.dart';
 import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/utils/fluffy_share.dart';
@@ -6,7 +7,9 @@ import 'package:fluffychat/widgets/avatar.dart';
 import 'package:fluffychat/widgets/matrix.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:language_picker/languages.dart';
 import 'package:matrix/matrix.dart';
+import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
@@ -23,7 +26,6 @@ class SettingsView extends StatelessWidget {
     final localeProvider = context.read<LocaleProvider>();
 
     final theme = Theme.of(context);
-    final showChatBackupBanner = controller.showChatBackupBanner;
     final activeRoute = GoRouter.of(
       context,
     ).routeInformationProvider.value.uri.path;
@@ -210,7 +212,7 @@ class SettingsView extends StatelessWidget {
                         (language) => DropdownMenuItem<Language>(
                       value: language,
                       child: Text(
-                        "${language.name} (${language.isoCode})",
+                        '${language.name} (${language.isoCode})',
                         style: TextStyle(fontWeight: FontWeight.w400),
                       ),
                     ),

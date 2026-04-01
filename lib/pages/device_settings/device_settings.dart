@@ -1,9 +1,5 @@
 import 'package:async/async.dart' show Result;
 import 'package:collection/collection.dart' show IterableExtension;
-import 'package:matrix/encryption/utils/key_verification.dart';
-import 'package:matrix/matrix.dart';
-import 'package:url_launcher/url_launcher_string.dart';
-
 import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/pages/device_settings/device_settings_view.dart';
 import 'package:fluffychat/pages/key_verification/key_verification_dialog.dart';

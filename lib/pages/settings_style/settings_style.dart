@@ -1,7 +1,4 @@
-import 'package:flutter/material.dart';
-
 import 'package:file_picker/file_picker.dart';
-
 import 'package:fluffychat/config/setting_keys.dart';
 import 'package:fluffychat/utils/account_config.dart';
 import 'package:fluffychat/utils/file_selector.dart';

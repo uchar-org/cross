@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:collection/collection.dart';
 import 'package:cross_file/cross_file.dart';
@@ -19,6 +20,7 @@ import 'package:fluffychat/widgets/future_loading_dialog.dart';
 import 'package:fluffychat/widgets/share_scaffold_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
 import 'package:flutter_shortcuts_new/flutter_shortcuts_new.dart';
 import 'package:go_router/go_router.dart';
 import 'package:matrix/matrix.dart' as sdk;
@@ -367,11 +369,6 @@ class ChatListController extends State<ChatList>
       _processIncomingSharedMedia,
     );
 
-    // For receiving shared Uris
-    _intentUriStreamSubscription = AppLinks().uriLinkStream.listen(
-      _processIncomingUris,
-    );
-
     if (PlatformInfos.isAndroid) {
       final shortcuts = FlutterShortcuts();
       shortcuts.initialize().then(
@@ -396,7 +393,7 @@ class ChatListController extends State<ChatList>
     scrollController.addListener(_onScroll);
     _waitForFirstSync();
     _hackyWebRTCFixForWeb();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (mounted) {
         _showLastSeenSupportBanner();
         searchServer = Matrix.of(
@@ -408,20 +405,24 @@ class ChatListController extends State<ChatList>
         if (Platform.isAndroid) {
           await FlutterCallkitIncoming.requestNotificationPermission(
             {
-              "title": "Notification permission",
-              "rationaleMessagePermission":
-                  "Notification permission is required, to show notification.",
-              "postNotificationMessageRequired":
-                  "Notification permission is required, Please allow notification permission from setting.",
+              'title': 'Notification permission',
+              'rationaleMessagePermission':
+                  'Notification permission is required, to show notification.',
+              'postNotificationMessageRequired':
+                  'Notification permission is required, Please allow notification permission from setting.',
             },
           );
         }
       }
 
-      // Workaround for system UI overlay style not applied on app start
-      SystemChrome.setSystemUIOverlayStyle(
-        Theme.of(context).appBarTheme.systemOverlayStyle!,
-      );
+      if (context.mounted) {
+        // Workaround for system UI overlay style not applied on app start
+        SystemChrome.setSystemUIOverlayStyle(
+          Theme.of(context).appBarTheme.systemOverlayStyle!,
+        ); 
+      } else {
+        Logs().v('appBar does not change because context unmounted');
+      }
     });
 
     super.initState();
@@ -1030,5 +1031,5 @@ enum ChatContextAction {
   mute,
   leave,
   addToSpace,
-  block,
+  block, lowPriority,
 }

@@ -1,12 +1,7 @@
-import 'package:async/async.dart' show Result;
 import 'dart:typed_data';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 
+import 'package:async/async.dart' as Result;
 import 'package:cross_file/cross_file.dart';
-import 'package:matrix/matrix.dart';
-import 'package:mime/mime.dart';
-
 import 'package:fluffychat/config/app_config.dart';
 import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/utils/localized_exception_extension.dart';
@@ -19,6 +14,7 @@ import 'package:fluffychat/widgets/adaptive_dialogs/dialog_text_field.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart' hide Result;
+import 'package:matrix/matrix.dart';
 import 'package:mime/mime.dart';
 
 import '../../utils/resize_video.dart';
@@ -60,7 +56,7 @@ class SendFileDialogState extends State<SendFileDialog> {
       }
       scaffoldMessenger.showLoadingSnackBar(l10n.prepareSendingAttachment);
       Navigator.of(context, rootNavigator: false).pop();
-      final clientConfig = await Result.capture(widget.room.client.getConfig());
+      final clientConfig = await Result.Result.capture(widget.room.client.getConfig());
       final maxUploadSize =
           clientConfig.asValue?.value.mUploadSize ?? 100 * 1000 * 1000;
 

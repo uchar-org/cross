@@ -81,9 +81,7 @@ class SettingsStyleView extends StatelessWidget {
                     Theme.of(context).brightness == Brightness.light
                     ? light?.primary
                     : dark?.primary;
-                final colors = List<Color?>.from(
-                  SettingsStyleController.customColors,
-                );
+                final colors = [null, AppConfig.chatColor, ...Colors.primaries];
                 if (systemColor == null) {
                   colors.remove(null);
                 }

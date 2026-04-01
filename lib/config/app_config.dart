@@ -17,7 +17,8 @@ abstract class AppConfig {
   static const String schemePrefix = 'matrix:';
   static const String pushNotificationsChannelId = 'fluffychat_push';
   static const String pushNotificationsAppId = 'uz.uzinfocom.uchar';
-  static const double borderRadius = 18.0;
+  static const double borderRadius = 16.0;
+  static const double spaceBorderRadius = 11.0;
   static const double columnWidth = 360.0;
   static const double imageMessagePadding = 2.5;
   static const double innerWidgetRadius = borderRadius - imageMessagePadding;

@@ -1,14 +1,9 @@
 import 'dart:async';
 
-import 'package:fluffychat/pages/call/call_screen.dart';
-import 'package:flutter/material.dart';
-
-import 'package:go_router/go_router.dart';
-import 'package:matrix/matrix.dart';
-
 import 'package:fluffychat/config/themes.dart';
 import 'package:fluffychat/pages/archive/archive.dart';
 import 'package:fluffychat/pages/bootstrap/bootstrap_dialog.dart';
+import 'package:fluffychat/pages/call/call_screen.dart';
 import 'package:fluffychat/pages/chat/chat.dart';
 import 'package:fluffychat/pages/chat_access_settings/chat_access_settings_controller.dart';
 import 'package:fluffychat/pages/chat_details/chat_details.dart';
@@ -18,7 +13,7 @@ import 'package:fluffychat/pages/chat_members/chat_members.dart';
 import 'package:fluffychat/pages/chat_permissions_settings/chat_permissions_settings.dart';
 import 'package:fluffychat/pages/chat_search/chat_search_page.dart';
 import 'package:fluffychat/pages/device_settings/device_settings.dart';
-import 'package:fluffychat/pages/intro/intro_page.dart';
+import 'package:fluffychat/pages/intro/intro_page_presenter.dart';
 import 'package:fluffychat/pages/invitation_selection/invitation_selection.dart';
 import 'package:fluffychat/pages/login/login.dart';
 import 'package:fluffychat/pages/new_group/new_group.dart';
@@ -80,7 +75,7 @@ abstract class AppRoutes {
           pageBuilder: (context, state) =>
               defaultPageBuilder(context, state, SignInPage(signUp: false)),
           redirect: ( BuildContext context, GoRouterState state,) {
-            Logs().i("call sign in redirect");
+            Logs().i('call sign in redirect');
             return loggedInRedirect(context, state);
           },
         ),
@@ -98,7 +93,7 @@ abstract class AppRoutes {
             Login(client: state.extra as Client),
           ),
           redirect: ( BuildContext context, GoRouterState state,) {
-            Logs().i("call login redirect");
+            Logs().i('call login redirect');
             return loggedInRedirect(context, state);
           },
         ),

@@ -1,32 +1,26 @@
 import 'dart:io';
 import 'dart:ui' as ui;
 
-import 'package:fluffychat/utils/native_mac/mac_haptic.dart';
-import 'package:fluffychat/widgets/my_swipe_to.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
-import 'package:matrix/matrix.dart';
-
 import 'package:fluffychat/config/setting_keys.dart';
 import 'package:fluffychat/config/themes.dart';
 import 'package:fluffychat/l10n/l10n.dart';
+import 'package:fluffychat/pages/chat/chat.dart';
 import 'package:fluffychat/utils/adaptive_bottom_sheet.dart';
 import 'package:fluffychat/utils/date_time_extension.dart';
 import 'package:fluffychat/utils/file_description.dart';
 import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_locals.dart';
+import 'package:fluffychat/utils/native_mac/mac_haptic.dart';
 import 'package:fluffychat/utils/room_status_extension.dart';
 import 'package:fluffychat/utils/string_color.dart';
 import 'package:fluffychat/widgets/avatar.dart';
 import 'package:fluffychat/widgets/matrix.dart';
 import 'package:fluffychat/widgets/member_actions_popup_menu_button.dart';
+import 'package:fluffychat/widgets/my_swipe_to.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:matrix/matrix.dart';
-import 'package:swipe_to_action/swipe_to_action.dart';
 
-import 'package:fluffychat/pages/chat/chat.dart';
 import '../../../config/app_config.dart';
 import 'message_content.dart';
 import 'message_context_menu.dart';
@@ -551,7 +545,8 @@ class Message extends StatelessWidget {
                                                               messageStatus: myMessageStatus,
                                                               isReplied:
                                                                   event.inReplyToEventId(includingFallback: false) !=
-                                                                  null,
+                                                                  null, 
+                                                              bigEmojis: bigEmojis,
                                                             );
                                                           },
                                                         ),

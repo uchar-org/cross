@@ -1,23 +1,22 @@
 import 'dart:io';
 
+import 'package:fluffychat/config/app_config.dart';
+import 'package:fluffychat/config/locale_provide.dart';
+import 'package:fluffychat/config/routes.dart';
+import 'package:fluffychat/config/setting_keys.dart';
+import 'package:fluffychat/config/themes.dart';
+import 'package:fluffychat/l10n/l10n.dart';
+import 'package:fluffychat/widgets/app_lock.dart';
+import 'package:fluffychat/widgets/theme_builder.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
 import 'package:go_router/go_router.dart';
 import 'package:jailbreak_root_detection/jailbreak_root_detection.dart';
 import 'package:matrix/matrix.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:fluffychat/config/app_config.dart';
-import 'package:fluffychat/config/routes.dart';
-import 'package:fluffychat/config/setting_keys.dart';
-import 'package:fluffychat/config/themes.dart';
-import 'package:fluffychat/l10n/l10n.dart';
-import 'package:fluffychat/config/locale_provider.dart';
-import 'package:fluffychat/widgets/app_lock.dart';
-import 'package:fluffychat/widgets/theme_builder.dart';
 import '../utils/custom_scroll_behaviour.dart';
 import 'check_root.dart';
 import 'matrix.dart';
