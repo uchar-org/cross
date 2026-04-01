@@ -1,15 +1,14 @@
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
-import 'package:matrix/matrix.dart';
-import 'package:slugify/slugify.dart';
-
 import 'package:fluffychat/config/app_config.dart';
 import 'package:fluffychat/config/setting_keys.dart';
 import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/utils/markdown_context_builder.dart';
 import 'package:fluffychat/widgets/mxc_image.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:matrix/matrix.dart';
+import 'package:slugify/slugify.dart';
+
 import '../../widgets/avatar.dart';
 import '../../widgets/matrix.dart';
 import 'command_hints.dart';
@@ -377,6 +376,7 @@ class _InputBarState extends State<InputBar> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Autocomplete<Map<String, String?>>(
+      key: Key('chat_input_field'),
       focusNode: widget.focusNode,
       textEditingController: widget.controller,
       optionsBuilder: getSuggestions,
@@ -386,7 +386,11 @@ class _InputBarState extends State<InputBar> {
           controller: controller,
           focusNode: focusNode,
           readOnly: widget.readOnly,
-          contextMenuBuilder: (c, e) => markdownContextBuilder(c, e, controller),
+          onEditingComplete: () {
+          // To not lose focus on iOS:
+          // https://github.com/krille-chan/fluffychat/issues/2784
+        },
+        contextMenuBuilder: (c, e) => markdownContextBuilder(c, e, controller),
           contentInsertionConfiguration: ContentInsertionConfiguration(
             onContentInserted: (KeyboardInsertedContent content) {
               final data = content.data;

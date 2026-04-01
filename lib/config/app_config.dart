@@ -37,6 +37,7 @@ abstract class AppConfig {
       'https://uchar.uz';
   static const String appId = 'uz.uzinfocom.uchar';
   static const String appOpenUrlScheme = 'uz.uzinfocom.uchar';
+  static const String appSsoUrlScheme = 'im.fluffychat.auth';
 
   static const String sourceCodeUrl = 'https://github.com/efael/fluffy';
   static const String supportUrl = 'https://github.com/efael/fluffy/issues';

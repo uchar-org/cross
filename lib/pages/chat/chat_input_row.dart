@@ -14,6 +14,9 @@ import 'package:fluffychat/utils/other_party_can_receive.dart';
 import 'package:fluffychat/utils/platform_infos.dart';
 import 'package:fluffychat/widgets/avatar.dart';
 import 'package:fluffychat/widgets/matrix.dart';
+import 'package:flutter/material.dart';
+import 'package:matrix/matrix.dart';
+
 import '../../config/themes.dart';
 import 'chat.dart';
 import 'input_bar.dart';
@@ -130,7 +133,7 @@ class ChatInputRow extends StatelessWidget {
                       : const SizedBox.shrink(),
                 ]
               : <Widget>[
-                  const SizedBox(width: 4),
+                  const SizedBox(width: 8),
                   AnimatedContainer(
                     duration: FluffyThemes.animationDuration,
                     curve: FluffyThemes.animationCurve,
@@ -410,6 +413,7 @@ class ChatInputRow extends StatelessWidget {
                             ),
                           )
                         : IconButton(
+                            key: Key('send_button'),
                             tooltip: L10n.of(context).send,
                             onPressed: controller.send,
                             style: IconButton.styleFrom(

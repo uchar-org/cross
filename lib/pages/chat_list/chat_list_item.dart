@@ -1,7 +1,3 @@
-import 'package:flutter/material.dart';
-
-import 'package:matrix/matrix.dart';
-
 import 'package:fluffychat/config/app_config.dart';
 import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/pages/chat_list/unread_bubble.dart';
@@ -10,6 +6,9 @@ import 'package:fluffychat/utils/room_status_extension.dart';
 import 'package:fluffychat/widgets/adaptive_dialogs/show_ok_cancel_alert_dialog.dart';
 import 'package:fluffychat/widgets/future_loading_dialog.dart';
 import 'package:fluffychat/widgets/hover_builder.dart';
+import 'package:flutter/material.dart';
+import 'package:matrix/matrix.dart';
+
 import '../../config/themes.dart';
 import '../../utils/date_time_extension.dart';
 import '../../widgets/avatar.dart';
@@ -59,9 +58,9 @@ class ChatListItem extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
-    final needLastEventSender = lastEvent == null
-        ? false
-        : room.getState(EventTypes.RoomMember, lastEvent.senderId) == null;
+    final needLastEventSender =
+        lastEvent != null &&
+        room.getState(EventTypes.RoomMember, lastEvent.senderId) == null;
     final space = this.space;
 
     return Padding(
@@ -92,14 +91,19 @@ class ChatListItem extends StatelessWidget {
                             top: 0,
                             left: 0,
                             child: Avatar(
-                              border: BorderSide(
-                                width: 2,
-                                color:
-                                    backgroundColor ??
-                                    theme.colorScheme.surface,
+                              shapeBorder: RoundedSuperellipseBorder(
+                                side: BorderSide(
+                                  width: 2,
+                                  color:
+                                      backgroundColor ??
+                                      theme.colorScheme.surface,
+                                ),
+                                borderRadius: BorderRadius.circular(
+                                  AppConfig.spaceBorderRadius * 0.75,
+                                ),
                               ),
                               borderRadius: BorderRadius.circular(
-                                AppConfig.borderRadius / 4,
+                                AppConfig.spaceBorderRadius * 0.75,
                               ),
                               mxContent: space.avatar,
                               size: Avatar.defaultSize * 0.75,
@@ -111,22 +115,32 @@ class ChatListItem extends StatelessWidget {
                           bottom: 0,
                           right: 0,
                           child: Avatar(
-                            border: space == null
+                            shapeBorder: space == null
                                 ? room.isSpace
-                                      ? BorderSide(
-                                          width: 1,
-                                          color: theme.dividerColor,
+                                      ? RoundedSuperellipseBorder(
+                                          side: BorderSide(
+                                            width: 1,
+                                            color: theme.dividerColor,
+                                          ),
+                                          borderRadius: BorderRadius.circular(
+                                            AppConfig.spaceBorderRadius,
+                                          ),
                                         )
                                       : null
-                                : BorderSide(
-                                    width: 2,
-                                    color:
-                                        backgroundColor ??
-                                        theme.colorScheme.surface,
+                                : RoundedRectangleBorder(
+                                    side: BorderSide(
+                                      width: 2,
+                                      color:
+                                          backgroundColor ??
+                                          theme.colorScheme.surface,
+                                    ),
+                                    borderRadius: BorderRadius.circular(
+                                      Avatar.defaultSize,
+                                    ),
                                   ),
                             borderRadius: room.isSpace
                                 ? BorderRadius.circular(
-                                    AppConfig.borderRadius / 4,
+                                    AppConfig.spaceBorderRadius,
                                   )
                                 : null,
                             mxContent: room.avatar,
@@ -184,6 +198,17 @@ class ChatListItem extends StatelessWidget {
                       padding: EdgeInsets.only(left: 4.0),
                       child: Icon(Icons.notifications_off_outlined, size: 16),
                     ),
+                  if (room.isLowPriority)
+                    Padding(
+                      padding: EdgeInsets.only(
+                        right: hasNotifications ? 4.0 : 0.0,
+                      ),
+                      child: Icon(
+                        Icons.low_priority,
+                        size: 16,
+                        color: theme.colorScheme.primary,
+                      ),
+                    ),
                   if (room.isFavourite)
                     Padding(
                       padding: EdgeInsets.only(
@@ -203,8 +228,13 @@ class ChatListItem extends StatelessWidget {
                           context,
                         ),
                         style: TextStyle(
-                          fontSize: 12,
-                          color: theme.colorScheme.outline,
+                          fontSize: 11,
+                          fontWeight: room.hasNewMessages
+                              ? FontWeight.bold
+                              : null,
+                          color: hasNotifications
+                              ? theme.colorScheme.primary
+                              : null,
                         ),
                       ),
                     ),

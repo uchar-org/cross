@@ -40,6 +40,9 @@ import 'package:fluffychat/widgets/layouts/two_column_layout.dart';
 import 'package:fluffychat/widgets/log_view.dart';
 import 'package:fluffychat/widgets/matrix.dart';
 import 'package:fluffychat/widgets/share_scaffold_dialog.dart';
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:matrix/matrix.dart';
 
 abstract class AppRoutes {
   static FutureOr<String?> loggedInRedirect(
@@ -69,7 +72,7 @@ abstract class AppRoutes {
     GoRoute(
       path: '/home',
       pageBuilder: (context, state) =>
-          defaultPageBuilder(context, state, const IntroPage()),
+          defaultPageBuilder(context, state, const IntroPagePresenter()),
       redirect: loggedInRedirect,
       routes: [
         GoRoute(
@@ -177,14 +180,23 @@ abstract class AppRoutes {
             ),
             GoRoute(
               path: 'newprivatechat',
-              pageBuilder: (context, state) =>
-                  defaultPageBuilder(context, state, const NewPrivateChat()),
+              pageBuilder: (context, state) => defaultPageBuilder(
+                context,
+                state,
+                NewPrivateChat(
+                  key: ValueKey('new_chat_${state.uri.fragment}'),
+                  deeplink: state.uri.fragment,
+                ),
+              ),
               redirect: loggedOutRedirect,
             ),
             GoRoute(
               path: 'newgroup',
-              pageBuilder: (context, state) =>
-                  defaultPageBuilder(context, state, const NewGroup()),
+              pageBuilder: (context, state) => defaultPageBuilder(
+                context,
+                state,
+                NewGroup(spaceId: state.uri.queryParameters['space_id']),
+              ),
               redirect: loggedOutRedirect,
             ),
             GoRoute(
@@ -192,7 +204,10 @@ abstract class AppRoutes {
               pageBuilder: (context, state) => defaultPageBuilder(
                 context,
                 state,
-                const NewGroup(createGroupType: CreateGroupType.space),
+                NewGroup(
+                  createGroupType: CreateGroupType.space,
+                  spaceId: state.uri.queryParameters['space_id'],
+                ),
               ),
               redirect: loggedOutRedirect,
             ),
@@ -270,8 +285,11 @@ abstract class AppRoutes {
                     GoRoute(
                       path: 'addaccount',
                       redirect: loggedOutRedirect,
-                      pageBuilder: (context, state) =>
-                          defaultPageBuilder(context, state, const IntroPage()),
+                      pageBuilder: (context, state) => defaultPageBuilder(
+                        context,
+                        state,
+                        const IntroPagePresenter(),
+                      ),
                       routes: [
                         GoRoute(
                           path: 'sign_in',

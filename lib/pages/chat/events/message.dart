@@ -21,6 +21,11 @@ import 'package:fluffychat/utils/string_color.dart';
 import 'package:fluffychat/widgets/avatar.dart';
 import 'package:fluffychat/widgets/matrix.dart';
 import 'package:fluffychat/widgets/member_actions_popup_menu_button.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:matrix/matrix.dart';
+import 'package:swipe_to_action/swipe_to_action.dart';
+
 import 'package:fluffychat/pages/chat/chat.dart';
 import '../../../config/app_config.dart';
 import 'message_content.dart';
@@ -55,6 +60,7 @@ class Message extends StatelessWidget {
   final List<Color> colors;
   final void Function()? onExpand;
   final bool isCollapsed;
+  final Set<String> bigEmojis;
   final ChatController controller;
 
   const Message(
@@ -63,6 +69,7 @@ class Message extends StatelessWidget {
     this.previousEvent,
     this.displayReadMarker = false,
     this.longPressSelect = false,
+    required this.bigEmojis,
     required this.onSelect,
     required this.onInfoTab,
     required this.scrollToEventId,
@@ -104,7 +111,8 @@ class Message extends StatelessWidget {
       return StateMessage(event, onExpand: onExpand, isCollapsed: isCollapsed);
     }
 
-    if (event.type == EventTypes.Message && event.messageType == EventTypes.KeyVerificationRequest) {
+    if (event.type == EventTypes.Message &&
+        event.messageType == EventTypes.KeyVerificationRequest) {
       return StateMessage(event);
     }
 
@@ -119,17 +127,27 @@ class Message extends StatelessWidget {
         !event.originServerTs.sameEnvironment(nextEvent!.originServerTs);
     final nextEventSameSender =
         nextEvent != null &&
-        {EventTypes.Message, EventTypes.Sticker, EventTypes.Encrypted}.contains(nextEvent!.type) &&
+        {
+          EventTypes.Message,
+          EventTypes.Sticker,
+          EventTypes.Encrypted,
+        }.contains(nextEvent!.type) &&
         nextEvent!.senderId == event.senderId &&
         !displayTime;
 
     final previousEventSameSender =
         previousEvent != null &&
-        {EventTypes.Message, EventTypes.Sticker, EventTypes.Encrypted}.contains(previousEvent!.type) &&
+        {
+          EventTypes.Message,
+          EventTypes.Sticker,
+          EventTypes.Encrypted,
+        }.contains(previousEvent!.type) &&
         previousEvent!.senderId == event.senderId &&
         previousEvent!.originServerTs.sameEnvironment(event.originServerTs);
 
-    final textColor = ownMessage ? theme.onBubbleColor : theme.colorScheme.onSurface;
+    final textColor = ownMessage
+        ? theme.onBubbleColor
+        : theme.colorScheme.onSurface;
 
     final linkColor = ownMessage
         ? theme.brightness == Brightness.light
@@ -137,7 +155,9 @@ class Message extends StatelessWidget {
               : theme.colorScheme.onTertiaryContainer
         : theme.colorScheme.primary;
 
-    final rowMainAxisAlignment = ownMessage ? MainAxisAlignment.end : MainAxisAlignment.start;
+    final rowMainAxisAlignment = ownMessage
+        ? MainAxisAlignment.end
+        : MainAxisAlignment.start;
 
     final displayEvent = event.getDisplayEvent(timeline);
     const hardCorner = Radius.circular(4);
@@ -145,8 +165,12 @@ class Message extends StatelessWidget {
     final borderRadius = BorderRadius.only(
       topLeft: !ownMessage && nextEventSameSender ? hardCorner : roundedCorner,
       topRight: ownMessage && nextEventSameSender ? hardCorner : roundedCorner,
-      bottomLeft: !ownMessage && previousEventSameSender ? hardCorner : roundedCorner,
-      bottomRight: ownMessage && previousEventSameSender ? hardCorner : roundedCorner,
+      bottomLeft: !ownMessage && previousEventSameSender
+          ? hardCorner
+          : roundedCorner,
+      bottomRight: ownMessage && previousEventSameSender
+          ? hardCorner
+          : roundedCorner,
     );
 
     final innerRoundedCorner = Radius.circular(AppConfig.innerWidgetRadius);
@@ -186,13 +210,21 @@ class Message extends StatelessWidget {
       );
     }
 
-    final hasReactions = event.hasAggregatedEvents(timeline, RelationshipTypes.reaction);
+    final hasReactions = event.hasAggregatedEvents(
+      timeline,
+      RelationshipTypes.reaction,
+    );
 
-    final threadChildren = event.aggregatedEvents(timeline, RelationshipTypes.thread);
+    final threadChildren = event.aggregatedEvents(
+      timeline,
+      RelationshipTypes.thread,
+    );
 
-    final showReactionPicker = singleSelected && event.room.canSendDefaultMessages;
+    final showReactionPicker =
+        singleSelected && event.room.canSendDefaultMessages;
 
     final enterThread = this.enterThread;
+    final sender = event.senderFromMemoryOrFallback;
 
     return Center(
       child: MySwipeable(
@@ -769,14 +801,22 @@ class BubbleBackground extends StatelessWidget {
   Widget build(BuildContext context) {
     if (ignore) return child;
     return CustomPaint(
-      painter: BubblePainter(repaint: scrollController, colors: colors, context: context),
+      painter: BubblePainter(
+        repaint: scrollController,
+        colors: colors,
+        context: context,
+      ),
       child: child,
     );
   }
 }
 
 class BubblePainter extends CustomPainter {
-  BubblePainter({required this.context, required this.colors, required super.repaint});
+  BubblePainter({
+    required this.context,
+    required this.colors,
+    required super.repaint,
+  });
 
   final BuildContext context;
   final List<Color> colors;
@@ -789,7 +829,10 @@ class BubblePainter extends CustomPainter {
     final scrollableRect = Offset.zero & scrollableBox.size;
     final bubbleBox = context.findRenderObject() as RenderBox;
 
-    final origin = bubbleBox.localToGlobal(Offset.zero, ancestor: scrollableBox);
+    final origin = bubbleBox.localToGlobal(
+      Offset.zero,
+      ancestor: scrollableBox,
+    );
     final paint = Paint()
       ..shader = ui.Gradient.linear(
         scrollableRect.topCenter,
@@ -808,5 +851,39 @@ class BubblePainter extends CustomPainter {
     final oldScrollable = _scrollable;
     _scrollable = scrollable;
     return scrollable.position != oldScrollable?.position;
+  }
+}
+
+class _AnimateIn extends StatefulWidget {
+  final bool animateIn;
+  final Widget child;
+  const _AnimateIn({required this.animateIn, required this.child});
+
+  @override
+  State<_AnimateIn> createState() => __AnimateInState();
+}
+
+class __AnimateInState extends State<_AnimateIn> {
+  bool _animationFinished = false;
+  @override
+  Widget build(BuildContext context) {
+    if (!widget.animateIn) return widget.child;
+    if (!_animationFinished) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        setState(() {
+          _animationFinished = true;
+        });
+      });
+    }
+    return AnimatedOpacity(
+      duration: FluffyThemes.animationDuration,
+      curve: FluffyThemes.animationCurve,
+      opacity: _animationFinished ? 1 : 0,
+      child: AnimatedSize(
+        duration: FluffyThemes.animationDuration,
+        curve: FluffyThemes.animationCurve,
+        child: _animationFinished ? widget.child : const SizedBox.shrink(),
+      ),
+    );
   }
 }

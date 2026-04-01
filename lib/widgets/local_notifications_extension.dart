@@ -22,7 +22,8 @@ extension LocalNotificationsExtension on MatrixState {
     ..src = 'assets/assets/sounds/notification.ogg'
     ..load();
 
-  void showLocalNotification(Event event) async {
+  Future<void> showLocalNotification(Event event) async {
+    final l10n = L10n.of(context);
     final roomId = event.room.id;
     if (activeRoomId == roomId) {
       if (WidgetsBinding.instance.lifecycleState == AppLifecycleState.resumed) {
@@ -73,8 +74,7 @@ extension LocalNotificationsExtension on MatrixState {
               method: thumbnailMethod,
             );
       }
-
-      _audioPlayer.play();
+      if (AppSettings.webNotificationSound.value) _audioPlayer.play();
 
       html.Notification(
         title,
@@ -122,11 +122,11 @@ extension LocalNotificationsExtension on MatrixState {
         actions: [
           NotificationAction(
             DesktopNotificationActions.openChat.name,
-            L10n.of(context).openChat,
+            l10n.openChat,
           ),
           NotificationAction(
             DesktopNotificationActions.seen.name,
-            L10n.of(context).markAsRead,
+            l10n.markAsRead,
           ),
         ],
         hints: hints,
@@ -135,7 +135,7 @@ extension LocalNotificationsExtension on MatrixState {
         var action = DesktopNotificationActions.values.singleWhereOrNull(
           (a) => a.name == actionStr,
         );
-        if (action == null && actionStr == "default") {
+        if (action == null && actionStr == 'default') {
           action = DesktopNotificationActions.openChat;
         }
         switch (action!) {

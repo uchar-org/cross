@@ -1,15 +1,11 @@
-import 'dart:developer';
-
-import 'package:flutter/material.dart';
-
-import 'package:go_router/go_router.dart';
-import 'package:matrix/matrix.dart';
-
 import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/pages/chat_permissions_settings/chat_permissions_settings_view.dart';
 import 'package:fluffychat/widgets/future_loading_dialog.dart';
 import 'package:fluffychat/widgets/matrix.dart';
 import 'package:fluffychat/widgets/permission_slider_dialog.dart';
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:matrix/matrix.dart';
 
 class ChatPermissionsSettings extends StatefulWidget {
   const ChatPermissionsSettings({super.key});
@@ -40,6 +36,7 @@ class ChatPermissionsSettingsController extends State<ChatPermissionsSettings> {
       currentLevel: currentLevel,
     );
     if (newLevel == null) return;
+    if (!context.mounted) return;
     final content = Map<String, dynamic>.from(
       room.getState(EventTypes.RoomPowerLevels)!.content,
     );
@@ -51,7 +48,6 @@ class ChatPermissionsSettingsController extends State<ChatPermissionsSettings> {
     } else {
       content[key] = newLevel;
     }
-    inspect(content);
     await showFutureLoadingDialog(
       context: context,
       future: () => room.client.setRoomStateWithKey(

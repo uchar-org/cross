@@ -1,3 +1,4 @@
+import 'package:async/async.dart' show Result;
 import 'dart:typed_data';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -15,6 +16,11 @@ import 'package:fluffychat/utils/platform_infos.dart';
 import 'package:fluffychat/utils/size_string.dart';
 import 'package:fluffychat/widgets/adaptive_dialogs/adaptive_dialog_action.dart';
 import 'package:fluffychat/widgets/adaptive_dialogs/dialog_text_field.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:matrix/matrix.dart' hide Result;
+import 'package:mime/mime.dart';
+
 import '../../utils/resize_video.dart';
 
 class SendFileDialog extends StatefulWidget {
@@ -39,6 +45,7 @@ class SendFileDialog extends StatefulWidget {
 class SendFileDialogState extends State<SendFileDialog> {
   bool compress = true;
 
+  /// Images smaller than 20kb don't need compression.
   static const int minSizeToCompress = 20 * 1000;
 
   final TextEditingController _labelTextController = TextEditingController();
@@ -53,8 +60,9 @@ class SendFileDialogState extends State<SendFileDialog> {
       }
       scaffoldMessenger.showLoadingSnackBar(l10n.prepareSendingAttachment);
       Navigator.of(context, rootNavigator: false).pop();
-      final clientConfig = await widget.room.client.getConfig();
-      final maxUploadSize = clientConfig.mUploadSize ?? 100 * 1000 * 1000;
+      final clientConfig = await Result.capture(widget.room.client.getConfig());
+      final maxUploadSize =
+          clientConfig.asValue?.value.mUploadSize ?? 100 * 1000 * 1000;
 
       for (final xfile in widget.files) {
         final MatrixFile file;
@@ -62,6 +70,7 @@ class SendFileDialogState extends State<SendFileDialog> {
         final length = await xfile.length();
         final mimeType = xfile.mimeType ?? lookupMimeType(xfile.path);
 
+        // Generate video thumbnail
         if (PlatformInfos.isMobile &&
             mimeType != null &&
             mimeType.startsWith('video')) {
@@ -69,6 +78,7 @@ class SendFileDialogState extends State<SendFileDialog> {
           thumbnail = await xfile.getVideoThumbnail();
         }
 
+        // If file is a video, shrink it!
         if (PlatformInfos.isMobile &&
             mimeType != null &&
             mimeType.startsWith('video')) {
@@ -80,6 +90,7 @@ class SendFileDialogState extends State<SendFileDialog> {
           if (length > maxUploadSize) {
             throw FileTooBigMatrixException(length, maxUploadSize);
           }
+          // Else we just create a MatrixFile
           file = MatrixFile(
             bytes: await xfile.readAsBytes(),
             name: xfile.name,
@@ -128,6 +139,7 @@ class SendFileDialogState extends State<SendFileDialog> {
             ),
           );
           await Future.delayed(retryAfterDuration);
+
           scaffoldMessenger.showLoadingSnackBar(l10n.sendingAttachment);
 
           await widget.room.sendFileEvent(
@@ -156,6 +168,8 @@ class SendFileDialogState extends State<SendFileDialog> {
       );
       rethrow;
     }
+
+    return;
   }
 
   Future<String> _calcCombinedFileSize() async {
@@ -333,11 +347,9 @@ class SendFileDialogState extends State<SendFileDialog> {
             width: 360,
             child: SingleChildScrollView(
               child: Column(
-                mainAxisSize: MainAxisSize.min,
+                mainAxisSize: .min,
                 children: [
-                  const SizedBox(height: 8),
-
-                  // ── RASM PREVIEW ──
+                  const SizedBox(height: 12),
                   if (uniqueFileType == 'image')
                     Padding(
                       padding: const EdgeInsets.only(bottom: 16.0),
@@ -356,18 +368,20 @@ class SendFileDialogState extends State<SendFileDialog> {
                       child: Row(
                         children: [
                           Icon(
-                            uniqueFileType == 'video'
+                            uniqueFileType == null
+                                ? Icons.description_outlined
+                                : uniqueFileType == 'video'
                                 ? Icons.video_file_outlined
                                 : uniqueFileType == 'audio'
-                                    ? Icons.audio_file_outlined
-                                    : Icons.description_outlined,
+                                ? Icons.audio_file_outlined
+                                : Icons.description_outlined,
                             size: 32,
                           ),
                           const SizedBox(width: 8),
                           Expanded(
                             child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisSize: .min,
+                              crossAxisAlignment: .start,
                               children: [
                                 Text(
                                   fileName,
@@ -386,8 +400,6 @@ class SendFileDialogState extends State<SendFileDialog> {
                         ],
                       ),
                     ),
-
-                  // ── LABEL (faqat 1 ta fayl bo'lsa) ──
                   if (widget.files.length == 1)
                     Padding(
                       padding: const EdgeInsets.only(bottom: 8.0),
@@ -403,7 +415,7 @@ class SendFileDialogState extends State<SendFileDialog> {
                   // Workaround for SwitchListTile.adaptive crashes in CupertinoDialog
                   if ({'image', 'video'}.contains(uniqueFileType))
                     Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
+                      crossAxisAlignment: .center,
                       children: [
                         if ({
                           TargetPlatform.iOS,
@@ -425,8 +437,8 @@ class SendFileDialogState extends State<SendFileDialog> {
                         const SizedBox(width: 16),
                         Expanded(
                           child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: .min,
+                            crossAxisAlignment: .start,
                             children: [
                               Text(
                                 L10n.of(context).compress,

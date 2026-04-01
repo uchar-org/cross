@@ -1,12 +1,6 @@
 import 'dart:convert';
 
-import 'package:flutter/material.dart';
-
 import 'package:collection/collection.dart';
-import 'package:go_router/go_router.dart';
-import 'package:matrix/matrix.dart' as sdk;
-import 'package:matrix/matrix.dart';
-
 import 'package:fluffychat/config/app_config.dart';
 import 'package:fluffychat/config/themes.dart';
 import 'package:fluffychat/l10n/l10n.dart';
@@ -23,6 +17,10 @@ import 'package:fluffychat/widgets/avatar.dart';
 import 'package:fluffychat/widgets/future_loading_dialog.dart';
 import 'package:fluffychat/widgets/hover_builder.dart';
 import 'package:fluffychat/widgets/matrix.dart';
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:matrix/matrix.dart' as sdk;
+import 'package:matrix/matrix.dart';
 
 enum AddRoomType { chat, subspace }
 
@@ -152,14 +150,17 @@ class _SpaceViewState extends State<SpaceView> {
     switch (action) {
       case SpaceActions.settings:
         await space?.postLoad();
+        if (!mounted) return;
         context.push('/rooms/${widget.spaceId}/details');
         break;
       case SpaceActions.invite:
         await space?.postLoad();
+        if (!mounted) return;
         context.push('/rooms/${widget.spaceId}/invite');
         break;
       case SpaceActions.members:
         await space?.postLoad();
+        if (!mounted) return;
         context.push('/rooms/${widget.spaceId}/details/members');
         break;
       case SpaceActions.leave:
@@ -563,14 +564,16 @@ class _SpaceViewState extends State<SpaceView> {
                           );
                         }
                         final item = _discoveredChildren[i];
+                        var joinedRoom = room.client.getRoomById(item.roomId);
                         final displayname =
                             item.name ??
                             item.canonicalAlias ??
+                            joinedRoom?.getLocalizedDisplayname() ??
                             L10n.of(context).emptyChat;
+                        final avatarUrl = item.avatarUrl ?? joinedRoom?.avatar;
                         if (!displayname.toLowerCase().contains(filter)) {
                           return const SizedBox.shrink();
                         }
-                        var joinedRoom = room.client.getRoomById(item.roomId);
                         if (joinedRoom?.membership == Membership.leave) {
                           joinedRoom = null;
                         }
@@ -630,7 +633,7 @@ class _SpaceViewState extends State<SpaceView> {
                                       )
                                     : Avatar(
                                         size: avatarSize,
-                                        mxContent: item.avatarUrl,
+                                        mxContent: avatarUrl,
                                         name: '#',
                                         backgroundColor:
                                             theme.colorScheme.surfaceContainer,

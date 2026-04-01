@@ -1,3 +1,4 @@
+import 'package:fluffychat/config/themes.dart';
 import 'package:flutter/material.dart';
 
 import 'package:go_router/go_router.dart';
@@ -5,11 +6,15 @@ import 'package:matrix/matrix.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 import 'package:fluffychat/config/app_config.dart';
-import 'package:fluffychat/config/themes.dart';
 import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/widgets/adaptive_dialogs/show_ok_cancel_alert_dialog.dart';
 import 'package:fluffychat/widgets/avatar.dart';
 import 'package:fluffychat/widgets/matrix.dart';
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:matrix/matrix.dart';
+import 'package:url_launcher/url_launcher_string.dart';
+
 import '../../utils/fluffy_share.dart';
 import 'chat_list.dart';
 
@@ -165,6 +170,8 @@ class ClientChooserButton extends StatelessWidget {
         borderRadius: BorderRadius.circular(99),
         color: Colors.transparent,
         child: PopupMenuButton<Object>(
+          key: Key('accounts_and_settings_buttons'),
+          tooltip: 'Accounts and settings',
           popUpAnimationStyle: FluffyThemes.isColumnMode(context)
               ? AnimationStyle.noAnimation
               : null, // https://github.com/flutter/flutter/issues/167180
@@ -183,7 +190,7 @@ class ClientChooserButton extends StatelessWidget {
     );
   }
 
-  void _clientSelected(Object object, BuildContext context) async {
+  Future<void> _clientSelected(Object object, BuildContext context) async {
     if (object is Client) {
       controller.setActiveClient(object);
     } else if (object is String) {
@@ -199,6 +206,7 @@ class ClientChooserButton extends StatelessWidget {
             cancelLabel: L10n.of(context).cancel,
           );
           if (consent != OkCancelResult.ok) return;
+          if (!context.mounted) return;
           context.go('/rooms/settings/addaccount');
           break;
         case SettingsAction.newGroup:

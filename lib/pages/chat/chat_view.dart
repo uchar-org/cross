@@ -1,13 +1,7 @@
 import 'dart:ui' as ui;
 
 import 'package:fluffychat/config/app_custom_action_intent.dart';
-import 'package:flutter/material.dart';
-
-import 'package:badges/badges.dart';
-import 'package:desktop_drop/desktop_drop.dart';
-import 'package:flutter/services.dart';
-import 'package:matrix/matrix.dart';
-
+import 'package:fluffychat/config/setting_keys.dart';
 import 'package:fluffychat/config/themes.dart';
 import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/pages/chat/chat.dart';
@@ -15,6 +9,7 @@ import 'package:fluffychat/pages/chat/chat_app_bar_list_tile.dart';
 import 'package:fluffychat/pages/chat/chat_app_bar_title.dart';
 import 'package:fluffychat/pages/chat/chat_event_list.dart';
 import 'package:fluffychat/pages/chat/encryption_button.dart';
+import 'package:fluffychat/pages/chat/jitsi_popup_button.dart';
 import 'package:fluffychat/pages/chat/pinned_events.dart';
 import 'package:fluffychat/pages/chat/reply_display.dart';
 import 'package:fluffychat/utils/account_config.dart';
@@ -24,6 +19,12 @@ import 'package:fluffychat/widgets/future_loading_dialog.dart';
 import 'package:fluffychat/widgets/matrix.dart';
 import 'package:fluffychat/widgets/mxc_image.dart';
 import 'package:fluffychat/widgets/unread_rooms_badge.dart';
+import 'package:badges/badges.dart';
+import 'package:desktop_drop/desktop_drop.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:matrix/matrix.dart';
+
 import '../../utils/stream_extension.dart';
 import 'chat_emoji_picker.dart';
 import 'chat_input_row.dart';
@@ -34,128 +35,6 @@ class ChatView extends StatelessWidget {
   final ChatController controller;
 
   const ChatView(this.controller, {super.key});
-
-  List<Widget> _appBarActions(BuildContext context) {
-    if (controller.selectMode) {
-      return [
-        if (controller.canEditSelectedEvents)
-          IconButton(
-            icon: const Icon(Icons.edit_outlined),
-            tooltip: L10n.of(context).edit,
-            onPressed: controller.editSelectedEventAction,
-          ),
-        if (controller.selectedEvents.length == 1 &&
-            controller.activeThreadId == null &&
-            controller.room.canSendDefaultMessages)
-          IconButton(
-            icon: const Icon(Icons.message_outlined),
-            tooltip: L10n.of(context).replyInThread,
-            onPressed: () => controller.enterThread(
-              controller.selectedEvents.single.eventId,
-            ),
-          ),
-        IconButton(
-          icon: const Icon(Icons.copy_outlined),
-          tooltip: L10n.of(context).copyToClipboard,
-          onPressed: controller.copyEventsAction,
-        ),
-        if (controller.canRedactSelectedEvents)
-          IconButton(
-            icon: const Icon(Icons.delete_outlined),
-            tooltip: L10n.of(context).redactMessage,
-            onPressed: controller.redactEventsAction,
-          ),
-        if (controller.selectedEvents.length == 1)
-          PopupMenuButton<_EventContextAction>(
-            useRootNavigator: true,
-            onSelected: (action) {
-              switch (action) {
-                case _EventContextAction.info:
-                  controller.showEventInfo();
-                  controller.clearSelectedEvents();
-                  break;
-                case _EventContextAction.report:
-                  controller.reportEventAction();
-                  break;
-              }
-            },
-            itemBuilder: (context) => [
-              if (controller.canPinSelectedEvents)
-                PopupMenuItem(
-                  onTap: controller.pinEvent,
-                  value: null,
-                  child: Row(
-                    mainAxisSize: .min,
-                    children: [
-                      const Icon(Icons.push_pin_outlined),
-                      const SizedBox(width: 12),
-                      Text(L10n.of(context).pinMessage),
-                    ],
-                  ),
-                ),
-              if (controller.canSaveSelectedEvent)
-                PopupMenuItem(
-                  onTap: () => controller.saveSelectedEvent(context),
-                  value: null,
-                  child: Row(
-                    mainAxisSize: .min,
-                    children: [
-                      const Icon(Icons.download_outlined),
-                      const SizedBox(width: 12),
-                      Text(L10n.of(context).downloadFile),
-                    ],
-                  ),
-                ),
-              PopupMenuItem(
-                value: _EventContextAction.info,
-                child: Row(
-                  mainAxisSize: .min,
-                  children: [
-                    const Icon(Icons.info_outlined),
-                    const SizedBox(width: 12),
-                    Text(L10n.of(context).messageInfo),
-                  ],
-                ),
-              ),
-              if (controller.selectedEvents.single.status.isSent)
-                PopupMenuItem(
-                  value: _EventContextAction.report,
-                  child: Row(
-                    mainAxisSize: .min,
-                    children: [
-                      const Icon(Icons.shield_outlined, color: Colors.red),
-                      const SizedBox(width: 12),
-                      Text(L10n.of(context).reportMessage),
-                    ],
-                  ),
-                ),
-            ],
-          ),
-      ];
-    } else if (!controller.room.isArchived) {
-      return [
-        if (controller.hasActiveCall)
-          FilledButton.icon(
-            onPressed: controller.onPhoneButtonTap,
-            icon: const Icon(Icons.call),
-            label: Text(L10n.of(context).joinCall),
-            style: FilledButton.styleFrom(
-              backgroundColor: Colors.green,
-              foregroundColor: Colors.white,
-            ),
-          )
-        else
-          IconButton(
-            onPressed: controller.onPhoneButtonTap,
-            icon: const Icon(Icons.call_outlined),
-            tooltip: L10n.of(context).placeCall,
-          ),
-        EncryptionButton(controller.room),
-        ChatSettingsPopupMenu(controller.room, true),
-      ];
-    }
-    return [];
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -180,7 +59,8 @@ class ChatView extends StatelessWidget {
         actions: {
           EscapeIntent: CallbackAction<EscapeIntent>(
             onInvoke: (intent) {
-              if (controller.editEvent != null || controller.replyEvent != null) {
+              if (controller.editEvent != null ||
+                  controller.replyEvent != null) {
                 controller.cancelReplyEventAction();
               }
               return null;
@@ -189,7 +69,7 @@ class ChatView extends StatelessWidget {
         },
         child: PopScope(
           canPop:
-              controller.selectedEvents.isEmpty &&
+          controller.selectedEvents.isEmpty &&
               !controller.showEmojiPicker &&
               controller.activeThreadId == null,
           onPopInvokedWithResult: (pop, _) async {
@@ -230,39 +110,169 @@ class ChatView extends StatelessWidget {
                     ),
                     backgroundColor: controller.selectedEvents.isEmpty
                         ? controller.activeThreadId != null
-                              ? theme.colorScheme.secondaryContainer
-                              : null
+                        ? theme.colorScheme.secondaryContainer
+                        : null
                         : theme.colorScheme.tertiaryContainer,
                     automaticallyImplyLeading: false,
                     leading: controller.selectMode
                         ? IconButton(
-                            icon: const Icon(Icons.close),
-                            onPressed: controller.clearSelectedEvents,
-                            tooltip: L10n.of(context).close,
-                            color: theme.colorScheme.onTertiaryContainer,
-                          )
+                      icon: const Icon(Icons.close),
+                      onPressed: controller.clearSelectedEvents,
+                      tooltip: L10n.of(context).close,
+                      color: theme.colorScheme.onTertiaryContainer,
+                    )
                         : activeThreadId != null
                         ? IconButton(
-                            icon: const Icon(Icons.close),
-                            onPressed: controller.closeThread,
-                            tooltip: L10n.of(context).backToMainChat,
-                            color: theme.colorScheme.onSecondaryContainer,
-                          )
+                      icon: const Icon(Icons.close),
+                      onPressed: controller.closeThread,
+                      tooltip: L10n.of(context).backToMainChat,
+                      color: theme.colorScheme.onSecondaryContainer,
+                    )
                         : FluffyThemes.isColumnMode(context)
                         ? null
                         : StreamBuilder<Object>(
-                            stream: Matrix.of(context).client.onSync.stream.where(
-                              (syncUpdate) => syncUpdate.hasRoomUpdate,
-                            ),
-                            builder: (context, _) => UnreadRoomsBadge(
-                              filter: (r) => r.id != controller.roomId,
-                              badgePosition: BadgePosition.topEnd(end: 8, top: 4),
-                              child: const Center(child: BackButton()),
-                            ),
-                          ),
+                      stream: Matrix.of(
+                        context,
+                      ).client.onSync.stream.where(
+                            (syncUpdate) => syncUpdate.hasRoomUpdate,
+                      ),
+                      builder: (context, _) => UnreadRoomsBadge(
+                        filter: (r) => r.id != controller.roomId,
+                        badgePosition: BadgePosition.topEnd(
+                          end: 8,
+                          top: 4,
+                        ),
+                        child: const Center(child: BackButton()),
+                      ),
+                    ),
                     titleSpacing: FluffyThemes.isColumnMode(context) ? 24 : 0,
                     title: ChatAppBarTitle(controller),
-                    actions: _appBarActions(context),
+                    actions: [
+                      if (controller.selectMode) ...[
+                        if (controller.canEditSelectedEvents)
+                          IconButton(
+                            icon: const Icon(Icons.edit_outlined),
+                            tooltip: L10n.of(context).edit,
+                            onPressed: controller.editSelectedEventAction,
+                          ),
+                        if (controller.selectedEvents.length == 1 &&
+                            controller.activeThreadId == null &&
+                            controller.room.canSendDefaultMessages)
+                          IconButton(
+                            icon: const Icon(Icons.message_outlined),
+                            tooltip: L10n.of(context).replyInThread,
+                            onPressed: () => controller.enterThread(
+                              controller.selectedEvents.single.eventId,
+                            ),
+                          ),
+                        IconButton(
+                          icon: const Icon(Icons.copy_outlined),
+                          tooltip: L10n.of(context).copyToClipboard,
+                          onPressed: controller.copyEventsAction,
+                        ),
+                        if (controller.canRedactSelectedEvents)
+                          IconButton(
+                            icon: const Icon(Icons.delete_outlined),
+                            tooltip: L10n.of(context).redactMessage,
+                            onPressed: controller.redactEventsAction,
+                          ),
+                        if (controller.selectedEvents.length == 1)
+                          PopupMenuButton<_EventContextAction>(
+                            useRootNavigator: true,
+                            onSelected: (action) {
+                              switch (action) {
+                                case _EventContextAction.info:
+                                  controller.showEventInfo();
+                                  controller.clearSelectedEvents();
+                                  break;
+                                case _EventContextAction.report:
+                                  controller.reportEventAction();
+                                  break;
+                              }
+                            },
+                            itemBuilder: (context) => [
+                              if (controller.canPinSelectedEvents)
+                                PopupMenuItem(
+                                  onTap: controller.pinEvent,
+                                  value: null,
+                                  child: Row(
+                                    mainAxisSize: .min,
+                                    children: [
+                                      const Icon(Icons.push_pin_outlined),
+                                      const SizedBox(width: 12),
+                                      Text(L10n.of(context).pinMessage),
+                                    ],
+                                  ),
+                                ),
+                              if (controller.canSaveSelectedEvent)
+                                PopupMenuItem(
+                                  onTap: () =>
+                                      controller.saveSelectedEvent(context),
+                                  value: null,
+                                  child: Row(
+                                    mainAxisSize: .min,
+                                    children: [
+                                      const Icon(Icons.download_outlined),
+                                      const SizedBox(width: 12),
+                                      Text(L10n.of(context).downloadFile),
+                                    ],
+                                  ),
+                                ),
+                              PopupMenuItem(
+                                value: _EventContextAction.info,
+                                child: Row(
+                                  mainAxisSize: .min,
+                                  children: [
+                                    const Icon(Icons.info_outlined),
+                                    const SizedBox(width: 12),
+                                    Text(L10n.of(context).messageInfo),
+                                  ],
+                                ),
+                              ),
+                              if (controller.selectedEvents.single.status.isSent)
+                                PopupMenuItem(
+                                  value: _EventContextAction.report,
+                                  child: Row(
+                                    mainAxisSize: .min,
+                                    children: [
+                                      const Icon(
+                                        Icons.shield_outlined,
+                                        color: Colors.red,
+                                      ),
+                                      const SizedBox(width: 12),
+                                      Text(L10n.of(context).reportMessage),
+                                    ],
+                                  ),
+                                ),
+                            ],
+                          ),
+                      ] else if (!controller.room.isArchived) ...[
+                        // Call button: show active-call join button if there's
+                        // an ongoing call, otherwise show the standard call
+                        // icon. Falls back to Jitsi if the feature flag is on
+                        // and the Element Call service is not available.
+                        if (controller.hasActiveCall)
+                          FilledButton.icon(
+                            onPressed: controller.onPhoneButtonTap,
+                            icon: const Icon(Icons.call),
+                            label: Text(L10n.of(context).joinCall),
+                            style: FilledButton.styleFrom(
+                              backgroundColor: Colors.green,
+                              foregroundColor: Colors.white,
+                            ),
+                          )
+                        else if (AppSettings.jitsiFeature.value)
+                          JitsiPopupButton(controller.room)
+                        else
+                          IconButton(
+                            onPressed: controller.onPhoneButtonTap,
+                            icon: const Icon(Icons.call_outlined),
+                            tooltip: L10n.of(context).placeCall,
+                          ),
+                        EncryptionButton(controller.room),
+                        ChatSettingsPopupMenu(controller.room, true),
+                      ],
+                    ],
                     bottom: PreferredSize(
                       preferredSize: Size.fromHeight(appbarBottomHeight),
                       child: Column(
@@ -274,13 +284,14 @@ class ChatView extends StatelessWidget {
                               height: ChatAppBarListTile.fixedHeight,
                               child: Center(
                                 child: TextButton.icon(
-                                  onPressed: () =>
-                                      controller.scrollToEventId(activeThreadId),
+                                  onPressed: () => controller.scrollToEventId(
+                                    activeThreadId,
+                                  ),
                                   icon: const Icon(Icons.message),
                                   label: Text(L10n.of(context).replyInThread),
                                   style: TextButton.styleFrom(
                                     foregroundColor:
-                                        theme.colorScheme.onSecondaryContainer,
+                                    theme.colorScheme.onSecondaryContainer,
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(4),
                                     ),
@@ -303,7 +314,9 @@ class ChatView extends StatelessWidget {
                               title: L10n.of(context).jumpToLastReadMessage,
                               trailing: TextButton(
                                 onPressed: () {
-                                  controller.scrollToEventId(scrollUpBannerEventId);
+                                  controller.scrollToEventId(
+                                    scrollUpBannerEventId,
+                                  );
                                   controller.discardScrollUpBannerEventId();
                                 },
                                 child: Text(L10n.of(context).jump),
@@ -314,19 +327,19 @@ class ChatView extends StatelessWidget {
                     ),
                   ),
                   floatingActionButton:
-                      controller.showScrollDownButton &&
-                          controller.selectedEvents.isEmpty
+                  controller.showScrollDownButton &&
+                      controller.selectedEvents.isEmpty
                       ? Padding(
-                          padding: const EdgeInsets.only(bottom: 56.0),
-                          child: FloatingActionButton(
-                            onPressed: controller.scrollDown,
-                            heroTag: null,
-                            mini: true,
-                            backgroundColor: theme.colorScheme.surface,
-                            foregroundColor: theme.colorScheme.onSurface,
-                            child: const Icon(Icons.arrow_downward_outlined),
-                          ),
-                        )
+                    padding: const EdgeInsets.only(bottom: 56.0),
+                    child: FloatingActionButton(
+                      onPressed: controller.scrollDown,
+                      heroTag: null,
+                      mini: true,
+                      backgroundColor: theme.colorScheme.surface,
+                      foregroundColor: theme.colorScheme.onSurface,
+                      child: const Icon(Icons.arrow_downward_outlined),
+                    ),
+                  )
                       : null,
                   body: DropTarget(
                     onDragDone: controller.onDragDone,
@@ -388,44 +401,52 @@ class ChatView extends StatelessWidget {
                                         ? theme.colorScheme.tertiaryContainer
                                         : theme.colorScheme.surfaceContainerHigh,
                                     borderRadius: BorderRadius.circular(32),
-                                    child: controller.room.isAbandonedDMRoom == true
+                                    child:
+                                    controller.room.isAbandonedDMRoom == true
                                         ? Row(
-                                            mainAxisAlignment: .spaceEvenly,
-                                            children: [
-                                              TextButton.icon(
-                                                style: TextButton.styleFrom(
-                                                  padding: const EdgeInsets.all(16),
-                                                  foregroundColor:
-                                                      theme.colorScheme.error,
-                                                ),
-                                                icon: const Icon(
-                                                  Icons.archive_outlined,
-                                                ),
-                                                onPressed: controller.leaveChat,
-                                                label: Text(L10n.of(context).leave),
-                                              ),
-                                              TextButton.icon(
-                                                style: TextButton.styleFrom(
-                                                  padding: const EdgeInsets.all(16),
-                                                ),
-                                                icon: const Icon(
-                                                  Icons.forum_outlined,
-                                                ),
-                                                onPressed: controller.recreateChat,
-                                                label: Text(
-                                                  L10n.of(context).reopenChat,
-                                                ),
-                                              ),
-                                            ],
-                                          )
-                                        : Column(
-                                            mainAxisSize: .min,
-                                            children: [
-                                              ReplyDisplay(controller),
-                                              ChatInputRow(controller),
-                                              ChatEmojiPicker(controller),
-                                            ],
+                                      mainAxisAlignment: .spaceEvenly,
+                                      children: [
+                                        TextButton.icon(
+                                          style: TextButton.styleFrom(
+                                            padding: const EdgeInsets.all(
+                                              16,
+                                            ),
+                                            foregroundColor:
+                                            theme.colorScheme.error,
                                           ),
+                                          icon: const Icon(
+                                            Icons.archive_outlined,
+                                          ),
+                                          onPressed: controller.leaveChat,
+                                          label: Text(
+                                            L10n.of(context).leave,
+                                          ),
+                                        ),
+                                        TextButton.icon(
+                                          style: TextButton.styleFrom(
+                                            padding: const EdgeInsets.all(
+                                              16,
+                                            ),
+                                          ),
+                                          icon: const Icon(
+                                            Icons.forum_outlined,
+                                          ),
+                                          onPressed:
+                                          controller.recreateChat,
+                                          label: Text(
+                                            L10n.of(context).reopenChat,
+                                          ),
+                                        ),
+                                      ],
+                                    )
+                                        : Column(
+                                      mainAxisSize: .min,
+                                      children: [
+                                        ReplyDisplay(controller),
+                                        ChatInputRow(controller),
+                                        ChatEmojiPicker(controller),
+                                      ],
+                                    ),
                                   ),
                                 ),
                             ],
@@ -435,7 +456,10 @@ class ChatView extends StatelessWidget {
                           Container(
                             color: theme.scaffoldBackgroundColor.withAlpha(230),
                             alignment: Alignment.center,
-                            child: const Icon(Icons.upload_outlined, size: 100),
+                            child: const Icon(
+                              Icons.upload_outlined,
+                              size: 100,
+                            ),
                           ),
                       ],
                     ),

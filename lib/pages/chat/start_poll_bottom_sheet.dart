@@ -1,9 +1,7 @@
-import 'package:flutter/material.dart';
-
-import 'package:matrix/matrix.dart';
-
 import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/utils/localized_exception_extension.dart';
+import 'package:flutter/material.dart';
+import 'package:matrix/matrix.dart';
 
 class StartPollBottomSheet extends StatefulWidget {
   final Room room;
@@ -46,6 +44,7 @@ class _StartPollBottomSheetState extends State<StartPollBottomSheet> {
         maxSelections: _allowMultipleAnswers ? _answers.length : 1,
         txid: _txid,
       );
+      if (!mounted) return;
       Navigator.of(context).pop();
     } catch (e, s) {
       Logs().w('Unable to create poll', e, s);

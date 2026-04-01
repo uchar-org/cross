@@ -1,22 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-
 import 'package:collection/collection.dart';
 import 'package:desktop_notifications/desktop_notifications.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:intl/intl.dart';
-import 'package:just_audio/just_audio.dart';
-import 'package:matrix/encryption.dart';
-import 'package:matrix/matrix.dart';
-import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:universal_html/html.dart' as html;
-import 'package:permission_handler/permission_handler.dart';
-import 'package:url_launcher/url_launcher_string.dart';
-
 import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/utils/callkit/call_monitor.dart';
 import 'package:fluffychat/utils/callkit/callkit_service.dart';
@@ -25,16 +11,27 @@ import 'package:fluffychat/utils/init_with_restore.dart';
 import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_file_extension.dart';
 import 'package:fluffychat/utils/platform_infos.dart';
 import 'package:fluffychat/utils/uia_request_manager.dart';
+import 'package:fluffychat/utils/voip_plugin.dart';
 import 'package:fluffychat/widgets/adaptive_dialogs/show_ok_cancel_alert_dialog.dart';
 import 'package:fluffychat/widgets/fluffy_chat_app.dart';
 import 'package:fluffychat/widgets/future_loading_dialog.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
+import 'package:just_audio/just_audio.dart';
+import 'package:matrix/encryption.dart';
+import 'package:matrix/matrix.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:universal_html/html.dart' as html;
+import 'package:url_launcher/url_launcher_string.dart';
+
 import '../config/setting_keys.dart';
 import '../pages/key_verification/key_verification_dialog.dart';
 import '../utils/account_bundles.dart';
 import '../utils/background_push.dart';
 import 'local_notifications_extension.dart';
-
-// import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class Matrix extends StatefulWidget {
   final Widget? child;
@@ -80,6 +77,8 @@ class MatrixState extends State<Matrix> with WidgetsBindingObserver {
     return widget.clients[_activeClient];
   }
 
+  VoipPlugin? voipPlugin;
+
   bool get isMultiAccount => widget.clients.length > 1;
 
   int getClientIndexByMatrixId(String matrixId) =>
@@ -92,6 +91,8 @@ class MatrixState extends State<Matrix> with WidgetsBindingObserver {
     final i = widget.clients.indexWhere((c) => c == cl);
     if (i != -1) {
       _activeClient = i;
+      // TODO: Multi-client VoiP support
+      createVoipPlugin();
     } else {
       Logs().w('Tried to set an unknown client ${cl!.userID} as active');
     }
@@ -177,7 +178,7 @@ class MatrixState extends State<Matrix> with WidgetsBindingObserver {
   final onRoomKeyRequestSub = <String, StreamSubscription>{};
   final onKeyVerificationRequestSub = <String, StreamSubscription>{};
   final onNotification = <String, StreamSubscription>{};
-  final onLoginStateChanged = <String, StreamSubscription<LoginState>>{};
+  final onLogoutSub = <String, StreamSubscription<LoginState>>{};
   final onUiaRequest = <String, StreamSubscription<UiaRequest>>{};
 
   String? _cachedPassword;
@@ -255,34 +256,34 @@ class MatrixState extends State<Matrix> with WidgetsBindingObserver {
                 context,
           );
         });
-    onLoginStateChanged[name] ??= c.onLoginStateChanged.stream.listen((state) {
-      if (state == LoginState.loggedIn) {
-        backgroundPush?.setupPush();
-      }
-      final loggedInWithMultipleClients = widget.clients.length > 1;
-      if (state == LoginState.loggedOut) {
-        _cancelSubs(c.clientName);
-        widget.clients.remove(c);
-        ClientManager.removeClientNameFromStore(c.clientName, store);
-        InitWithRestoreExtension.deleteSessionBackup(name);
-      }
-      if (loggedInWithMultipleClients && state != LoginState.loggedIn) {
-        ScaffoldMessenger.of(
-          FluffyChatApp.router.routerDelegate.navigatorKey.currentContext ??
-              context,
-        ).showSnackBar(
-          SnackBar(content: Text(L10n.of(context).oneClientLoggedOut)),
-        );
+    onLogoutSub[name] ??= c.onLoginStateChanged.stream
+        .where((state) => state == LoginState.loggedOut)
+        .listen((_) {
+          final loggedInWithMultipleClients = widget.clients.length > 1;
 
-        if (state != LoginState.loggedIn) {
-          FluffyChatApp.router.go('/rooms');
-        }
-      } else {
-        FluffyChatApp.router.go(
-          state == LoginState.loggedIn ? '/backup' : '/home',
-        );
-      }
-    });
+          _cancelSubs(c.clientName);
+          widget.clients.remove(c);
+          ClientManager.removeClientNameFromStore(c.clientName, store);
+          InitWithRestoreExtension.deleteSessionBackup(name);
+
+          if (loggedInWithMultipleClients) {
+            final snackbarContext =
+                FluffyChatApp
+                    .router
+                    .routerDelegate
+                    .navigatorKey
+                    .currentContext ??
+                context;
+
+            if (!snackbarContext.mounted) return;
+            final l10n = L10n.of(snackbarContext);
+            ScaffoldMessenger.of(
+              snackbarContext,
+            ).showSnackBar(SnackBar(content: Text(l10n.oneClientLoggedOut)));
+            return;
+          }
+          FluffyChatApp.router.go('/');
+        });
     onUiaRequest[name] ??= c.onUiaRequest.stream.listen(uiaRequestHandler);
     if (PlatformInfos.isWeb || PlatformInfos.isLinux) {
       c.onSync.stream.first.then((s) {
@@ -299,45 +300,13 @@ class MatrixState extends State<Matrix> with WidgetsBindingObserver {
     onRoomKeyRequestSub.remove(name);
     onKeyVerificationRequestSub[name]?.cancel();
     onKeyVerificationRequestSub.remove(name);
-    onLoginStateChanged[name]?.cancel();
-    onLoginStateChanged.remove(name);
+    onLogoutSub[name]?.cancel();
+    onLogoutSub.remove(name);
     onNotification[name]?.cancel();
     onNotification.remove(name);
   }
 
-  Future<void> initMatrix() async {
-    // Initialize CallKit service
-    if (PlatformInfos.isMobile) {
-      await CallKitService.instance.initialize();
-
-      // Set up call accepted callback
-      CallKitService.instance.onCallAccepted = (roomId, callUuid) async {
-        Logs().i(
-          '[Matrix] CallKit call accepted: roomId=$roomId, uuid=$callUuid',
-        );
-
-        // Request camera and microphone permissions BEFORE navigating
-        final cameraStatus = await Permission.camera.request();
-        final micStatus = await Permission.microphone.request();
-
-        if (!cameraStatus.isGranted || !micStatus.isGranted) {
-          Logs().w('[Matrix] Permissions not granted for call');
-          // Still navigate - Element Call may prompt again
-        }
-
-        // Navigate to call screen with CallKit UUID
-        FluffyChatApp.router.go(
-          '/rooms/$roomId/call',
-          extra: {'callKitUuid': callUuid},
-        );
-      };
-
-      // Start call monitor for sync-based incoming call detection
-      if (widget.clients.isNotEmpty) {
-        CallMonitor.instance.start(widget.clients.first);
-      }
-    }
-
+  void initMatrix() {
     for (final c in widget.clients) {
       _registerSubs(c.clientName);
     }
@@ -372,14 +341,17 @@ class MatrixState extends State<Matrix> with WidgetsBindingObserver {
           }
         },
       );
-      // Setup push after first sync when client is ready
-      client.onSync.stream.first.then((_) {
-        if (backgroundPush != null) {
-          backgroundPush!.client = client;
-          backgroundPush!.setupPush();
-        }
-      });
     }
+
+    createVoipPlugin();
+  }
+
+  Future<void> createVoipPlugin() async {
+    if (!AppSettings.experimentalVoip.value) {
+      voipPlugin = null;
+      return;
+    }
+    voipPlugin = VoipPlugin(this);
   }
 
   @override
@@ -405,9 +377,8 @@ class MatrixState extends State<Matrix> with WidgetsBindingObserver {
 
     onRoomKeyRequestSub.values.map((s) => s.cancel());
     onKeyVerificationRequestSub.values.map((s) => s.cancel());
-    onLoginStateChanged.values.map((s) => s.cancel());
+    onLogoutSub.values.map((s) => s.cancel());
     onNotification.values.map((s) => s.cancel());
-    client.httpClient.close();
 
     linuxNotifications?.close();
 
@@ -425,15 +396,17 @@ class MatrixState extends State<Matrix> with WidgetsBindingObserver {
   }
 
   Future<void> dehydrateAction(BuildContext context) async {
+    final l10n = L10n.of(context);
     final response = await showOkCancelAlertDialog(
       context: context,
       isDestructive: true,
-      title: L10n.of(context).dehydrate,
-      message: L10n.of(context).dehydrateWarning,
+      title: l10n.dehydrate,
+      message: l10n.dehydrateWarning,
     );
     if (response != OkCancelResult.ok) {
       return;
     }
+    if (!context.mounted) return;
     final result = await showFutureLoadingDialog(
       context: context,
       future: client.exportDump,
@@ -447,6 +420,7 @@ class MatrixState extends State<Matrix> with WidgetsBindingObserver {
         'fluffychat-export-${DateFormat(DateFormat.YEAR_MONTH_DAY).format(DateTime.now())}.fluffybackup';
 
     final file = MatrixFile(bytes: exportBytes, name: exportFileName);
+    if (!context.mounted) return;
     file.save(context);
   }
 }

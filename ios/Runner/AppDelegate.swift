@@ -20,5 +20,7 @@ import FirebaseMessaging
                             didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
     Messaging.messaging().apnsToken = deviceToken
     super.application(application, didRegisterForRemoteNotificationsWithDeviceToken: deviceToken)
-  }
+
+    // From https://pub.dev/packages/flutter_local_notifications#-ios-setup
+    UNUserNotificationCenter.current().delegate = self as? UNUserNotificationCenterDelegate  }
 }
