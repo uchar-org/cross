@@ -43,7 +43,7 @@
             }
         }
     },
-    "account": "Hisob",
+    "account": "Akkaunt",
     "@account": {
         "type": "String",
         "placeholders": {}
@@ -1466,7 +1466,7 @@
         "placeholders": {}
     },
     "oneClientLoggedOut": "Mijozlaringizdan biri tizimdan chiqdi",
-    "addAccount": "Hisob qoʻshish",
+    "addAccount": "Akkaunt qoʻshish",
     "editBundlesForAccount": "Bu hisob uchun toʻplamlarni tahrirlash",
     "addToBundle": "Toʻplamga qoʻshish",
     "removeFromBundle": "Bu toʻplamdan oʻchirish",
