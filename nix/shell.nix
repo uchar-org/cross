@@ -5,7 +5,7 @@ let
   isLinux = pkgs.stdenv.isLinux;
   formatter = pkgs.alejandra;
 
-  pinnedFlutter = pkgs.flutter338;
+  pinnedFlutter = pkgs.flutter341;
   pinnedJDK = pkgs.jdk17_headless;
   androidCustomPackage = inputs.android-nixpkgs.sdk.${system} (
     sdkPkgs:

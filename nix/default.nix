@@ -1,7 +1,7 @@
 { inputs, system, lib, stdenv, fetchFromGitHub, fetchzip, imagemagick, libgbm
-, libdrm, flutter338, pulseaudio, webkitgtk_4_1, copyDesktopItems
+, libdrm, flutter341, pulseaudio, webkitgtk_4_1, copyDesktopItems
 , makeDesktopItem, jdk17_headless, google-chrome, callPackage, runCommand, yj
-, vodozemac-wasm ? callPackage ./vodozemac-wasm.nix { flutter = flutter338; }
+, vodozemac-wasm ? callPackage ./vodozemac-wasm.nix { flutter = flutter341; }
 , targetFlutterPlatform ? "linux", }:
 
 let
@@ -14,7 +14,7 @@ let
 
   };
 
-  pinnedFlutter = flutter338;
+  pinnedFlutter = flutter341;
 
   androidCustomPackage = inputs.android-nixpkgs.sdk.${system} (
     # show all potential values with
@@ -94,11 +94,11 @@ in pinnedFlutter.buildFlutterApplication (rec {
         inherit version src;
         inherit (src) passthru;
 
-        postPatch = ''
-          substituteInPlace third_party/CMakeLists.txt \
-            --replace-fail "\''${CMAKE_CURRENT_LIST_DIR}/downloads/libwebrtc.zip" ${libwebrtc}
-            ln -s ${libwebrtc} third_party/libwebrtc
-        '';
+        # postPatch = ''
+        #   substituteInPlace third_party/CMakeLists.txt \
+        #     --replace-fail "\''${CMAKE_CURRENT_LIST_DIR}/downloads/libwebrtc.zip" ${libwebrtc}
+        #     ln -s ${libwebrtc} third_party/libwebrtc
+        # '';
 
         installPhase = ''
           runHook preInstall
