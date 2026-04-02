@@ -94,11 +94,11 @@ in pinnedFlutter.buildFlutterApplication (rec {
         inherit version src;
         inherit (src) passthru;
 
-        postPatch = ''
-          substituteInPlace third_party/CMakeLists.txt \
-            --replace-fail "\''${CMAKE_CURRENT_LIST_DIR}/downloads/libwebrtc.zip" ${libwebrtc}
-            ln -s ${libwebrtc} third_party/libwebrtc
-        '';
+        # postPatch = ''
+        #   substituteInPlace third_party/CMakeLists.txt \
+        #     --replace-fail "\''${CMAKE_CURRENT_LIST_DIR}/downloads/libwebrtc.zip" ${libwebrtc}
+        #     ln -s ${libwebrtc} third_party/libwebrtc
+        # '';
 
         installPhase = ''
           runHook preInstall
