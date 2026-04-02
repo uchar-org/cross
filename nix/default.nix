@@ -1,7 +1,7 @@
 { inputs, system, lib, stdenv, fetchFromGitHub, fetchzip, imagemagick, libgbm
-, libdrm, flutter338, pulseaudio, webkitgtk_4_1, copyDesktopItems
+, libdrm, flutter341, pulseaudio, webkitgtk_4_1, copyDesktopItems
 , makeDesktopItem, jdk17_headless, google-chrome, callPackage, runCommand, yj
-, vodozemac-wasm ? callPackage ./vodozemac-wasm.nix { flutter = flutter338; }
+, vodozemac-wasm ? callPackage ./vodozemac-wasm.nix { flutter = flutter341; }
 , targetFlutterPlatform ? "linux", }:
 
 let
@@ -14,7 +14,7 @@ let
 
   };
 
-  pinnedFlutter = flutter338;
+  pinnedFlutter = flutter341;
 
   androidCustomPackage = inputs.android-nixpkgs.sdk.${system} (
     # show all potential values with
