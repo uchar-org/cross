@@ -28,7 +28,6 @@ class ChatInputRow extends StatelessWidget {
     final theme = Theme.of(context);
     final textMessageOnly =
         controller.sendController.text.isNotEmpty ||
-        controller.replyEvent != null ||
         controller.editEvent != null;
 
     if (!controller.room.otherPartyCanReceiveMessages) {
