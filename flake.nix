@@ -62,7 +62,7 @@
 
             # Output package
             packages = {
-              default = pkgs.callPackage ./nix/package.nix {
+              linux = pkgs.callPackage ./nix/package.nix {
                 inherit
                   pkgs
                   inputs

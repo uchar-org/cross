@@ -1,6 +1,6 @@
 { pkgs, pinnedFlutter, ... }:
 let
-  vodozemac-wasm = pkgs.callPackage ../vodozemac-wasm.nix { flutter = pinnedFlutter; };
+  vodozemac-wasm = pkgs.callPackage ../vodozemac { flutter = pinnedFlutter; };
 in
 {
   preBuild = ''
