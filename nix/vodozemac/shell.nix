@@ -1,6 +1,6 @@
 {
   pkgs,
-  vodozemac ? pkgs.callPackage ./vodozemac-wasm.nix {}, 
+  vodozemac ? pkgs.callPackage ./. { },
   ...
 }:
 pkgs.writeScriptBin "init-vodozemac" ''

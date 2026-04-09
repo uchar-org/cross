@@ -1,4 +1,10 @@
-{ pkgs, inputs, system, formatter ? pkgs.alejandra, ... }@attrs:
+{
+  pkgs,
+  inputs,
+  system,
+  formatter ? pkgs.alejandra,
+  ...
+}@attrs:
 let
   system = pkgs.hostPlatform.system;
   isDarwin = pkgs.stdenv.isDarwin;
@@ -8,8 +14,7 @@ let
   pinnedFlutter = pkgs.flutter341;
   pinnedJDK = pkgs.jdk17_headless;
   androidCustomPackage = inputs.android-nixpkgs.sdk.${system} (
-    sdkPkgs:
-    with sdkPkgs; [
+    sdkPkgs: with sdkPkgs; [
       cmdline-tools-latest
       cmake-3-22-1
       build-tools-35-0-0
@@ -23,7 +28,8 @@ let
       platforms-android-35
       platforms-android-36
       system-images-android-36-google-apis-playstore-x86-64
-    ]);
+    ]
+  );
 
   androidEmulator = pkgs.androidenv.emulateApp {
     name = "emulator";
@@ -49,7 +55,8 @@ let
     };
   };
 
-in pkgs.mkShell {
+in
+pkgs.mkShell {
   packages = [
     pkgs.rustup
     pkgs.olm
@@ -59,11 +66,13 @@ in pkgs.mkShell {
     androidCustomPackage
     pinnedJDK
     pkgs.imagemagick
-  ] ++ pkgs.lib.optionals isLinux [
+    pkgs.pkg-config
+  ]
+  ++ pkgs.lib.optionals isLinux [
     pkgs.webkitgtk_4_1
     pkgs.libsecret.dev
     pkgs.copyDesktopItems
-    (import ./shell_vodozemac.nix attrs)
+    (import ./vodozemac/shell.nix attrs)
     (pkgs.writeScriptBin "android-emulator" ''
       ${androidEmulator}/bin/run-test-emulator
     '')
@@ -77,9 +86,9 @@ in pkgs.mkShell {
     ANDROID_SDK_ROOT = "${androidCustomPackage}/share/android-sdk";
     JAVA_HOME = pinnedJDK.home;
     FLUTTER_ROOT = "${pinnedFlutter}";
-    GRADLE_OPTS =
-      "-Dorg.gradle.project.android.aapt2FromMavenOverride=${androidCustomPackage}/share/android-sdk/build-tools/35.0.0/aapt2";
-  } // pkgs.lib.optionalAttrs isLinux {
+    GRADLE_OPTS = "-Dorg.gradle.project.android.aapt2FromMavenOverride=${androidCustomPackage}/share/android-sdk/build-tools/35.0.0/aapt2";
+  }
+  // pkgs.lib.optionalAttrs isLinux {
     CMAKE_PREFIX_PATH = pkgs.lib.makeLibraryPath [ pkgs.libsecret.dev ];
     CHROME_EXECUTABLE = "${pkgs.google-chrome}/bin/google-chrome-stable";
   };
