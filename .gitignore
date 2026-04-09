@@ -75,5 +75,7 @@ web/native_executer.js*
 
 /.direnv
 
+nix.back/
+nix.bak/
 /result
 /.claude
