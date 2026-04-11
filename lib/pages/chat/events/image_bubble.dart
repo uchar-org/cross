@@ -187,10 +187,12 @@ class ImageBubble extends StatelessWidget {
                           ),
                           onOpen: (url) => UrlLauncher(context, url.url).launchUrl(),
                           eventId: event.eventId,
-                          checkboxCheckedEvents: event.aggregatedEvents(
-                            timeline!,
-                            EventCheckboxRoomExtension.relationshipType,
-                          ),
+                          checkboxCheckedEvents: timeline == null
+                              ? null
+                              : event.aggregatedEvents(
+                                  timeline!,
+                                  EventCheckboxRoomExtension.relationshipType,
+                                ),
                           trailingWidget: SizedBox(width: 42, height: 14),
                         ),
 

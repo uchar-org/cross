@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 
-import 'package:async/async.dart' as Result;
+import 'package:async/async.dart' show Result;
 import 'package:cross_file/cross_file.dart';
 import 'package:fluffychat/config/app_config.dart';
 import 'package:fluffychat/l10n/l10n.dart';
@@ -14,7 +14,6 @@ import 'package:fluffychat/widgets/adaptive_dialogs/dialog_text_field.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart' hide Result;
-import 'package:matrix/matrix.dart';
 import 'package:mime/mime.dart';
 
 import '../../utils/resize_video.dart';
@@ -58,7 +57,7 @@ class SendFileDialogState extends State<SendFileDialog> {
       }
       scaffoldMessenger.showLoadingSnackBar(l10n.prepareSendingAttachment);
       Navigator.of(context, rootNavigator: false).pop();
-      final clientConfig = await Result.Result.capture(widget.room.client.getConfig());
+      final clientConfig = await Result.capture(widget.room.client.getConfig());
       final maxUploadSize =
           clientConfig.asValue?.value.mUploadSize ?? 100 * 1000 * 1000;
 
@@ -114,24 +113,20 @@ class SendFileDialogState extends State<SendFileDialog> {
 
         final extraContent = <String, dynamic>{
           if (label.isNotEmpty) 'body': label,
-          if (replyTo != null)
-            'm.relates_to': {
-              'm.in_reply_to': {
-                'event_id': replyTo.eventId,
-              },
-            },
         };
 
+        Future<void> doSendFileEvent() => widget.room.sendFileEvent(
+              file,
+              thumbnail: thumbnail,
+              shrinkImageMaxDimension: compress ? 1600 : null,
+              extraContent: extraContent.isEmpty ? null : extraContent,
+              inReplyTo: replyTo,
+              threadRootEventId: widget.threadRootEventId,
+              threadLastEventId: widget.threadLastEventId,
+            );
+
         try {
-          await widget.room.sendFileEvent(
-            file,
-            thumbnail: thumbnail,
-            shrinkImageMaxDimension: compress ? 1600 : null,
-            extraContent: extraContent.isEmpty ? null : extraContent,
-            inReplyTo: replyTo,
-            threadRootEventId: widget.threadRootEventId,
-            threadLastEventId: widget.threadLastEventId,
-          );
+          await doSendFileEvent();
         } on MatrixException catch (e) {
           final retryAfterMs = e.retryAfterMs;
           if (e.error != MatrixError.M_LIMIT_EXCEEDED || retryAfterMs == null) {
@@ -152,13 +147,7 @@ class SendFileDialogState extends State<SendFileDialog> {
 
           scaffoldMessenger.showLoadingSnackBar(l10n.sendingAttachment);
 
-          await widget.room.sendFileEvent(
-            file,
-            thumbnail: thumbnail,
-            shrinkImageMaxDimension: compress ? 1600 : null,
-            extraContent: extraContent.isEmpty ? null : extraContent,
-            inReplyTo: replyTo,
-          );
+          await doSendFileEvent();
         }
       }
       scaffoldMessenger.clearSnackBars();
@@ -193,7 +182,7 @@ class SendFileDialogState extends State<SendFileDialog> {
   Widget _buildSingleImagePreview(XFile file) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(AppConfig.borderRadius / 2),
-      child: FutureBuilder<List<int>>(
+      child: FutureBuilder<Uint8List>(
         future: file.readAsBytes(),
         builder: (context, snapshot) {
           if (snapshot.data == null) {
@@ -213,7 +202,7 @@ class SendFileDialogState extends State<SendFileDialog> {
             );
           }
           return Image.memory(
-            snapshot.data! as dynamic,
+            snapshot.data!,
             height: 220,
             width: 220,
             fit: BoxFit.cover,
@@ -259,7 +248,7 @@ class SendFileDialogState extends State<SendFileDialog> {
         ),
         itemCount: count,
         itemBuilder: (context, index) {
-          return FutureBuilder<List<int>>(
+          return FutureBuilder<Uint8List>(
             future: widget.files[index].readAsBytes(),
             builder: (context, snapshot) {
               return ClipRRect(
@@ -270,14 +259,14 @@ class SendFileDialogState extends State<SendFileDialog> {
                       onTap: () {
                         ProfessionalImagePreview.show(
                           context,
-                          bytes: snapshot.data as dynamic,
+                          bytes: snapshot.data!,
                           heroTag: widget.key.toString(),
                         );
                       },
                       child: Hero(
                         tag: widget.key.toString(),
                         child: Image.memory(
-                            snapshot.data! as dynamic,
+                            snapshot.data!,
                             fit: BoxFit.cover,
                             errorBuilder: (_, __, ___) => Container(
                               color: Colors.grey.shade300,

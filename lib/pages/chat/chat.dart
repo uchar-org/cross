@@ -180,7 +180,15 @@ class ChatController extends State<ChatPageWithRoom>
     }
 
     if (image != null && image.isNotEmpty) {
-      imageFiles.add(XFile.fromData(image));
+      final ts = DateTime.now().millisecondsSinceEpoch;
+      imageFiles.add(
+        XFile.fromData(
+          image,
+          name: 'clipboard_$ts.png',
+          mimeType: 'image/png',
+          length: image.length,
+        ),
+      );
     }
 
     if (imageFiles.isEmpty) return;

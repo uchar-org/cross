@@ -13,4 +13,15 @@ mv .vodozemac/dart/web/pkg/vodozemac_bindings_dart* ./assets/vodozemac/
 rm -rf .vodozemac
 
 flutter pub get
-dart compile js ./web/native_executer.dart -o ./web/native_executer.js -m
+dart compile js ./web/native_executor.dart -o ./web/native_executor.js -m
+
+# Download native_imaging for web (Imaging.js + Imaging.wasm).
+# Without these, custom_image_resizer.dart's `await native.init()` crashes
+# with "dart.global.Imaging is undefined" and image upload fails.
+version=$(yq ".dependencies.native_imaging" < pubspec.yaml)
+version=$(expr "$version" : '\^*\(.*\)')
+curl -L "https://github.com/famedly/dart_native_imaging/releases/download/v${version}/native_imaging.zip" > native_imaging.zip
+unzip -o native_imaging.zip
+mv js/* web/
+rmdir js
+rm native_imaging.zip

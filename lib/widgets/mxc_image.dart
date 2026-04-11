@@ -107,7 +107,7 @@ class _MxcImageState extends State<MxcImage> {
     }
   }
 
-  void _tryLoad() async {
+  Future<void> _tryLoad() async {
     if (_imageData != null) {
       return;
     }
@@ -116,7 +116,7 @@ class _MxcImageState extends State<MxcImage> {
     } on IOException catch (_) {
       if (!mounted) return;
       await Future.delayed(widget.retryDuration);
-      _tryLoad();
+      await _tryLoad();
     }
   }
 
