@@ -122,6 +122,7 @@ class MessageContent extends StatelessWidget {
         switch (event.messageType) {
           case MessageTypes.Image:
           case MessageTypes.Sticker:
+            if (event.redacted) continue textmessage;
             return LayoutBuilder(
               builder: (context, constraints) {
                 final maxBubbleWidth = constraints.maxWidth * 0.7;
