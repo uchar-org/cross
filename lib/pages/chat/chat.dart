@@ -179,6 +179,12 @@ class ChatController extends State<ChatPageWithRoom>
       );
     }
 
+    if (image != null && image.isNotEmpty) {
+      imageFiles.add(XFile.fromData(image));
+    }
+
+    if (imageFiles.isEmpty) return;
+
     await showAdaptiveDialog(
       context: context,
       builder: (c) => SendFileDialog(
