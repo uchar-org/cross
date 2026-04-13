@@ -11,7 +11,6 @@ let
     pkgs.libdrm
   ];
   vodozemac-wasm = pkgs.callPackage ../vodozemac { flutter = pinnedFlutter; };
-  vodozemac-wasm-path = "${vodozemac-wasm}/vodozemac_bindings_dart_bg.wasm";
 in
 {
   nativeBuildInputs = with pkgs; [
@@ -29,34 +28,13 @@ in
   ];
 
   env.NIX_LDFLAGS = "-rpath-link ${libwebrtcRpath}";
+  NIX_LD = lib.fileContents "${stdenv.cc}/nix-support/dynamic-linker";
 
   env.CPATH = "${pkgs.fribidi.dev}/include/fribidi";
 
-  # shellHook = ''
-  #   mkdir -p build/flutter_assets/fonts
-
-  #   flutter build linux -v --split-debug-info="$debug"
-
-  #   built=build/linux/*/$flutterMode/bundle
-
-  #   mkdir -p $out/bin
-  #   mkdir -p $out/app
-  #   mv $built $out/app/$pname
-
-  #   for f in $(find $out/app/$pname -maxdepth 1 -type f); do
-  #     ln -s $f $out/bin/$(basename $f)
-  #   done
-
-  #   find $out/app/$pname -iname "*.so" -type f -exec chmod +x {} +
-
-  #   for f in $(find $out/app/$pname -executable -type f); do
-  #     if patchelf --print-rpath "$f" | grep /build; then
-  #       echo "strip RPath of $f"
-  #       newrp=$(patchelf --print-rpath $f | sed -r "s|/build.*ephemeral:||g" | sed -r "s|/build.*profile:||g")
-  #       patchelf --set-rpath "$newrp" "$f"
-  #     fi
-  #   done
-  # '';
+  shellHook = ''
+    export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:./build/linux/x64/debug/bundle/lib/"
+  '';
 
   desktopItems = [
     (pkgs.makeDesktopItem {
