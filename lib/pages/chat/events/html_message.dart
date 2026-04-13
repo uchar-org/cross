@@ -6,7 +6,9 @@ import 'package:fluffychat/widgets/future_loading_dialog.dart';
 import 'package:fluffychat/widgets/mxc_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
+import 'package:linkify/linkify.dart' as linkify_lib;
 import 'package:highlight/highlight.dart' show highlight;
 import 'package:html/dom.dart' as dom;
 import 'package:html/parser.dart' as parser;
@@ -137,9 +139,8 @@ class HtmlMessage extends StatelessWidget {
       // Single linebreak nodes between Elements are ignored:
       if (text == '\n') text = '';
 
-      return LinkifySpan(
+      return _OriginTextLinkifySpan(
         text: text,
-        options: const LinkifyOptions(humanize: false),
         linkStyle: linkStyle,
         onOpen: onOpen,
       );
@@ -492,4 +493,42 @@ extension on String {
 
 extension on dom.Element {
   dom.Element get rootElement => parent?.rootElement ?? this;
+}
+
+class _OriginTextLinkifySpan extends TextSpan {
+  _OriginTextLinkifySpan({
+    required String text,
+    TextStyle? linkStyle,
+    void Function(LinkableElement)? onOpen,
+  }) : super(
+          children: _build(text, linkStyle, onOpen),
+        );
+
+  static List<InlineSpan> _build(
+    String text,
+    TextStyle? linkStyle,
+    void Function(LinkableElement)? onOpen,
+  ) {
+    final elements = linkify_lib.linkify(
+      text,
+      options: const LinkifyOptions(
+        humanize: false,
+        looseUrl: true,
+        defaultToHttps: true,
+      ),
+    );
+    return [
+      for (final element in elements)
+        if (element is LinkableElement)
+          TextSpan(
+            text: element.originText,
+            style: linkStyle,
+            recognizer: onOpen != null
+                ? (TapGestureRecognizer()..onTap = () => onOpen(element))
+                : null,
+          )
+        else
+          TextSpan(text: element.text),
+    ];
+  }
 }
