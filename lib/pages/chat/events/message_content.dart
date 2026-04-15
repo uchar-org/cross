@@ -20,6 +20,7 @@ import '../../../config/app_config.dart';
 import '../../../utils/event_checkbox_extension.dart';
 import '../../../utils/platform_infos.dart';
 import '../../../utils/url_launcher.dart';
+import '../../../utils/url_preview_service.dart';
 import 'audio_player.dart';
 import 'call_notify_event.dart';
 import 'cute_events.dart';
@@ -27,6 +28,7 @@ import 'html_message.dart';
 import 'image_bubble.dart';
 import 'map_bubble.dart';
 import 'message_download_content.dart';
+import 'url_preview.dart';
 
 class MessageContent extends StatelessWidget {
   final Event event;
@@ -285,51 +287,66 @@ class MessageContent extends StatelessWidget {
             final bigEmotes =
                 !event.isRichMessage && bigEmojis.contains(event.body);
 
+            final urls = UrlPreviewService.extractUrls(event.body);
+
             return Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              child: Stack(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  HtmlMessage(
-                    html: html,
-                    textColor: textColor,
-                    room: event.room,
-                    fontSize: AppSettings.fontSizeFactor.value * AppConfig.messageFontSize * (bigEmotes ? 5 : 1),
-                    limitHeight: !selected,
-                    linkStyle: TextStyle(
-                      color: linkColor,
-                      fontSize: AppSettings.fontSizeFactor.value * AppConfig.messageFontSize,
-                      decoration: TextDecoration.underline,
-                      decorationColor: linkColor,
-                    ),
-                    onOpen: (url) => UrlLauncher(context, url.url).launchUrl(),
-                    eventId: event.eventId,
-                    checkboxCheckedEvents: event.aggregatedEvents(
-                      timeline,
-                      EventCheckboxRoomExtension.relationshipType,
-                    ),
-                    trailingWidget: SizedBox(
-                      width: isReplied
-                          ? double.infinity
-                          : messageStatus == null
-                          ? 46
-                          : 60,
-                      height: 14,
-                    ),
-                  ),
+                  Stack(
+                    children: [
+                      HtmlMessage(
+                        html: html,
+                        textColor: textColor,
+                        room: event.room,
+                        fontSize: AppSettings.fontSizeFactor.value * AppConfig.messageFontSize * (bigEmotes ? 5 : 1),
+                        limitHeight: !selected,
+                        linkStyle: TextStyle(
+                          color: linkColor,
+                          fontSize: AppSettings.fontSizeFactor.value * AppConfig.messageFontSize,
+                          decoration: TextDecoration.underline,
+                          decorationColor: linkColor,
+                        ),
+                        onOpen: (url) => UrlLauncher(context, url.url).launchUrl(),
+                        eventId: event.eventId,
+                        checkboxCheckedEvents: event.aggregatedEvents(
+                          timeline,
+                          EventCheckboxRoomExtension.relationshipType,
+                        ),
+                        trailingWidget: SizedBox(
+                          width: isReplied
+                              ? double.infinity
+                              : messageStatus == null
+                              ? 46
+                              : 60,
+                          height: 14,
+                        ),
+                      ),
 
-                  // Time - always in the lower right corner
-                  Positioned(
-                    right: 0,
-                    bottom: 0,
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(formattedTime, style: TextStyle(color: textColor, fontSize: 12)),
-                        if (messageStatus != null) const SizedBox(width: 3),
-                        if (messageStatus != null) MessageStatusWidget(status: messageStatus, iconColor: textColor),
-                      ],
-                    ),
+                      // Time - always in the lower right corner
+                      Positioned(
+                        right: 0,
+                        bottom: 0,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(formattedTime, style: TextStyle(color: textColor, fontSize: 12)),
+                            if (messageStatus != null) const SizedBox(width: 3),
+                            if (messageStatus != null) MessageStatusWidget(status: messageStatus, iconColor: textColor),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
+                  if (urls.isNotEmpty)
+                    UrlPreviewWidget(
+                      key: ValueKey('preview_${event.eventId}_${urls.first}'),
+                      url: urls.first,
+                      textColor: textColor,
+                      linkColor: linkColor,
+                    ),
                 ],
               ),
             );
