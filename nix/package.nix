@@ -53,7 +53,14 @@ let
 
   platforms = {
     web = import ./platforms/web.nix { inherit pkgs pinnedFlutter; };
-    linux = import ./platforms/linux.nix { inherit pkgs stdenv lib; };
+    linux = import ./platforms/linux.nix {
+      inherit
+        pkgs
+        pinnedFlutter
+        stdenv
+        lib
+        ;
+    };
     apk = import ./platforms/apk.nix {
       inherit
         pkgs
@@ -65,9 +72,16 @@ let
   };
 
 in
-pinnedFlutter.buildFlutterApplication (
+(pinnedFlutter.buildFlutterApplication (
   head
   // lib.optionalAttrs (targetFlutterPlatform == "linux") platforms.linux
   // lib.optionalAttrs (targetFlutterPlatform == "web") platforms.web
   // lib.optionalAttrs (targetFlutterPlatform == "apk") platforms.apk
-)
+)).overrideAttrs
+  (old: {
+    # extraIncludes = break [ pkgs.fribidi.dev ];
+    # flutterBuildFlags = [
+    #   "--cmake-args"
+    #   "-CXXFLAGS=\"-I${pkgs.fribidi.dev}/include\""
+    # ];
+  })

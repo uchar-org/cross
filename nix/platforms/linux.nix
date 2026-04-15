@@ -1,5 +1,6 @@
 {
   pkgs,
+  pinnedFlutter,
   stdenv,
   lib,
   ...
@@ -9,17 +10,31 @@ let
     pkgs.libgbm
     pkgs.libdrm
   ];
+  vodozemac-wasm = pkgs.callPackage ../vodozemac { flutter = pinnedFlutter; };
 in
 {
   nativeBuildInputs = with pkgs; [
     imagemagick
     copyDesktopItems
     webkitgtk_4_1
+    rustup
   ];
 
-  runtimeDependencies = with pkgs; [ pulseaudio ];
+  buildInputs = [ vodozemac-wasm ];
+
+  runtimeDependencies = with pkgs; [
+    pulseaudio
+    vodozemac-wasm
+  ];
 
   env.NIX_LDFLAGS = "-rpath-link ${libwebrtcRpath}";
+  NIX_LD = lib.fileContents "${stdenv.cc}/nix-support/dynamic-linker";
+
+  env.CPATH = "${pkgs.fribidi.dev}/include/fribidi";
+
+  shellHook = ''
+    export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:./build/linux/x64/debug/bundle/lib/"
+  '';
 
   desktopItems = [
     (pkgs.makeDesktopItem {
