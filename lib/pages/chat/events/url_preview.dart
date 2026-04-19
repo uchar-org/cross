@@ -172,30 +172,27 @@ class _UrlPreviewWidgetState extends State<UrlPreviewWidget>
         data.imageUri != null && !_imageLoadFailed && _hasSuitableImage(data);
     final isYoutube = _isYoutubeVideo;
 
-    return Padding(
-      padding: const EdgeInsets.only(top: 6),
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          final availableWidth = constraints.maxWidth;
-          return GestureDetector(
-            onTap: () => launchUrlString(
-              widget.url,
-              mode: LaunchMode.externalApplication,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final availableWidth = constraints.maxWidth;
+        return GestureDetector(
+          onTap: () => launchUrlString(
+            widget.url,
+            mode: LaunchMode.externalApplication,
+          ),
+          child: Container(
+            width: availableWidth,
+            decoration: BoxDecoration(
+              color: theme.colorScheme.surfaceContainerHighest.withAlpha(100),
+              borderRadius: BorderRadius.circular(AppConfig.borderRadius - 4),
             ),
-            child: Container(
-              width: availableWidth,
-              decoration: BoxDecoration(
-                color: theme.colorScheme.surfaceContainerHighest.withAlpha(100),
-                borderRadius: BorderRadius.circular(AppConfig.borderRadius - 4),
-              ),
-              clipBehavior: Clip.antiAlias,
-              child: isYoutube && showImage
-                  ? _buildYoutubeLayout(data, availableWidth)
-                  : _buildCompactLayout(data, showImage, availableWidth),
-            ),
-          );
-        },
-      ),
+            clipBehavior: Clip.antiAlias,
+            child: isYoutube && showImage
+                ? _buildYoutubeLayout(data, availableWidth)
+                : _buildCompactLayout(data, showImage, availableWidth),
+          ),
+        );
+      },
     );
   }
 
