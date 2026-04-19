@@ -128,17 +128,15 @@ class ChatInputRow extends StatelessWidget {
                 ]
               : <Widget>[
                   const SizedBox(width: 8),
-                  AnimatedContainer(
-                    duration: FluffyThemes.animationDuration,
-                    curve: FluffyThemes.animationCurve,
-                    width: textMessageOnly ? 0 : 48,
+                  Container(
                     height: height,
+                    width: 48,
                     alignment: Alignment.center,
-                    decoration: const BoxDecoration(),
-                    clipBehavior: Clip.hardEdge,
                     child: PopupMenuButton<AddPopupMenuActions>(
                       useRootNavigator: true,
                       icon: const Icon(Icons.add_circle_outline),
+                      iconSize: 24,
+                      padding: EdgeInsets.zero,
                       iconColor: theme.colorScheme.onPrimaryContainer,
                       onSelected: controller.onAddPopupMenuButtonSelected,
                       itemBuilder: (BuildContext context) => [
@@ -347,59 +345,72 @@ class ChatInputRow extends StatelessWidget {
                       ),
                     ),
                   ),
-                  Container(
-                    height: height,
-                    width: height,
-                    alignment: Alignment.center,
-                    child:
-                        PlatformInfos.platformCanRecord &&
-                            !controller.sendController.text.isNotEmpty &&
-                            controller.editEvent == null
-                        ? HoverBuilder(
-                            builder: (context, hovered) => IconButton(
-                              tooltip: L10n.of(context).voiceMessage,
-                              onPressed: hovered
-                                  ? () => recordingViewModel.startRecording(
-                                      controller.room,
-                                    )
-                                  : () => ScaffoldMessenger.of(context)
-                                        .showSnackBar(
-                                          SnackBar(
-                                            margin: EdgeInsets.only(
-                                              bottom: height + 16,
-                                              left: 16,
-                                              right: 16,
-                                              top: 16,
-                                            ),
-                                            showCloseIcon: true,
-                                            content: Text(
-                                              L10n.of(
-                                                context,
-                                              ).longPressToRecordVoiceMessage,
-                                            ),
-                                          ),
+                  if (PlatformInfos.platformCanRecord)
+                    AnimatedContainer(
+                      duration: FluffyThemes.animationDuration,
+                      curve: FluffyThemes.animationCurve,
+                      width: textMessageOnly ? 0 : height,
+                      height: height,
+                      alignment: Alignment.center,
+                      decoration: const BoxDecoration(),
+                      clipBehavior: Clip.hardEdge,
+                      child: HoverBuilder(
+                        builder: (context, hovered) => IconButton(
+                          tooltip: L10n.of(context).voiceMessage,
+                          onPressed: hovered
+                              ? () => recordingViewModel.startRecording(
+                                  controller.room,
+                                )
+                              : () =>
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        margin: EdgeInsets.only(
+                                          bottom: height + 16,
+                                          left: 16,
+                                          right: 16,
+                                          top: 16,
                                         ),
-                              onLongPress: () => recordingViewModel
-                                  .startRecording(controller.room),
-                              style: IconButton.styleFrom(
-                                backgroundColor: theme.bubbleColor,
-                                foregroundColor: theme.onBubbleColor,
-                              ),
-                              icon: Icon(
-                                hovered ? Icons.mic : Icons.mic_none_outlined,
-                              ),
-                            ),
-                          )
-                        : IconButton(
-                            key: Key('send_button'),
-                            tooltip: L10n.of(context).send,
-                            onPressed: controller.send,
-                            style: IconButton.styleFrom(
-                              backgroundColor: theme.bubbleColor,
-                              foregroundColor: theme.onBubbleColor,
-                            ),
-                            icon: const Icon(Icons.send_outlined),
+                                        showCloseIcon: true,
+                                        content: Text(
+                                          L10n.of(
+                                            context,
+                                          ).longPressToRecordVoiceMessage,
+                                        ),
+                                      ),
+                                    ),
+                          onLongPress: () => recordingViewModel.startRecording(
+                            controller.room,
                           ),
+                          style: IconButton.styleFrom(
+                            backgroundColor: theme.bubbleColor,
+                            foregroundColor: theme.onBubbleColor,
+                          ),
+                          icon: Icon(
+                            hovered ? Icons.mic : Icons.mic_none_outlined,
+                          ),
+                        ),
+                      ),
+                    ),
+                  SizedBox(
+                    width: height,
+                    height: height,
+                    child: Center(
+                      child: AnimatedScale(
+                        duration: FluffyThemes.animationDuration,
+                        curve: FluffyThemes.animationCurve,
+                        scale: textMessageOnly ? 1.0 : 0.0,
+                        child: IconButton(
+                          key: Key('send_button'),
+                          tooltip: L10n.of(context).send,
+                          onPressed: controller.send,
+                          style: IconButton.styleFrom(
+                            backgroundColor: theme.bubbleColor,
+                            foregroundColor: theme.onBubbleColor,
+                          ),
+                          icon: const Icon(Icons.send_outlined),
+                        ),
+                      ),
+                    ),
                   ),
                 ],
         );
