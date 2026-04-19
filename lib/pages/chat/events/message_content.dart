@@ -287,7 +287,11 @@ class MessageContent extends StatelessWidget {
             final bigEmotes =
                 !event.isRichMessage && bigEmojis.contains(event.body);
 
-            final urls = UrlPreviewService.extractUrls(event.body);
+            final bodyWithoutReply = event.body
+                .split('\n')
+                .where((line) => !line.startsWith('> '))
+                .join('\n');
+            final urls = UrlPreviewService.extractUrls(bodyWithoutReply);
 
             final hasUrlPreview = urls.isNotEmpty;
             final timeRowWidth = isReplied
