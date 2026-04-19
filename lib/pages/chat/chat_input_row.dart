@@ -26,9 +26,6 @@ class ChatInputRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final textMessageOnly =
-        controller.sendController.text.isNotEmpty ||
-        controller.editEvent != null;
 
     if (!controller.room.otherPartyCanReceiveMessages) {
       return Center(
@@ -47,7 +44,13 @@ class ChatInputRow extends StatelessWidget {
       foregroundColor: theme.colorScheme.onTertiaryContainer,
     );
 
-    return RecordingViewModel(
+    return ListenableBuilder(
+      listenable: controller.sendController,
+      builder: (context, _) {
+        final textMessageOnly =
+            controller.sendController.text.isNotEmpty ||
+            controller.editEvent != null;
+        return RecordingViewModel(
       builder: (context, recordingViewModel) {
         if (recordingViewModel.isRecording) {
           return RecordingInputRow(
@@ -414,6 +417,8 @@ class ChatInputRow extends StatelessWidget {
                   ),
                 ],
         );
+      },
+    );
       },
     );
   }
