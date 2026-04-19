@@ -75,6 +75,16 @@ class _UrlPreviewWidgetState extends State<UrlPreviewWidget>
     }
   }
 
+  static const double _minImageDimension = 64;
+
+  bool _hasSuitableImage(UrlPreviewData data) {
+    final w = data.imageWidth;
+    final h = data.imageHeight;
+    if (w != null && w < _minImageDimension) return false;
+    if (h != null && h < _minImageDimension) return false;
+    return true;
+  }
+
   Widget _buildMxcImage(Uri uri, double width, double height, BoxFit fit) {
     return MxcImage(
       uri: uri,
@@ -158,7 +168,8 @@ class _UrlPreviewWidgetState extends State<UrlPreviewWidget>
 
     final data = _previewData!;
     final theme = Theme.of(context);
-    final showImage = data.imageUri != null && !_imageLoadFailed;
+    final showImage =
+        data.imageUri != null && !_imageLoadFailed && _hasSuitableImage(data);
     final isYoutube = _isYoutubeVideo;
 
     return Padding(
