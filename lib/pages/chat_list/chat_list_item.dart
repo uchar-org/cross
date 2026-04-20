@@ -7,6 +7,8 @@ import 'package:fluffychat/widgets/adaptive_dialogs/show_ok_cancel_alert_dialog.
 import 'package:fluffychat/widgets/future_loading_dialog.dart';
 import 'package:fluffychat/widgets/hover_builder.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:tabler_icons/tabler_icons.dart';
 import 'package:matrix/matrix.dart';
 
 import '../../config/themes.dart';
@@ -166,7 +168,7 @@ class ChatListItem extends StatelessWidget {
                                 color: backgroundColor,
                                 borderRadius: BorderRadius.circular(16),
                                 child: const Icon(
-                                  Icons.arrow_drop_down_circle_outlined,
+                                  TablerIcons.circle_chevron_down,
                                   size: 18,
                                 ),
                               ),
@@ -196,7 +198,7 @@ class ChatListItem extends StatelessWidget {
                   if (isMuted)
                     const Padding(
                       padding: EdgeInsets.only(left: 4.0),
-                      child: Icon(Icons.notifications_off_outlined, size: 16),
+                      child: Icon(TablerIcons.bell_off, size: 16),
                     ),
                   if (room.isLowPriority)
                     Padding(
@@ -204,7 +206,7 @@ class ChatListItem extends StatelessWidget {
                         right: hasNotifications ? 4.0 : 0.0,
                       ),
                       child: Icon(
-                        Icons.low_priority,
+                        TablerIcons.arrow_bar_to_down,
                         size: 16,
                         color: theme.colorScheme.primary,
                       ),
@@ -215,7 +217,7 @@ class ChatListItem extends StatelessWidget {
                         right: hasNotifications ? 4.0 : 0.0,
                       ),
                       child: Icon(
-                        Icons.push_pin,
+                        TablerIcons.pin_filled,
                         size: 16,
                         color: theme.colorScheme.primary,
                       ),
@@ -262,7 +264,7 @@ class ChatListItem extends StatelessWidget {
                         ? Padding(
                             padding: const EdgeInsets.only(right: 4.0),
                             child: Icon(
-                              Icons.edit_outlined,
+                              TablerIcons.pencil,
                               color: theme.colorScheme.secondary,
                               size: 16,
                             ),
@@ -286,7 +288,7 @@ class ChatListItem extends StatelessWidget {
                               mainAxisSize: .min,
                               children: [
                                 Icon(
-                                  Icons.message_outlined,
+                                  TablerIcons.message,
                                   size: 12,
                                   color: theme.colorScheme.outline,
                                 ),
@@ -383,7 +385,7 @@ class ChatListItem extends StatelessWidget {
                   ? room.membership == Membership.invite
                         ? IconButton(
                             tooltip: L10n.of(context).declineInvitation,
-                            icon: const Icon(Icons.delete_forever_outlined),
+                            icon: const Icon(TablerIcons.trash_filled),
                             color: theme.colorScheme.error,
                             onPressed: () async {
                               final consent = await showOkCancelAlertDialog(
@@ -403,7 +405,7 @@ class ChatListItem extends StatelessWidget {
                           )
                         : null
                   : IconButton(
-                      icon: const Icon(Icons.delete_outlined),
+                      icon: const Icon(TablerIcons.trash),
                       onPressed: onForget,
                     ),
             ),

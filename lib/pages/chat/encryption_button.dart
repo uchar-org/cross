@@ -1,6 +1,8 @@
 import 'package:badges/badges.dart' as b;
 import 'package:fluffychat/l10n/l10n.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:tabler_icons/tabler_icons.dart';
 import 'package:go_router/go_router.dart';
 import 'package:matrix/matrix.dart';
 
@@ -45,8 +47,8 @@ class EncryptionButton extends StatelessWidget {
               ),
               child: Icon(
                 room.encrypted
-                    ? Icons.lock_outlined
-                    : Icons.no_encryption_outlined,
+                    ? TablerIcons.lock
+                    : TablerIcons.lock_off,
                 size: 20,
                 color: (shouldBeEncrypted && !room.encrypted)
                     ? theme.colorScheme.error

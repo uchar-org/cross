@@ -1,6 +1,8 @@
 import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_locals.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:tabler_icons/tabler_icons.dart';
 import 'package:matrix/matrix.dart';
 
 import '../../config/themes.dart';
@@ -27,7 +29,7 @@ class ReplyDisplay extends StatelessWidget {
         children: <Widget>[
           IconButton(
             tooltip: L10n.of(context).close,
-            icon: const Icon(Icons.close),
+            icon: const Icon(TablerIcons.x),
             onPressed: controller.cancelReplyEventAction,
           ),
           Expanded(
@@ -60,7 +62,7 @@ class _EditContent extends StatelessWidget {
     }
     return Row(
       children: <Widget>[
-        Icon(Icons.edit, color: theme.colorScheme.primary),
+        Icon(TablerIcons.pencil, color: theme.colorScheme.primary),
         Container(width: 15.0),
         Text(
           event.calcLocalizedBodyFallback(

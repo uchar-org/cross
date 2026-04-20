@@ -9,6 +9,8 @@ import 'package:fluffychat/widgets/avatar.dart';
 import 'package:fluffychat/widgets/hover_builder.dart';
 import 'package:fluffychat/widgets/matrix.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:tabler_icons/tabler_icons.dart';
 import 'package:flutter/services.dart';
 import 'package:matrix/matrix.dart';
 
@@ -72,7 +74,7 @@ class ChatInputRow extends StatelessWidget {
                         onPressed: controller.deleteErrorEventsAction,
                         child: Row(
                           children: <Widget>[
-                            const Icon(Icons.delete_forever_outlined),
+                            const Icon(TablerIcons.trash_filled),
                             Text(L10n.of(context).delete),
                           ],
                         ),
@@ -86,7 +88,7 @@ class ChatInputRow extends StatelessWidget {
                         onPressed: controller.forwardEventsAction,
                         child: Row(
                           children: <Widget>[
-                            const Icon(Icons.keyboard_arrow_left_outlined),
+                            const Icon(TablerIcons.chevron_left),
                             Text(L10n.of(context).forward),
                           ],
                         ),
@@ -105,7 +107,7 @@ class ChatInputRow extends StatelessWidget {
                                   child: Row(
                                     children: <Widget>[
                                       Text(L10n.of(context).reply),
-                                      const Icon(Icons.keyboard_arrow_right),
+                                      const Icon(TablerIcons.chevron_right),
                                     ],
                                   ),
                                 ),
@@ -119,7 +121,7 @@ class ChatInputRow extends StatelessWidget {
                                     children: <Widget>[
                                       Text(L10n.of(context).tryToSendAgain),
                                       const SizedBox(width: 4),
-                                      const Icon(Icons.send_outlined, size: 16),
+                                      const Icon(TablerIcons.send, size: 16),
                                     ],
                                   ),
                                 ),
@@ -138,7 +140,7 @@ class ChatInputRow extends StatelessWidget {
                     clipBehavior: Clip.hardEdge,
                     child: PopupMenuButton<AddPopupMenuActions>(
                       useRootNavigator: true,
-                      icon: const Icon(Icons.add_circle_outline),
+                      icon: const Icon(TablerIcons.circle_plus),
                       iconColor: theme.colorScheme.onPrimaryContainer,
                       onSelected: controller.onAddPopupMenuButtonSelected,
                       itemBuilder: (BuildContext context) => [
@@ -151,7 +153,7 @@ class ChatInputRow extends StatelessWidget {
                                     theme.colorScheme.onPrimaryContainer,
                                 foregroundColor:
                                     theme.colorScheme.primaryContainer,
-                                child: const Icon(Icons.gps_fixed_outlined),
+                                child: const Icon(TablerIcons.map_pin),
                               ),
                               title: Text(L10n.of(context).shareLocation),
                               contentPadding: const EdgeInsets.all(0),
@@ -165,7 +167,7 @@ class ChatInputRow extends StatelessWidget {
                                   theme.colorScheme.onPrimaryContainer,
                               foregroundColor:
                                   theme.colorScheme.primaryContainer,
-                              child: const Icon(Icons.poll_outlined),
+                              child: const Icon(TablerIcons.chart_bar),
                             ),
                             title: Text(L10n.of(context).startPoll),
                             contentPadding: const EdgeInsets.all(0),
@@ -179,7 +181,7 @@ class ChatInputRow extends StatelessWidget {
                                   theme.colorScheme.onPrimaryContainer,
                               foregroundColor:
                                   theme.colorScheme.primaryContainer,
-                              child: const Icon(Icons.photo_outlined),
+                              child: const Icon(TablerIcons.photo),
                             ),
                             title: Text(L10n.of(context).sendImage),
                             contentPadding: const EdgeInsets.all(0),
@@ -194,7 +196,7 @@ class ChatInputRow extends StatelessWidget {
                               foregroundColor:
                                   theme.colorScheme.primaryContainer,
                               child: const Icon(
-                                Icons.video_camera_back_outlined,
+                                TablerIcons.video,
                               ),
                             ),
                             title: Text(L10n.of(context).sendVideo),
@@ -209,7 +211,7 @@ class ChatInputRow extends StatelessWidget {
                                   theme.colorScheme.onPrimaryContainer,
                               foregroundColor:
                                   theme.colorScheme.primaryContainer,
-                              child: const Icon(Icons.attachment_outlined),
+                              child: const Icon(TablerIcons.paperclip),
                             ),
                             title: Text(L10n.of(context).sendFile),
                             contentPadding: const EdgeInsets.all(0),
@@ -229,7 +231,7 @@ class ChatInputRow extends StatelessWidget {
                       clipBehavior: Clip.hardEdge,
                       child: PopupMenuButton(
                         useRootNavigator: true,
-                        icon: const Icon(Icons.camera_alt_outlined),
+                        icon: const Icon(TablerIcons.camera),
                         onSelected: controller.onAddPopupMenuButtonSelected,
                         iconColor: theme.colorScheme.onPrimaryContainer,
                         itemBuilder: (context) => [
@@ -241,7 +243,7 @@ class ChatInputRow extends StatelessWidget {
                                     theme.colorScheme.onPrimaryContainer,
                                 foregroundColor:
                                     theme.colorScheme.primaryContainer,
-                                child: const Icon(Icons.videocam_outlined),
+                                child: const Icon(TablerIcons.video),
                               ),
                               title: Text(L10n.of(context).recordAVideo),
                               contentPadding: const EdgeInsets.all(0),
@@ -255,7 +257,7 @@ class ChatInputRow extends StatelessWidget {
                                     theme.colorScheme.onPrimaryContainer,
                                 foregroundColor:
                                     theme.colorScheme.primaryContainer,
-                                child: const Icon(Icons.camera_alt_outlined),
+                                child: const Icon(TablerIcons.camera),
                               ),
                               title: Text(L10n.of(context).takeAPhoto),
                               contentPadding: const EdgeInsets.all(0),
@@ -273,8 +275,8 @@ class ChatInputRow extends StatelessWidget {
                       color: theme.colorScheme.onPrimaryContainer,
                       icon: Icon(
                         controller.showEmojiPicker
-                            ? Icons.keyboard
-                            : Icons.add_reaction_outlined,
+                            ? TablerIcons.keyboard
+                            : TablerIcons.mood_smile,
                         key: ValueKey(controller.showEmojiPicker),
                       ),
                       onPressed: controller.emojiPickerAction,
@@ -386,7 +388,7 @@ class ChatInputRow extends StatelessWidget {
                                 foregroundColor: theme.onBubbleColor,
                               ),
                               icon: Icon(
-                                hovered ? Icons.mic : Icons.mic_none_outlined,
+                                hovered ? TablerIcons.microphone : TablerIcons.microphone,
                               ),
                             ),
                           )
@@ -398,7 +400,7 @@ class ChatInputRow extends StatelessWidget {
                               backgroundColor: theme.bubbleColor,
                               foregroundColor: theme.onBubbleColor,
                             ),
-                            icon: const Icon(Icons.send_outlined),
+                            icon: const Icon(TablerIcons.send),
                           ),
                   ),
                 ],

@@ -7,6 +7,8 @@ import 'package:fluffychat/widgets/adaptive_dialogs/show_text_input_dialog.dart'
 import 'package:fluffychat/widgets/avatar.dart';
 import 'package:fluffychat/widgets/presence_builder.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:tabler_icons/tabler_icons.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:go_router/go_router.dart';
@@ -125,8 +127,8 @@ class UserDialog extends StatelessWidget {
                                                 : 1.0,
                                             child: Icon(
                                               copied
-                                                  ? Icons.check_circle
-                                                  : Icons.copy,
+                                                  ? TablerIcons.circle_check_filled
+                                                  : TablerIcons.copy,
                                               size: 12,
                                               color: copied
                                                   ? Colors.green
@@ -193,7 +195,7 @@ class UserDialog extends StatelessWidget {
                 children: [
                   AdaptiveIconTextButton(
                     label: L10n.of(context).block,
-                    icon: Icons.block_outlined,
+                    icon: TablerIcons.ban,
                     onTap: client.userID == profile.userId
                         ? null
                         : () {
@@ -207,7 +209,7 @@ class UserDialog extends StatelessWidget {
                   ),
                   AdaptiveIconTextButton(
                     label: L10n.of(context).report,
-                    icon: Icons.gavel_outlined,
+                    icon: TablerIcons.hammer,
                     onTap: client.userID == profile.userId
                         ? null
                         : () async {
@@ -231,7 +233,7 @@ class UserDialog extends StatelessWidget {
                   ),
                   AdaptiveIconTextButton(
                     label: L10n.of(context).share,
-                    icon: Icons.adaptive.share,
+                    icon: TablerIcons.share,
                     onTap: () => FluffyShare.share(
                       'https://matrix.to/#/${profile.userId}',
                       context,

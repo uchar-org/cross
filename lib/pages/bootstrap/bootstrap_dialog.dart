@@ -10,6 +10,8 @@ import 'package:fluffychat/widgets/future_loading_dialog.dart';
 import 'package:fluffychat/widgets/layouts/login_scaffold.dart';
 import 'package:fluffychat/widgets/matrix.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:tabler_icons/tabler_icons.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:go_router/go_router.dart';
 import 'package:matrix/encryption.dart';
@@ -183,7 +185,7 @@ class BootstrapDialogState extends State<BootstrapDialog> {
                   trailing: CircleAvatar(
                     backgroundColor: Colors.transparent,
                     child: Icon(
-                      Icons.info_outlined,
+                      TablerIcons.info_circle,
                       color: theme.colorScheme.primary,
                     ),
                   ),
@@ -198,7 +200,7 @@ class BootstrapDialogState extends State<BootstrapDialog> {
                   controller: TextEditingController(text: key),
                   decoration: const InputDecoration(
                     contentPadding: EdgeInsets.all(16),
-                    suffixIcon: Icon(Icons.key_outlined),
+                    suffixIcon: Icon(TablerIcons.lock),
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -231,7 +233,7 @@ class BootstrapDialogState extends State<BootstrapDialog> {
                 ),
                 const SizedBox(height: 16),
                 ElevatedButton.icon(
-                  icon: const Icon(Icons.check_outlined),
+                  icon: const Icon(TablerIcons.check),
                   label: Text(L10n.of(context).next),
                   onPressed:
                       (_recoveryKeyCopied || _storeInSecureStorage == true)
@@ -301,7 +303,7 @@ class BootstrapDialogState extends State<BootstrapDialog> {
                         horizontal: 8.0,
                       ),
                       trailing: Icon(
-                        Icons.info_outlined,
+                        TablerIcons.info_circle,
                         color: theme.colorScheme.primary,
                       ),
                       subtitle: Text(
@@ -324,7 +326,7 @@ class BootstrapDialogState extends State<BootstrapDialog> {
                         hintStyle: TextStyle(
                           fontFamily: theme.textTheme.bodyLarge?.fontFamily,
                         ),
-                        prefixIcon: const Icon(Icons.key_outlined),
+                        prefixIcon: const Icon(TablerIcons.lock),
                         labelText: L10n.of(context).recoveryKey,
                         hintText: 'Es** **** **** ****',
                         errorText: _recoveryKeyInputError,
@@ -340,7 +342,7 @@ class BootstrapDialogState extends State<BootstrapDialog> {
                       ),
                       icon: _recoveryKeyInputLoading
                           ? const CircularProgressIndicator.adaptive()
-                          : const Icon(Icons.lock_open_outlined),
+                          : const Icon(TablerIcons.lock_open),
                       label: Text(L10n.of(context).unlockOldMessages),
                       onPressed: _recoveryKeyInputLoading
                           ? null
@@ -411,7 +413,7 @@ class BootstrapDialogState extends State<BootstrapDialog> {
                     ),
                     const SizedBox(height: 16),
                     ElevatedButton.icon(
-                      icon: const Icon(Icons.cast_connected_outlined),
+                      icon: const Icon(TablerIcons.cast),
                       label: Text(L10n.of(context).transferFromAnotherDevice),
                       onPressed: _recoveryKeyInputLoading
                           ? null
@@ -474,7 +476,7 @@ class BootstrapDialogState extends State<BootstrapDialog> {
                         foregroundColor: theme.colorScheme.onErrorContainer,
                         iconColor: theme.colorScheme.onErrorContainer,
                       ),
-                      icon: const Icon(Icons.delete_outlined),
+                      icon: const Icon(TablerIcons.trash),
                       label: Text(L10n.of(context).recoveryKeyLost),
                       onPressed: _recoveryKeyInputLoading
                           ? null
@@ -525,7 +527,7 @@ class BootstrapDialogState extends State<BootstrapDialog> {
           break;
         case BootstrapState.error:
           titleText = L10n.of(context).oopsSomethingWentWrong;
-          body = const Icon(Icons.error_outline, color: Colors.red, size: 80);
+          body = const Icon(TablerIcons.alert_circle, color: Colors.red, size: 80);
           buttons.add(
             ElevatedButton(
               onPressed: () => _goBackAction(false),
@@ -539,7 +541,7 @@ class BootstrapDialogState extends State<BootstrapDialog> {
             mainAxisSize: .min,
             children: [
               const Icon(
-                Icons.check_circle_rounded,
+                TablerIcons.circle_check_filled,
                 size: 120,
                 color: Colors.green,
               ),

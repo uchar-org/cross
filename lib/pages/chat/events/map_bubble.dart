@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:tabler_icons/tabler_icons.dart';
 
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
@@ -62,7 +64,7 @@ class MapBubble extends StatelessWidget {
                           // Might have to do with psychological perception of where the tip exactly is
                           offset: const Offset(0, -12.5),
                           child: const Icon(
-                            Icons.location_pin,
+                            TablerIcons.map_pin_filled,
                             color: Colors.red,
                             size: 30,
                           ),

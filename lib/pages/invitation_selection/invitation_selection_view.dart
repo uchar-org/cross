@@ -4,6 +4,8 @@ import 'package:fluffychat/widgets/avatar.dart';
 import 'package:fluffychat/widgets/layouts/max_width_body.dart';
 import 'package:fluffychat/widgets/matrix.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:tabler_icons/tabler_icons.dart';
 import 'package:matrix/matrix.dart';
 
 import '../../widgets/adaptive_dialogs/user_dialog.dart';
@@ -68,7 +70,7 @@ class InvitationSelectionView extends StatelessWidget {
                             ),
                           ),
                         )
-                      : const Icon(Icons.search_outlined),
+                      : const Icon(TablerIcons.search),
                 ),
                 onChanged: controller.searchUserWithCoolDown,
               ),
@@ -193,7 +195,7 @@ class _InviteContactListTile extends StatelessWidget {
       trailing: TextButton.icon(
         onPressed: isMember ? null : onTap,
         label: Text(isMember ? l10n.participant : l10n.invite),
-        icon: Icon(isMember ? Icons.check : Icons.add),
+        icon: Icon(isMember ? TablerIcons.check : TablerIcons.plus),
       ),
     );
   }

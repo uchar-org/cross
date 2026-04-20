@@ -5,6 +5,8 @@ import 'package:fluffychat/utils/platform_infos.dart';
 import 'package:fluffychat/widgets/layouts/login_scaffold.dart';
 import 'package:fluffychat/widgets/matrix.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:tabler_icons/tabler_icons.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher_string.dart';
@@ -48,7 +50,7 @@ class IntroPage extends StatelessWidget {
                 child: Row(
                   mainAxisSize: .min,
                   children: [
-                    const Icon(Icons.import_export_outlined),
+                    const Icon(TablerIcons.arrows_up_down),
                     const SizedBox(width: 12),
                     Text(L10n.of(context).hydrate),
                   ],
@@ -59,7 +61,7 @@ class IntroPage extends StatelessWidget {
                 child: Row(
                   mainAxisSize: .min,
                   children: [
-                    const Icon(Icons.privacy_tip_outlined),
+                    const Icon(TablerIcons.shield),
                     const SizedBox(width: 12),
                     Text(L10n.of(context).privacy),
                   ],
@@ -70,7 +72,7 @@ class IntroPage extends StatelessWidget {
                 child: Row(
                   mainAxisSize: .min,
                   children: [
-                    const Icon(Icons.info_outlined),
+                    const Icon(TablerIcons.info_circle),
                     const SizedBox(width: 12),
                     Text(L10n.of(context).about),
                   ],

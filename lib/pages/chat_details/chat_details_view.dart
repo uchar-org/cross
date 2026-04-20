@@ -8,6 +8,8 @@ import 'package:fluffychat/widgets/chat_settings_popup_menu.dart';
 import 'package:fluffychat/widgets/layouts/max_width_body.dart';
 import 'package:fluffychat/widgets/matrix.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:tabler_icons/tabler_icons.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:go_router/go_router.dart';
 import 'package:matrix/matrix.dart';
@@ -64,14 +66,14 @@ class ChatDetailsView extends StatelessWidget {
               if (room.canonicalAlias.isNotEmpty)
                 IconButton(
                   tooltip: L10n.of(context).share,
-                  icon: const Icon(Icons.qr_code_rounded),
+                  icon: const Icon(TablerIcons.qrcode),
                   onPressed: () =>
                       showQrCodeViewer(context, room.canonicalAlias),
                 )
               else if (directChatMatrixID != null)
                 IconButton(
                   tooltip: L10n.of(context).share,
-                  icon: const Icon(Icons.qr_code_rounded),
+                  icon: const Icon(TablerIcons.qrcode),
                   onPressed: () =>
                       showQrCodeViewer(context, directChatMatrixID),
                 ),
@@ -126,7 +128,7 @@ class ChatDetailsView extends StatelessWidget {
                                         onPressed: controller.setAvatarAction,
                                         heroTag: null,
                                         child: const Icon(
-                                          Icons.camera_alt_outlined,
+                                          TablerIcons.camera,
                                         ),
                                       ),
                                     ),
@@ -152,12 +154,12 @@ class ChatDetailsView extends StatelessWidget {
                                           ),
                                     icon: Icon(
                                       room.isDirectChat
-                                          ? Icons.chat_bubble_outline
+                                          ? TablerIcons.message
                                           : room.canChangeStateEvent(
                                               EventTypes.RoomName,
                                             )
-                                          ? Icons.edit_outlined
-                                          : Icons.copy_outlined,
+                                          ? TablerIcons.pencil
+                                          : TablerIcons.copy,
                                       size: 16,
                                     ),
                                     style: TextButton.styleFrom(
@@ -181,7 +183,7 @@ class ChatDetailsView extends StatelessWidget {
                                             '/rooms/${controller.roomId}/details/members',
                                           ),
                                     icon: const Icon(
-                                      Icons.group_outlined,
+                                      TablerIcons.users,
                                       size: 14,
                                     ),
                                     style: TextButton.styleFrom(
@@ -221,7 +223,7 @@ class ChatDetailsView extends StatelessWidget {
                                     tooltip: L10n.of(
                                       context,
                                     ).setChatDescription,
-                                    icon: const Icon(Icons.edit_outlined),
+                                    icon: const Icon(TablerIcons.pencil),
                                   )
                                 : null,
                           ),
@@ -264,7 +266,7 @@ class ChatDetailsView extends StatelessWidget {
                                   theme.colorScheme.surfaceContainer,
                               foregroundColor: iconColor,
                               child: const Icon(
-                                Icons.admin_panel_settings_outlined,
+                                TablerIcons.shield_half_filled,
                               ),
                             ),
                             title: Text(L10n.of(context).accessAndVisibility),
@@ -274,7 +276,7 @@ class ChatDetailsView extends StatelessWidget {
                             onTap: () => context.push(
                               '/rooms/${room.id}/details/access',
                             ),
-                            trailing: const Icon(Icons.chevron_right_outlined),
+                            trailing: const Icon(TablerIcons.chevron_right),
                           ),
                           ListTile(
                             title: Text(L10n.of(context).chatPermissions),
@@ -285,9 +287,9 @@ class ChatDetailsView extends StatelessWidget {
                               backgroundColor:
                                   theme.colorScheme.surfaceContainer,
                               foregroundColor: iconColor,
-                              child: const Icon(Icons.tune_outlined),
+                              child: const Icon(TablerIcons.adjustments_horizontal),
                             ),
-                            trailing: const Icon(Icons.chevron_right_outlined),
+                            trailing: const Icon(TablerIcons.chevron_right),
                             onTap: () => context.push(
                               '/rooms/${room.id}/details/permissions',
                             ),
@@ -314,9 +316,9 @@ class ChatDetailsView extends StatelessWidget {
                               foregroundColor:
                                   theme.colorScheme.onPrimaryContainer,
                               radius: Avatar.defaultSize / 2,
-                              child: const Icon(Icons.add_outlined),
+                              child: const Icon(TablerIcons.plus),
                             ),
-                            trailing: const Icon(Icons.chevron_right_outlined),
+                            trailing: const Icon(TablerIcons.chevron_right),
                             onTap: () => context.go('/rooms/${room.id}/invite'),
                           ),
                       ],
@@ -332,14 +334,14 @@ class ChatDetailsView extends StatelessWidget {
                       leading: CircleAvatar(
                         backgroundColor: theme.scaffoldBackgroundColor,
                         child: const Icon(
-                          Icons.group_outlined,
+                          TablerIcons.users,
                           color: Colors.grey,
                         ),
                       ),
                       onTap: () => context.push(
                         '/rooms/${controller.roomId!}/details/members',
                       ),
-                      trailing: const Icon(Icons.chevron_right_outlined),
+                      trailing: const Icon(TablerIcons.chevron_right),
                     ),
             ),
           ),

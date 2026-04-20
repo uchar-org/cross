@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:tabler_icons/tabler_icons.dart';
 
 import 'package:fluffychat/config/themes.dart';
 
@@ -40,7 +42,7 @@ class AvatarPageHeader extends StatelessWidget {
                       elevation: 2,
                       onPressed: onAvatarEdit,
                       heroTag: null,
-                      child: const Icon(Icons.camera_alt_outlined),
+                      child: const Icon(TablerIcons.camera),
                     ),
                   ),
               ],

@@ -4,6 +4,8 @@ import 'package:fluffychat/pages/chat_list/chat_list.dart';
 import 'package:fluffychat/pages/chat_list/client_chooser_button.dart';
 import 'package:fluffychat/utils/sync_status_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:tabler_icons/tabler_icons.dart';
 import 'package:matrix/matrix.dart';
 
 import '../../widgets/matrix.dart';
@@ -67,14 +69,14 @@ class ChatListHeader extends StatelessWidget implements PreferredSizeWidget {
                   ? controller.isSearchMode
                         ? IconButton(
                             tooltip: L10n.of(context).cancel,
-                            icon: const Icon(Icons.close_outlined),
+                            icon: const Icon(TablerIcons.x),
                             onPressed: controller.cancelSearch,
                             color: theme.colorScheme.onPrimaryContainer,
                           )
                         : IconButton(
                             onPressed: controller.startSearch,
                             icon: Icon(
-                              Icons.search_outlined,
+                              TablerIcons.search,
                               color: theme.colorScheme.onPrimaryContainer,
                             ),
                           )
@@ -116,7 +118,7 @@ class ChatListHeader extends StatelessWidget implements PreferredSizeWidget {
                               ),
                               textStyle: const TextStyle(fontSize: 12),
                             ),
-                            icon: const Icon(Icons.edit_outlined, size: 16),
+                            icon: const Icon(TablerIcons.pencil, size: 16),
                             label: Text(
                               controller.searchServer ??
                                   Matrix.of(context).client.homeserver!.host,

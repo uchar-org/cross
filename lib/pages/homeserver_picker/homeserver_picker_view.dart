@@ -1,6 +1,8 @@
 import 'package:fluffychat/config/locale_provide.dart';
 import 'package:fluffychat/widgets/theme_builder.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:tabler_icons/tabler_icons.dart';
 
 import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:provider/provider.dart';
@@ -56,7 +58,7 @@ class HomeserverPickerView extends StatelessWidget {
                 child: Row(
                   mainAxisSize: .min,
                   children: [
-                    const Icon(Icons.import_export_outlined),
+                    const Icon(TablerIcons.arrows_up_down),
                     const SizedBox(width: 12),
                     Text(L10n.of(context).hydrate),
                   ],
@@ -67,7 +69,7 @@ class HomeserverPickerView extends StatelessWidget {
                 child: Row(
                   mainAxisSize: .min,
                   children: [
-                    const Icon(Icons.privacy_tip_outlined),
+                    const Icon(TablerIcons.shield),
                     const SizedBox(width: 12),
                     Text(L10n.of(context).privacy),
                   ],
@@ -78,7 +80,7 @@ class HomeserverPickerView extends StatelessWidget {
                 child: Row(
                   mainAxisSize: .min,
                   children: [
-                    const Icon(Icons.info_outlined),
+                    const Icon(TablerIcons.info_circle),
                     const SizedBox(width: 12),
                     Text(L10n.of(context).about),
                   ],
@@ -143,7 +145,7 @@ class HomeserverPickerView extends StatelessWidget {
                         ),
                         child: DropdownButtonFormField<Language>(
                           decoration: InputDecoration(
-                            prefixIcon: const Icon(Icons.language),
+                            prefixIcon: const Icon(TablerIcons.world),
                             filled: false,
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(
@@ -184,7 +186,7 @@ class HomeserverPickerView extends StatelessWidget {
                             autocorrect: false,
                             keyboardType: TextInputType.url,
                             decoration: InputDecoration(
-                              prefixIcon: const Icon(Icons.search_outlined),
+                              prefixIcon: const Icon(TablerIcons.search),
                               filled: false,
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(
@@ -244,7 +246,7 @@ class HomeserverPickerView extends StatelessWidget {
                                     ),
                                   );
                                 },
-                                icon: const Icon(Icons.info_outlined),
+                                icon: const Icon(TablerIcons.info_circle),
                               ),
                             ),
                           ),

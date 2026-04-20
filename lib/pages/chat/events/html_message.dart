@@ -5,6 +5,7 @@ import 'package:fluffychat/widgets/avatar.dart';
 import 'package:fluffychat/widgets/future_loading_dialog.dart';
 import 'package:fluffychat/widgets/mxc_image.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:tabler_icons/tabler_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
@@ -350,7 +351,7 @@ class HtmlMessage extends StatelessWidget {
                   children: [
                     WidgetSpan(
                       child: Icon(
-                        obscure ? Icons.arrow_right : Icons.arrow_drop_down,
+                        obscure ? TablerIcons.arrow_right : TablerIcons.chevron_down,
                         size: fontSize * 1.2,
                         color: textColor,
                       ),

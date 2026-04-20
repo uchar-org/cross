@@ -1,5 +1,7 @@
 import 'package:fluffychat/l10n/l10n.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:tabler_icons/tabler_icons.dart';
 
 import 'mxc_image.dart';
 
@@ -23,7 +25,7 @@ class MxcImageViewer extends StatelessWidget {
           elevation: 0,
           leading: IconButton(
             style: iconButtonStyle,
-            icon: const Icon(Icons.close),
+            icon: const Icon(TablerIcons.x),
             onPressed: Navigator.of(context).pop,
             color: Colors.white,
             tooltip: L10n.of(context).close,

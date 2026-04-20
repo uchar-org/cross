@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:tabler_icons/tabler_icons.dart';
 import 'package:flutter/material.dart';
 
 import 'package:fluffychat/l10n/l10n.dart';
@@ -13,7 +14,7 @@ class AddWidgetTileView extends StatelessWidget {
   Widget build(BuildContext context) {
     return ExpansionTile(
       title: Text(L10n.of(context).addWidget),
-      leading: const Icon(Icons.add),
+      leading: const Icon(TablerIcons.plus),
       initiallyExpanded: controller.initiallyExpanded,
       children: [
         CupertinoSegmentedControl(
@@ -42,7 +43,7 @@ class AddWidgetTileView extends StatelessWidget {
             controller: controller.nameController,
             autofocus: true,
             decoration: InputDecoration(
-              prefixIcon: const Icon(Icons.label),
+              prefixIcon: const Icon(TablerIcons.tag),
               label: Text(L10n.of(context).widgetName),
               errorText: controller.nameError,
             ),
@@ -53,7 +54,7 @@ class AddWidgetTileView extends StatelessWidget {
           child: TextField(
             controller: controller.urlController,
             decoration: InputDecoration(
-              prefixIcon: const Icon(Icons.add_link),
+              prefixIcon: const Icon(TablerIcons.link),
               label: Text(L10n.of(context).link),
               errorText: controller.urlError,
             ),

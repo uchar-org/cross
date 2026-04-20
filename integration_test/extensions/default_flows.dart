@@ -2,6 +2,8 @@ import 'dart:developer';
 
 import 'package:fluffychat/pages/chat_list/chat_list_body.dart';
 import 'package:fluffychat/pages/intro/intro_page.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:tabler_icons/tabler_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -23,7 +25,7 @@ extension DefaultFlowExtensions on WidgetTester {
     expect(input, findsOneWidget);
 
     // getting the placeholder in place
-    await tester.tap(find.byIcon(Icons.search));
+    await tester.tap(find.byIcon(TablerIcons.search));
     await tester.pumpAndSettle();
     await tester.enterText(input, homeserver);
     await tester.pumpAndSettle();

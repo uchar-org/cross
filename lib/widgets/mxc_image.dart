@@ -7,6 +7,8 @@ import 'package:fluffychat/utils/client_download_content_extension.dart';
 import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_file_extension.dart';
 import 'package:fluffychat/widgets/matrix.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:tabler_icons/tabler_icons.dart';
 import 'package:matrix/matrix.dart';
 
 class MxcImage extends StatefulWidget {
@@ -161,7 +163,7 @@ class _MxcImageState extends State<MxcImage> {
                     child: Material(
                       color: Theme.of(context).colorScheme.surfaceContainer,
                       child: Icon(
-                        Icons.broken_image_outlined,
+                        TablerIcons.photo,
                         size: min(widget.height ?? 64, 64),
                         color: Theme.of(context).colorScheme.onSurface,
                       ),
