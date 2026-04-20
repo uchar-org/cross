@@ -517,22 +517,30 @@ class ChatListController extends State<ChatList>
     Room room,
     BuildContext posContext, [
     Room? space,
+    Offset? tapPosition,
   ]) async {
     final overlay =
         Overlay.of(posContext).context.findRenderObject() as RenderBox;
 
-    final button = posContext.findRenderObject() as RenderBox;
-
-    final position = RelativeRect.fromRect(
-      Rect.fromPoints(
-        button.localToGlobal(const Offset(0, -65), ancestor: overlay),
-        button.localToGlobal(
-          button.size.bottomRight(Offset.zero) + const Offset(-50, 0),
-          ancestor: overlay,
+    final RelativeRect position;
+    if (tapPosition != null) {
+      position = RelativeRect.fromRect(
+        tapPosition & const Size(48, 48),
+        Offset.zero & overlay.size,
+      );
+    } else {
+      final button = posContext.findRenderObject() as RenderBox;
+      position = RelativeRect.fromRect(
+        Rect.fromPoints(
+          button.localToGlobal(const Offset(0, -65), ancestor: overlay),
+          button.localToGlobal(
+            button.size.bottomRight(Offset.zero) + const Offset(-50, 0),
+            ancestor: overlay,
+          ),
         ),
-      ),
-      Offset.zero & overlay.size,
-    );
+        Offset.zero & overlay.size,
+      );
+    }
 
     final displayname = room.getLocalizedDisplayname(
       MatrixLocals(L10n.of(context)),
