@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 
+import 'package:fluffychat/utils/platform_infos.dart';
 import 'package:flutter/material.dart';
 
 class MySwipeable extends StatefulWidget {
@@ -159,6 +160,10 @@ class _MySwipeableState extends State<MySwipeable> with TickerProviderStateMixin
         child: widget.child,
       ),
     ];
+
+    if (PlatformInfos.isDesktop || PlatformInfos.isWeb) {
+      return Stack(children: children);
+    }
 
     return GestureDetector(
       onHorizontalDragStart: _handleDragStart,

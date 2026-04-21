@@ -11,6 +11,7 @@ import 'package:fluffychat/utils/date_time_extension.dart';
 import 'package:fluffychat/utils/file_description.dart';
 import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_locals.dart';
 import 'package:fluffychat/utils/native_mac/mac_haptic.dart';
+import 'package:fluffychat/utils/platform_infos.dart';
 import 'package:fluffychat/utils/room_status_extension.dart';
 import 'package:fluffychat/utils/string_color.dart';
 import 'package:fluffychat/widgets/avatar.dart';
@@ -294,16 +295,19 @@ class Message extends StatelessWidget {
                                 bottom: 0,
                                 left: 0,
                                 right: 0,
-                                child: InkWell(
-                                  hoverColor: longPressSelect ? Colors.transparent : null,
-                                  enableFeedback: !selected,
-                                  onTap: longPressSelect ? null : () => onSelect(event),
-                                  borderRadius: BorderRadius.circular(AppConfig.borderRadius / 2),
-                                  child: Material(
+                                child: IgnorePointer(
+                                  ignoring: !longPressSelect && (PlatformInfos.isDesktop || PlatformInfos.isWeb),
+                                  child: InkWell(
+                                    hoverColor: longPressSelect ? Colors.transparent : null,
+                                    enableFeedback: !selected,
+                                    onTap: longPressSelect ? null : () => onSelect(event),
                                     borderRadius: BorderRadius.circular(AppConfig.borderRadius / 2),
-                                    color: selected || highlightMarker
-                                        ? theme.colorScheme.secondaryContainer.withAlpha(128)
-                                        : Colors.transparent,
+                                    child: Material(
+                                      borderRadius: BorderRadius.circular(AppConfig.borderRadius / 2),
+                                      color: selected || highlightMarker
+                                          ? theme.colorScheme.secondaryContainer.withAlpha(128)
+                                          : Colors.transparent,
+                                    ),
                                   ),
                                 ),
                               ),

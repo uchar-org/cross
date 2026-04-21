@@ -49,9 +49,12 @@ class ChatEventList extends StatelessWidget {
     final hasWallpaper =
         controller.room.client.applicationAccountConfig.wallpaperUrl != null;
 
+    final isDesktopOrWeb = PlatformInfos.isDesktop || PlatformInfos.isWeb;
+
     return SelectionArea(
-      contextMenuBuilder: (context, selectableRegionState) =>
-          const SizedBox.shrink(),
+      contextMenuBuilder: isDesktopOrWeb
+          ? null
+          : (context, selectableRegionState) => const SizedBox.shrink(),
       child: ListView.custom(
         padding: EdgeInsets.only(
           top: 16,
