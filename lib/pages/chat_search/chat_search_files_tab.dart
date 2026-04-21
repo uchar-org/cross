@@ -4,6 +4,8 @@ import 'package:fluffychat/pages/chat_search/search_footer.dart';
 import 'package:fluffychat/utils/date_time_extension.dart';
 import 'package:fluffychat/utils/matrix_sdk_extensions/event_extension.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:tabler_icons/tabler_icons.dart';
 import 'package:matrix/matrix.dart';
 
 class ChatSearchFilesTab extends StatelessWidget {
@@ -87,7 +89,7 @@ class ChatSearchFilesTab extends StatelessWidget {
                   color: theme.colorScheme.onInverseSurface,
                   clipBehavior: Clip.hardEdge,
                   child: ListTile(
-                    leading: const Icon(Icons.file_present_outlined),
+                    leading: const Icon(TablerIcons.file),
                     title: Text(
                       filename,
                       maxLines: 1,

@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:tabler_icons/tabler_icons.dart';
 import 'package:flutter/material.dart';
 
 import 'package:collection/collection.dart';
@@ -13,7 +14,6 @@ import 'package:fluffychat/pages/chat/typing_indicators.dart';
 import 'package:fluffychat/utils/account_config.dart';
 import 'package:fluffychat/utils/matrix_sdk_extensions/filtered_timeline_extension.dart';
 import 'package:fluffychat/utils/platform_infos.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
 
@@ -76,7 +76,7 @@ class ChatEventList extends StatelessWidget {
                         : controller.requestFuture,
                     icon: timeline.isRequestingFuture
                         ? CircularProgressIndicator.adaptive(strokeWidth: 2)
-                        : const Icon(Icons.arrow_downward_outlined),
+                        : const Icon(TablerIcons.arrow_down),
                     label: Text(L10n.of(context).loadMore),
                   ),
                 );
@@ -113,7 +113,7 @@ class ChatEventList extends StatelessWidget {
                           : controller.requestHistory,
                       icon: timeline.isRequestingHistory
                           ? CircularProgressIndicator.adaptive(strokeWidth: 2)
-                          : const Icon(Icons.arrow_upward_outlined),
+                          : const Icon(TablerIcons.arrow_up),
                       label: Text(L10n.of(context).loadMore),
                     ),
                   );

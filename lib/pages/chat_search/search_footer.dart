@@ -1,6 +1,8 @@
 import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/utils/date_time_extension.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:tabler_icons/tabler_icons.dart';
 
 class SearchFooter extends StatelessWidget {
   final DateTime? searchedUntil;
@@ -56,7 +58,7 @@ class SearchFooter extends StatelessWidget {
                         strokeWidth: 2,
                       ),
                     )
-                  : const Icon(Icons.arrow_downward_outlined),
+                  : const Icon(TablerIcons.arrow_down),
               label: Text(L10n.of(context).searchMore),
             ),
           ],

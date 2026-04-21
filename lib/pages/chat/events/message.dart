@@ -18,6 +18,8 @@ import 'package:fluffychat/widgets/matrix.dart';
 import 'package:fluffychat/widgets/member_actions_popup_menu_button.dart';
 import 'package:fluffychat/widgets/my_swipe_to.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:tabler_icons/tabler_icons.dart';
 import 'package:flutter/services.dart';
 import 'package:matrix/matrix.dart';
 
@@ -320,7 +322,7 @@ class Message extends StatelessWidget {
                                       child: IconButton(
                                         padding: EdgeInsets.zero,
                                         tooltip: L10n.of(context).select,
-                                        icon: Icon(selected ? Icons.check_circle : Icons.circle_outlined),
+                                        icon: Icon(selected ? TablerIcons.circle_check_filled : TablerIcons.circle),
                                         onPressed: () => onSelect(event),
                                       ),
                                     )
@@ -332,7 +334,7 @@ class Message extends StatelessWidget {
                                           width: 16,
                                           height: 16,
                                           child: event.status == EventStatus.error
-                                              ? const Icon(Icons.error, color: Colors.red)
+                                              ? const Icon(TablerIcons.alert_circle_filled, color: Colors.red)
                                               : event.fileSendingStatus != null
                                               ? const CircularProgressIndicator.adaptive(strokeWidth: 1)
                                               : null,
@@ -562,7 +564,7 @@ class Message extends StatelessWidget {
                                                               spacing: 4.0,
                                                               children: [
                                                                 Icon(
-                                                                  Icons.edit_outlined,
+                                                                  TablerIcons.pencil,
                                                                   color: textColor.withAlpha(164),
                                                                   size: 14,
                                                                 ),
@@ -625,7 +627,7 @@ class Message extends StatelessWidget {
                                                               ),
                                                             ),
                                                             IconButton(
-                                                              icon: const Icon(Icons.add_reaction_outlined),
+                                                              icon: const Icon(TablerIcons.mood_smile),
                                                               tooltip: L10n.of(context).customReaction,
                                                               onPressed: () async {
                                                                 final emoji = await showAdaptiveBottomSheet<String>(
@@ -740,7 +742,7 @@ class Message extends StatelessWidget {
                                 backgroundColor: theme.colorScheme.secondaryContainer,
                               ),
                               onPressed: () => enterThread(event.eventId),
-                              icon: const Icon(Icons.message),
+                              icon: const Icon(TablerIcons.message),
                               label: Text(
                                 '${L10n.of(context).countReplies(threadChildren.length)} | ${threadChildren.first.calcLocalizedBodyFallback(MatrixLocals(L10n.of(context)), withSenderNamePrefix: true)}',
                                 maxLines: 1,

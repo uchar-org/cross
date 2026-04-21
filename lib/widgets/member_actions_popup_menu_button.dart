@@ -1,6 +1,8 @@
 import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/widgets/permission_slider_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:tabler_icons/tabler_icons.dart';
 import 'package:matrix/matrix.dart';
 
 import 'adaptive_dialogs/show_ok_cancel_alert_dialog.dart';
@@ -85,7 +87,7 @@ void showMemberActionsPopupMenu({
           value: _MemberActions.mention,
           child: Row(
             children: [
-              const Icon(Icons.alternate_email_outlined),
+              const Icon(TablerIcons.at),
               const SizedBox(width: 18),
               Text(L10n.of(context).mention),
             ],
@@ -96,7 +98,7 @@ void showMemberActionsPopupMenu({
           value: _MemberActions.approve,
           child: Row(
             children: [
-              const Icon(Icons.how_to_reg_outlined),
+              const Icon(TablerIcons.user_check),
               const SizedBox(width: 18),
               Text(L10n.of(context).approve),
             ],
@@ -107,7 +109,7 @@ void showMemberActionsPopupMenu({
         value: _MemberActions.setRole,
         child: Row(
           children: [
-            const Icon(Icons.admin_panel_settings_outlined),
+            const Icon(TablerIcons.shield_half_filled),
             const SizedBox(width: 18),
             Column(
               mainAxisSize: .min,
@@ -137,7 +139,7 @@ void showMemberActionsPopupMenu({
           value: _MemberActions.grantCallPermission,
           child: Row(
             children: [
-              const Icon(Icons.call_outlined),
+              const Icon(TablerIcons.phone),
               const SizedBox(width: 18),
               Text(L10n.of(context).grantCallPermission),
             ],
@@ -149,7 +151,7 @@ void showMemberActionsPopupMenu({
           child: Row(
             children: [
               Icon(
-                Icons.person_remove_outlined,
+                TablerIcons.user_minus,
                 color: theme.colorScheme.onErrorContainer,
               ),
               const SizedBox(width: 18),
@@ -166,7 +168,7 @@ void showMemberActionsPopupMenu({
           child: Row(
             children: [
               Icon(
-                Icons.block_outlined,
+                TablerIcons.ban,
                 color: theme.colorScheme.onErrorContainer,
               ),
               const SizedBox(width: 18),
@@ -182,7 +184,7 @@ void showMemberActionsPopupMenu({
           value: _MemberActions.unban,
           child: Row(
             children: [
-              const Icon(Icons.warning),
+              const Icon(TablerIcons.alert_triangle_filled),
               const SizedBox(width: 18),
               Text(L10n.of(context).unbanFromChat),
             ],
@@ -194,7 +196,7 @@ void showMemberActionsPopupMenu({
           child: Row(
             children: [
               Icon(
-                Icons.gavel_outlined,
+                TablerIcons.hammer,
                 color: theme.colorScheme.onErrorContainer,
               ),
               const SizedBox(width: 18),

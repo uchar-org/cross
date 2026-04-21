@@ -8,6 +8,8 @@ import 'package:fluffychat/widgets/layouts/max_width_body.dart';
 import 'package:fluffychat/widgets/matrix.dart';
 import 'package:fluffychat/widgets/settings_switch_list_tile.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:tabler_icons/tabler_icons.dart';
 import 'package:go_router/go_router.dart';
 import 'package:matrix/matrix.dart';
 
@@ -70,7 +72,7 @@ class SettingsSecurityView extends StatelessWidget {
                     setting: AppSettings.sendPublicReadReceipts,
                   ),
                   ListTile(
-                    trailing: const Icon(Icons.chevron_right_outlined),
+                    trailing: const Icon(TablerIcons.chevron_right),
                     title: Text(L10n.of(context).blockedUsers),
                     subtitle: Text(
                       L10n.of(context).thereAreCountUsersBlocked(
@@ -83,7 +85,7 @@ class SettingsSecurityView extends StatelessWidget {
                   if (Matrix.of(context).client.encryption != null) ...{
                     if (PlatformInfos.isMobile)
                       ListTile(
-                        trailing: const Icon(Icons.chevron_right_outlined),
+                        trailing: const Icon(TablerIcons.chevron_right),
                         title: Text(L10n.of(context).appLock),
                         subtitle: Text(L10n.of(context).appLockDescription),
                         onTap: controller.setAppLockAction,
@@ -138,7 +140,7 @@ class SettingsSecurityView extends StatelessWidget {
                   ),
                   ListTile(
                     title: Text(L10n.of(context).yourPublicKey),
-                    leading: const Icon(Icons.vpn_key_outlined),
+                    leading: const Icon(TablerIcons.shield_lock),
                     subtitle: SelectableText(
                       Matrix.of(context).client.fingerprintKey.beautified,
                       style: const TextStyle(fontFamily: 'RobotoMono'),
@@ -147,15 +149,15 @@ class SettingsSecurityView extends StatelessWidget {
                   if (capabilities?.mChangePassword?.enabled != false ||
                       error != null)
                     ListTile(
-                      leading: const Icon(Icons.password_outlined),
-                      trailing: const Icon(Icons.chevron_right_outlined),
+                      leading: const Icon(TablerIcons.lock),
+                      trailing: const Icon(TablerIcons.chevron_right),
                       title: Text(L10n.of(context).changePassword),
                       onTap: () =>
                           context.go('/rooms/settings/security/password'),
                     ),
                   ListTile(
                     iconColor: Colors.orange,
-                    leading: const Icon(Icons.delete_sweep_outlined),
+                    leading: const Icon(TablerIcons.trash_x),
                     title: Text(
                       L10n.of(context).dehydrate,
                       style: const TextStyle(color: Colors.orange),
@@ -165,7 +167,7 @@ class SettingsSecurityView extends StatelessWidget {
                   Divider(color: theme.dividerColor),
                   ListTile(
                     iconColor: Colors.red,
-                    leading: const Icon(Icons.delete_outlined),
+                    leading: const Icon(TablerIcons.trash),
                     title: Text(
                       L10n.of(context).deleteAccount,
                       style: const TextStyle(color: Colors.red),

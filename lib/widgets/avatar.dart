@@ -2,6 +2,8 @@ import 'package:fluffychat/utils/string_color.dart';
 import 'package:fluffychat/widgets/mxc_image.dart';
 import 'package:fluffychat/widgets/presence_builder.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:tabler_icons/tabler_icons.dart';
 import 'package:matrix/matrix.dart';
 
 class Avatar extends StatelessWidget {
@@ -94,7 +96,7 @@ class Avatar extends StatelessWidget {
                     )
                   : Center(
                       child: Icon(
-                        Icons.person_2,
+                        TablerIcons.users,
                         color: theme.colorScheme.tertiary,
                         size: size / 1.5,
                       ),

@@ -13,6 +13,8 @@ import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_locals.dart';
 import 'package:fluffychat/widgets/avatar.dart';
 import 'package:fluffychat/widgets/matrix.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:tabler_icons/tabler_icons.dart';
 import 'package:go_router/go_router.dart';
 import 'package:matrix/matrix.dart';
 
@@ -101,7 +103,7 @@ class MessageContent extends StatelessWidget {
                 ),
                 title: Text(sender.calcDisplayname()),
                 subtitle: Text(event.originServerTs.localizedTime(context)),
-                trailing: const Icon(Icons.lock_outlined),
+                trailing: const Icon(TablerIcons.lock),
               ),
               const Divider(),
               Text(event.calcLocalizedBodyFallback(MatrixLocals(l10n))),
@@ -237,7 +239,7 @@ class MessageContent extends StatelessWidget {
                     ),
                     const SizedBox(height: 6),
                     OutlinedButton.icon(
-                      icon: Icon(Icons.location_on_outlined, color: textColor),
+                      icon: Icon(TablerIcons.map_pin, color: textColor),
                       onPressed: UrlLauncher(
                         context,
                         geoUri.toString(),
@@ -287,15 +289,26 @@ class MessageContent extends StatelessWidget {
             final bigEmotes =
                 !event.isRichMessage && bigEmojis.contains(event.body);
 
-            final urls = UrlPreviewService.extractUrls(event.body);
+            final bodyWithoutReply = event.body
+                .split('\n')
+                .where((line) => !line.startsWith('> '))
+                .join('\n');
+            final urls = UrlPreviewService.extractUrls(bodyWithoutReply);
+
+            final hasUrlPreview = urls.isNotEmpty;
+            final timeRowWidth = isReplied
+                ? double.infinity
+                : messageStatus == null
+                ? 46.0
+                : 60.0;
 
             return Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
+              child: Stack(
                 children: [
-                  Stack(
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       HtmlMessage(
                         html: html,
@@ -315,38 +328,36 @@ class MessageContent extends StatelessWidget {
                           timeline,
                           EventCheckboxRoomExtension.relationshipType,
                         ),
-                        trailingWidget: SizedBox(
-                          width: isReplied
-                              ? double.infinity
-                              : messageStatus == null
-                              ? 46
-                              : 60,
-                          height: 14,
-                        ),
+                        trailingWidget: hasUrlPreview
+                            ? null
+                            : SizedBox(width: timeRowWidth, height: 14),
                       ),
-
-                      // Time - always in the lower right corner
-                      Positioned(
-                        right: 0,
-                        bottom: 0,
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(formattedTime, style: TextStyle(color: textColor, fontSize: 12)),
-                            if (messageStatus != null) const SizedBox(width: 3),
-                            if (messageStatus != null) MessageStatusWidget(status: messageStatus, iconColor: textColor),
-                          ],
+                      if (hasUrlPreview) ...[
+                        const SizedBox(height: 4),
+                        UrlPreviewWidget(
+                          key: ValueKey('preview_${event.eventId}_${urls.first}'),
+                          url: urls.first,
+                          textColor: textColor,
+                          linkColor: linkColor,
                         ),
-                      ),
+                        const SizedBox(height: 24),
+                      ],
                     ],
                   ),
-                  if (urls.isNotEmpty)
-                    UrlPreviewWidget(
-                      key: ValueKey('preview_${event.eventId}_${urls.first}'),
-                      url: urls.first,
-                      textColor: textColor,
-                      linkColor: linkColor,
+
+                  // Time - always in the lower right corner
+                  Positioned(
+                    right: 0,
+                    bottom: 0,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(formattedTime, style: TextStyle(color: textColor, fontSize: 12)),
+                        if (messageStatus != null) const SizedBox(width: 3),
+                        if (messageStatus != null) MessageStatusWidget(status: messageStatus, iconColor: textColor),
+                      ],
                     ),
+                  ),
                 ],
               ),
             );

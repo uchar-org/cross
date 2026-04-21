@@ -9,6 +9,8 @@ import 'package:fluffychat/widgets/avatar.dart';
 import 'package:fluffychat/widgets/layouts/max_width_body.dart';
 import 'package:fluffychat/widgets/matrix.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:tabler_icons/tabler_icons.dart';
 import 'package:go_router/go_router.dart';
 import 'package:matrix/matrix.dart';
 import 'package:pretty_qr_code/pretty_qr_code.dart';
@@ -68,7 +70,7 @@ class NewPrivateChatView extends StatelessWidget {
                     fontWeight: FontWeight.normal,
                   ),
                   prefixIcon: searchResponse == null
-                      ? const Icon(Icons.search_outlined)
+                      ? const Icon(TablerIcons.search)
                       : FutureBuilder(
                           future: searchResponse,
                           builder: (context, snapshot) {
@@ -84,13 +86,13 @@ class NewPrivateChatView extends StatelessWidget {
                                 ),
                               );
                             }
-                            return const Icon(Icons.search_outlined);
+                            return const Icon(TablerIcons.search);
                           },
                         ),
                   suffixIcon: controller.controller.text.isEmpty
                       ? null
                       : IconButton(
-                          icon: const Icon(Icons.clear_outlined),
+                          icon: const Icon(TablerIcons.x),
                           onPressed: () {
                             controller.controller.clear();
                             controller.searchUsers();
@@ -136,7 +138,7 @@ class NewPrivateChatView extends StatelessWidget {
                                   theme.colorScheme.secondaryContainer,
                               foregroundColor:
                                   theme.colorScheme.onSecondaryContainer,
-                              child: Icon(Icons.adaptive.share_outlined),
+                              child: Icon(TablerIcons.share),
                             ),
                             title: Text(L10n.of(context).shareInviteLink),
                             onTap: controller.inviteAction,
@@ -147,7 +149,7 @@ class NewPrivateChatView extends StatelessWidget {
                                   theme.colorScheme.tertiaryContainer,
                               foregroundColor:
                                   theme.colorScheme.onTertiaryContainer,
-                              child: const Icon(Icons.group_add_outlined),
+                              child: const Icon(TablerIcons.user_plus),
                             ),
                             title: Text(L10n.of(context).createGroup),
                             onTap: () => context.go('/rooms/newgroup'),
@@ -160,7 +162,7 @@ class NewPrivateChatView extends StatelessWidget {
                                 foregroundColor:
                                     theme.colorScheme.onPrimaryContainer,
                                 child: const Icon(
-                                  Icons.qr_code_scanner_outlined,
+                                  TablerIcons.scan,
                                 ),
                               ),
                               title: Text(L10n.of(context).scanQrCode),
@@ -232,7 +234,7 @@ class NewPrivateChatView extends StatelessWidget {
                                 const SizedBox(height: 12),
                                 OutlinedButton.icon(
                                   onPressed: controller.searchUsers,
-                                  icon: const Icon(Icons.refresh_outlined),
+                                  icon: const Icon(TablerIcons.refresh),
                                   label: Text(L10n.of(context).tryAgain),
                                 ),
                               ],
@@ -247,7 +249,7 @@ class NewPrivateChatView extends StatelessWidget {
                             return Column(
                               mainAxisAlignment: .center,
                               children: [
-                                const Icon(Icons.search_outlined, size: 86),
+                                const Icon(TablerIcons.search, size: 86),
                                 Padding(
                                   padding: const EdgeInsets.all(16.0),
                                   child: Text(

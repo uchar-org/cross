@@ -26,6 +26,8 @@ import 'package:fluffychat/utils/voip/video_renderer.dart';
 import 'package:fluffychat/widgets/avatar.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:tabler_icons/tabler_icons.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart' hide VideoRenderer;
@@ -96,7 +98,7 @@ class _StreamView extends StatelessWidget {
               left: 4.0,
               bottom: 4.0,
               child: Icon(
-                audioMuted ? Icons.mic_off : Icons.mic,
+                audioMuted ? TablerIcons.microphone_off : TablerIcons.microphone,
                 color: Colors.white,
                 size: 18.0,
               ),
@@ -347,7 +349,7 @@ class MyCallingPage extends State<Calling> {
           heroTag: 'switchCamera',
           onPressed: _switchCamera,
           backgroundColor: Colors.black45,
-          child: const Icon(Icons.switch_camera),
+          child: const Icon(TablerIcons.camera_rotate),
         );
         final hangupButton = FloatingActionButton(
           heroTag: 'hangup',
@@ -356,21 +358,21 @@ class MyCallingPage extends State<Calling> {
           backgroundColor: _state == CallState.kEnded
               ? Colors.black45
               : Colors.red,
-          child: const Icon(Icons.call_end),
+          child: const Icon(TablerIcons.phone_off),
         );
         final answerButton = FloatingActionButton(
           heroTag: 'answer',
           onPressed: _answerCall,
           tooltip: 'Answer',
           backgroundColor: Colors.green,
-          child: const Icon(Icons.phone),
+          child: const Icon(TablerIcons.phone),
         );
         final muteMicButton = FloatingActionButton(
           heroTag: 'muteMic',
           onPressed: _muteMic,
           foregroundColor: isMicrophoneMuted ? Colors.black26 : Colors.white,
           backgroundColor: isMicrophoneMuted ? Colors.white : Colors.black45,
-          child: Icon(isMicrophoneMuted ? Icons.mic_off : Icons.mic),
+          child: Icon(isMicrophoneMuted ? TablerIcons.microphone_off : TablerIcons.microphone),
         );
         final screenSharingButton = FloatingActionButton(
           heroTag: 'screenSharing',
@@ -381,21 +383,21 @@ class MyCallingPage extends State<Calling> {
           backgroundColor: isScreensharingEnabled
               ? Colors.white
               : Colors.black45,
-          child: const Icon(Icons.desktop_mac),
+          child: const Icon(TablerIcons.device_desktop),
         );
         final holdButton = FloatingActionButton(
           heroTag: 'hold',
           onPressed: _remoteOnHold,
           foregroundColor: isRemoteOnHold ? Colors.black26 : Colors.white,
           backgroundColor: isRemoteOnHold ? Colors.white : Colors.black45,
-          child: const Icon(Icons.pause),
+          child: const Icon(TablerIcons.player_pause_filled),
         );
         final muteCameraButton = FloatingActionButton(
           heroTag: 'muteCam',
           onPressed: _muteCamera,
           foregroundColor: isLocalVideoMuted ? Colors.black26 : Colors.white,
           backgroundColor: isLocalVideoMuted ? Colors.white : Colors.black45,
-          child: Icon(isLocalVideoMuted ? Icons.videocam_off : Icons.videocam),
+          child: Icon(isLocalVideoMuted ? TablerIcons.video : TablerIcons.video),
         );
 
         late final List<Widget> actionButtons;
@@ -467,7 +469,7 @@ class MyCallingPage extends State<Calling> {
                         mainAxisAlignment: .center,
                         children: [
                           const Icon(
-                            Icons.pause,
+                            TablerIcons.player_pause_filled,
                             size: 48.0,
                             color: Colors.white,
                           ),
@@ -591,7 +593,7 @@ class MyCallingPage extends State<Calling> {
                         left: 24.0,
                         child: IconButton(
                           color: Colors.black45,
-                          icon: const Icon(Icons.arrow_back),
+                          icon: const Icon(TablerIcons.arrow_left),
                           onPressed: () {
                             PIPView.of(context)?.setFloating(true);
                           },

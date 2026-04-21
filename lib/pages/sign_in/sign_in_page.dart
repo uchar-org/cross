@@ -9,6 +9,8 @@ import 'package:fluffychat/widgets/layouts/login_scaffold.dart';
 import 'package:fluffychat/widgets/matrix.dart';
 import 'package:fluffychat/widgets/view_model_builder.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:tabler_icons/tabler_icons.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 class SignInPage extends StatelessWidget {
@@ -73,7 +75,7 @@ class SignInPage extends StatelessWidget {
                     errorText: state.publicHomeservers.error?.toLocalizedString(
                       context,
                     ),
-                    prefixIcon: const Icon(Icons.search_outlined),
+                    prefixIcon: const Icon(TablerIcons.search),
                     hintText: L10n.of(context).searchOrEnterHomeserverAddress,
                   ),
                 ),
@@ -110,7 +112,7 @@ class SignInPage extends StatelessWidget {
                                       child: IconButton(
                                         tooltip: website,
                                         icon: const Icon(
-                                          Icons.open_in_new_outlined,
+                                          TablerIcons.external_link,
                                           size: 16,
                                         ),
                                         onPressed: () =>

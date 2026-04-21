@@ -3,6 +3,8 @@ import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/pages/chat/chat_input_row.dart';
 import 'package:fluffychat/pages/chat/recording_view_model.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:tabler_icons/tabler_icons.dart';
 
 class RecordingInputRow extends StatelessWidget {
   final RecordingViewModelState state;
@@ -31,7 +33,7 @@ class RecordingInputRow extends StatelessWidget {
             width: 48,
             child: IconButton(
               tooltip: L10n.of(context).cancel,
-              icon: const Icon(Icons.delete_outlined),
+              icon: const Icon(TablerIcons.trash),
               color: theme.colorScheme.error,
               onPressed: state.cancel,
             ),
@@ -42,7 +44,7 @@ class RecordingInputRow extends StatelessWidget {
               width: 48,
               child: IconButton(
                 tooltip: L10n.of(context).resume,
-                icon: const Icon(Icons.play_circle_outline_outlined),
+                icon: const Icon(TablerIcons.player_play),
                 onPressed: state.resume,
               ),
             )
@@ -52,7 +54,7 @@ class RecordingInputRow extends StatelessWidget {
               width: 48,
               child: IconButton(
                 tooltip: L10n.of(context).pause,
-                icon: const Icon(Icons.pause_circle_outline_outlined),
+                icon: const Icon(TablerIcons.player_pause),
                 onPressed: state.pause,
               ),
             ),
@@ -96,7 +98,7 @@ class RecordingInputRow extends StatelessWidget {
                     dimension: 24,
                     child: CircularProgressIndicator.adaptive(),
                   )
-                : const Icon(Icons.send_outlined),
+                : const Icon(TablerIcons.send),
             onPressed: state.isSending ? null : () => state.stopAndSend(onSend),
           ),
           const SizedBox(width: 4),

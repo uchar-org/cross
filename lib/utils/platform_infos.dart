@@ -4,6 +4,8 @@ import 'package:fluffychat/config/setting_keys.dart';
 import 'package:fluffychat/l10n/l10n.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:tabler_icons/tabler_icons.dart';
 import 'package:go_router/go_router.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher_string.dart';
@@ -59,7 +61,7 @@ abstract class PlatformInfos {
         Text(l10n.versionWithNumber(version)),
         TextButton.icon(
           onPressed: () => launchUrlString(AppConfig.sourceCodeUrl),
-          icon: const Icon(Icons.source_outlined),
+          icon: const Icon(TablerIcons.file_text),
           label: Text(l10n.sourceCode),
         ),
         Builder(
@@ -69,7 +71,7 @@ abstract class PlatformInfos {
                 context.go('/logs');
                 Navigator.of(innerContext).pop();
               },
-              icon: const Icon(Icons.list_outlined),
+              icon: const Icon(TablerIcons.list),
               label: Text(l10n.logs),
             );
           },
@@ -81,7 +83,7 @@ abstract class PlatformInfos {
                 context.go('/configs');
                 Navigator.of(innerContext).pop();
               },
-              icon: const Icon(Icons.settings_applications_outlined),
+              icon: const Icon(TablerIcons.settings),
               label: Text(l10n.advancedConfigs),
             );
           },

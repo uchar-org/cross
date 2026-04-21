@@ -5,6 +5,8 @@ import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_locals.dart';
 import 'package:fluffychat/utils/url_launcher.dart';
 import 'package:fluffychat/widgets/avatar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:tabler_icons/tabler_icons.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:go_router/go_router.dart';
 import 'package:matrix/matrix.dart';
@@ -35,7 +37,7 @@ class ChatSearchMessageTab extends StatelessWidget {
       return Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(Icons.search_outlined, size: 64),
+          const Icon(TablerIcons.search, size: 64),
           const SizedBox(height: 8),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 32.0),
@@ -132,7 +134,7 @@ class _MessageSearchResultListTile extends StatelessWidget {
         overflow: TextOverflow.ellipsis,
       ),
       trailing: IconButton(
-        icon: const Icon(Icons.chevron_right_outlined),
+        icon: const Icon(TablerIcons.chevron_right),
         onPressed: () => context.go(
           '/${Uri(pathSegments: ['rooms', room.id], queryParameters: {'event': event.eventId})}',
         ),

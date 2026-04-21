@@ -31,10 +31,17 @@ class UrlPreviewData {
       title: json['og:title'] as String?,
       description: json['og:description'] as String?,
       imageUri: imageUrl != null ? Uri.tryParse(imageUrl) : null,
-      imageWidth: json['og:image:width'] as int?,
-      imageHeight: json['og:image:height'] as int?,
+      imageWidth: _asInt(json['og:image:width']),
+      imageHeight: _asInt(json['og:image:height']),
       siteName: json['og:site_name'] as String?,
     );
+  }
+
+  static int? _asInt(Object? value) {
+    if (value is int) return value;
+    if (value is num) return value.toInt();
+    if (value is String) return int.tryParse(value);
+    return null;
   }
 
   @override
