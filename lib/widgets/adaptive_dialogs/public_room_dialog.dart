@@ -3,6 +3,8 @@ import 'package:fluffychat/utils/fluffy_share.dart';
 import 'package:fluffychat/widgets/adaptive_dialogs/show_ok_cancel_alert_dialog.dart';
 import 'package:fluffychat/widgets/adaptive_dialogs/show_text_input_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:tabler_icons/tabler_icons.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:go_router/go_router.dart';
@@ -172,8 +174,8 @@ class PublicRoomDialog extends StatelessWidget {
                                                       : 1.0,
                                                   child: Icon(
                                                     copied
-                                                        ? Icons.check_circle
-                                                        : Icons.copy,
+                                                        ? TablerIcons.circle_check_filled
+                                                        : TablerIcons.copy,
                                                     size: 12,
                                                     color: copied
                                                         ? Colors.green
@@ -240,7 +242,7 @@ class PublicRoomDialog extends StatelessWidget {
                     children: [
                       AdaptiveIconTextButton(
                         label: L10n.of(context).report,
-                        icon: Icons.gavel_outlined,
+                        icon: TablerIcons.hammer,
                         onTap: () async {
                           Navigator.of(context).pop();
                           final reason = await showTextInputDialog(
@@ -263,13 +265,13 @@ class PublicRoomDialog extends StatelessWidget {
                       ),
                       AdaptiveIconTextButton(
                         label: L10n.of(context).copy,
-                        icon: Icons.copy_outlined,
+                        icon: TablerIcons.copy,
                         onTap: () =>
                             Clipboard.setData(ClipboardData(text: roomLink!)),
                       ),
                       AdaptiveIconTextButton(
                         label: L10n.of(context).share,
-                        icon: Icons.adaptive.share,
+                        icon: TablerIcons.share,
                         onTap: () => FluffyShare.share(
                           'https://matrix.to/#/$roomLink',
                           context,

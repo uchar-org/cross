@@ -7,6 +7,8 @@ import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_locals.dart';
 import 'package:fluffychat/widgets/adaptive_dialogs/show_modal_action_popup.dart';
 import 'package:fluffychat/widgets/future_loading_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:tabler_icons/tabler_icons.dart';
 import 'package:matrix/matrix.dart';
 
 class PinnedEvents extends StatelessWidget {
@@ -38,7 +40,7 @@ class PinnedEvents extends StatelessWidget {
                 .map(
                   (event) => AdaptiveModalAction(
                     value: event?.eventId ?? '',
-                    icon: const Icon(Icons.push_pin_outlined),
+                    icon: const Icon(TablerIcons.pin),
                     label:
                         event?.calcLocalizedBodyFallback(
                           MatrixLocals(l10n),
@@ -80,7 +82,7 @@ class PinnedEvents extends StatelessWidget {
             splashRadius: 18,
             iconSize: 18,
             color: theme.colorScheme.onSurfaceVariant,
-            icon: const Icon(Icons.push_pin),
+            icon: const Icon(TablerIcons.pin_filled),
             tooltip: L10n.of(context).unpin,
             onPressed: controller.room.canSendEvent(EventTypes.RoomPinnedEvents)
                 ? () => controller.unpinEvent(event!.eventId)

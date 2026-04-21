@@ -3,6 +3,8 @@ import 'package:fluffychat/pages/settings_3pid/settings_3pid.dart';
 import 'package:fluffychat/widgets/layouts/max_width_body.dart';
 import 'package:fluffychat/widgets/matrix.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:tabler_icons/tabler_icons.dart';
 import 'package:matrix/matrix.dart';
 
 class Settings3PidView extends StatelessWidget {
@@ -21,7 +23,7 @@ class Settings3PidView extends StatelessWidget {
         title: Text(L10n.of(context).passwordRecovery),
         actions: [
           IconButton(
-            icon: const Icon(Icons.add_outlined),
+            icon: const Icon(TablerIcons.plus),
             onPressed: controller.add3PidAction,
             tooltip: L10n.of(context).addEmail,
           ),
@@ -60,8 +62,8 @@ class Settings3PidView extends StatelessWidget {
                             : Colors.grey,
                         child: Icon(
                           identifier.isEmpty
-                              ? Icons.warning_outlined
-                              : Icons.info_outlined,
+                              ? TablerIcons.alert_triangle
+                              : TablerIcons.info_circle,
                         ),
                       ),
                       title: Text(
@@ -85,7 +87,7 @@ class Settings3PidView extends StatelessWidget {
                           title: Text(identifier[i].address),
                           trailing: IconButton(
                             tooltip: L10n.of(context).delete,
-                            icon: const Icon(Icons.delete_forever_outlined),
+                            icon: const Icon(TablerIcons.trash_filled),
                             color: Colors.red,
                             onPressed: () =>
                                 controller.delete3Pid(identifier[i]),
@@ -106,9 +108,9 @@ extension on ThirdPartyIdentifier {
   IconData get iconData {
     switch (medium) {
       case ThirdPartyIdentifierMedium.email:
-        return Icons.mail_outline_rounded;
+        return TablerIcons.mail;
       case ThirdPartyIdentifierMedium.msisdn:
-        return Icons.phone_android_outlined;
+        return TablerIcons.device_mobile;
     }
   }
 }

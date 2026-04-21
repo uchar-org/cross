@@ -1,6 +1,8 @@
 import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/utils/localized_exception_extension.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:tabler_icons/tabler_icons.dart';
 import 'package:matrix/matrix.dart';
 
 class StartPollBottomSheet extends StatefulWidget {
@@ -120,7 +122,7 @@ class _StartPollBottomSheetState extends State<StartPollBottomSheet> {
                   suffixIcon: _answers.length == 2
                       ? null
                       : IconButton(
-                          icon: const Icon(Icons.cancel_outlined),
+                          icon: const Icon(TablerIcons.circle_x),
                           onPressed: () => setState(() {
                             _answers.remove(answerController..dispose());
                           }),
@@ -132,7 +134,7 @@ class _StartPollBottomSheetState extends State<StartPollBottomSheet> {
           Align(
             alignment: Alignment.centerLeft,
             child: TextButton.icon(
-              icon: const Icon(Icons.add_outlined),
+              icon: const Icon(TablerIcons.plus),
               onPressed: _answers.length < maxAnswers
                   ? () => setState(() {
                       _answers.add(TextEditingController());

@@ -10,6 +10,7 @@ import 'package:fluffychat/utils/stream_extension.dart';
 import 'package:fluffychat/widgets/adaptive_dialogs/public_room_dialog.dart';
 import 'package:fluffychat/widgets/avatar.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:tabler_icons/tabler_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart';
 
@@ -87,17 +88,17 @@ class ChatListViewBody extends StatelessWidget {
                   if (controller.isSearchMode) ...[
                     SearchTitle(
                       title: L10n.of(context).publicRooms,
-                      icon: const Icon(Icons.explore_outlined),
+                      icon: const Icon(TablerIcons.compass),
                     ),
                     PublicRoomsHorizontalList(publicRooms: publicRooms),
                     SearchTitle(
                       title: L10n.of(context).publicSpaces,
-                      icon: const Icon(Icons.workspaces_outlined),
+                      icon: const Icon(TablerIcons.layout_grid),
                     ),
                     PublicRoomsHorizontalList(publicRooms: publicSpaces),
                     SearchTitle(
                       title: L10n.of(context).users,
-                      icon: const Icon(Icons.group_outlined),
+                      icon: const Icon(TablerIcons.users),
                     ),
                     AnimatedContainer(
                       clipBehavior: Clip.hardEdge,
@@ -185,7 +186,7 @@ class ChatListViewBody extends StatelessWidget {
                   if (controller.isSearchMode)
                     SearchTitle(
                       title: L10n.of(context).chats,
-                      icon: const Icon(Icons.forum_outlined),
+                      icon: const Icon(TablerIcons.messages),
                     ),
                   if (client.prevBatch != null &&
                       rooms.isEmpty &&
@@ -204,7 +205,7 @@ class ChatListViewBody extends StatelessWidget {
                               ],
                             ),
                             Icon(
-                              CupertinoIcons.chat_bubble_text_fill,
+                              TablerIcons.message,
                               size: 128,
                               color: theme.colorScheme.secondary,
                             ),
@@ -258,8 +259,8 @@ class ChatListViewBody extends StatelessWidget {
                           key: Key('chat_list_item_${room.id}'),
                           filter: filter,
                           onTap: () => controller.onChatTap(room),
-                          onLongPress: (context) => controller
-                              .chatContextAction(room, context, space),
+                          onLongPress: (context) =>
+                          controller.chatContextAction(room, context, space),
                           activeChat: controller.activeChat == room.id,
                         ),
                       ],

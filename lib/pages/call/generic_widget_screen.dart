@@ -5,6 +5,8 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:tabler_icons/tabler_icons.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:matrix/matrix.dart';
 
@@ -159,7 +161,7 @@ class _GenericWidgetScreenState extends State<GenericWidgetScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const Icon(
-                  Icons.error_outline,
+                  TablerIcons.alert_circle,
                   size: 64,
                   color: Colors.red,
                 ),
@@ -186,7 +188,7 @@ class _GenericWidgetScreenState extends State<GenericWidgetScreen> {
         title: Text(widget.settings.name ?? 'Widget'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.close),
+            icon: const Icon(TablerIcons.x),
             onPressed: () {
               widget.onClose?.call();
               Navigator.of(context).pop();

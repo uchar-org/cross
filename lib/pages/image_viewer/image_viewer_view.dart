@@ -4,6 +4,8 @@ import 'package:fluffychat/utils/platform_infos.dart';
 import 'package:fluffychat/widgets/hover_builder.dart';
 import 'package:fluffychat/widgets/mxc_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:tabler_icons/tabler_icons.dart';
 import 'package:matrix/matrix.dart';
 
 import 'image_viewer.dart';
@@ -28,7 +30,7 @@ class ImageViewerView extends StatelessWidget {
           elevation: 0,
           leading: IconButton(
             style: iconButtonStyle,
-            icon: const Icon(Icons.close),
+            icon: const Icon(TablerIcons.x),
             onPressed: Navigator.of(context).pop,
             color: Colors.white,
             tooltip: L10n.of(context).close,
@@ -37,7 +39,7 @@ class ImageViewerView extends StatelessWidget {
           actions: [
             IconButton(
               style: iconButtonStyle,
-              icon: const Icon(Icons.reply_outlined),
+              icon: const Icon(TablerIcons.arrow_back_up),
               onPressed: controller.forwardAction,
               color: Colors.white,
               tooltip: L10n.of(context).share,
@@ -45,7 +47,7 @@ class ImageViewerView extends StatelessWidget {
             const SizedBox(width: 8),
             IconButton(
               style: iconButtonStyle,
-              icon: const Icon(Icons.download_outlined),
+              icon: const Icon(TablerIcons.cloud_download),
               onPressed: () => controller.saveFileAction(context),
               color: Colors.white,
               tooltip: L10n.of(context).downloadFile,
@@ -61,7 +63,7 @@ class ImageViewerView extends StatelessWidget {
                     onPressed: () => controller.shareFileAction(context),
                     tooltip: L10n.of(context).share,
                     color: Colors.white,
-                    icon: Icon(Icons.adaptive.share_outlined),
+                    icon: Icon(TablerIcons.share),
                   ),
                 ),
               ),
@@ -131,7 +133,7 @@ class ImageViewerView extends StatelessWidget {
                           child: IconButton(
                             style: iconButtonStyle,
                             tooltip: L10n.of(context).previous,
-                            icon: const Icon(Icons.arrow_upward_outlined),
+                            icon: const Icon(TablerIcons.arrow_up),
                             onPressed: controller.prevImage,
                           ),
                         ),
@@ -141,7 +143,7 @@ class ImageViewerView extends StatelessWidget {
                           child: IconButton(
                             style: iconButtonStyle,
                             tooltip: L10n.of(context).next,
-                            icon: const Icon(Icons.arrow_downward_outlined),
+                            icon: const Icon(TablerIcons.arrow_down),
                             onPressed: controller.nextImage,
                           ),
                         ),

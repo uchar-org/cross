@@ -1,5 +1,7 @@
 import 'package:fluffychat/pages/chat/events/message.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:tabler_icons/tabler_icons.dart';
 
 class MessageStatusWidget extends StatelessWidget {
   final MessageStatus? status;
@@ -17,20 +19,20 @@ class MessageStatusWidget extends StatelessWidget {
             }
           case MessageStatus.seen:
             {
-              return Icon(Icons.done_all, size: 14, color: iconColor);
+              return Icon(TablerIcons.check, size: 14, color: iconColor);
             }
           case MessageStatus.pending:
             {
-              return Icon(Icons.schedule, size: 14, color: iconColor);
+              return Icon(TablerIcons.clock, size: 14, color: iconColor);
             }
           case MessageStatus.sent:
             {
-              return Icon(Icons.check, size: 14, color: iconColor);
+              return Icon(TablerIcons.check, size: 14, color: iconColor);
             }
           case MessageStatus.error:
             {
               return Icon(
-                Icons.error,
+                TablerIcons.alert_circle_filled,
                 size: 14,
                 color: Theme.of(context).colorScheme.error,
               );

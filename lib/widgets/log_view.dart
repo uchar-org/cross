@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:tabler_icons/tabler_icons.dart';
 
 import 'package:go_router/go_router.dart';
 import 'package:matrix/matrix.dart';
@@ -25,11 +27,11 @@ class LogViewerState extends State<LogViewer> {
         leading: BackButton(onPressed: () => context.go('/')),
         actions: [
           IconButton(
-            icon: const Icon(Icons.zoom_in_outlined),
+            icon: const Icon(TablerIcons.zoom_in),
             onPressed: () => setState(() => fontSize++),
           ),
           IconButton(
-            icon: const Icon(Icons.zoom_out_outlined),
+            icon: const Icon(TablerIcons.zoom_out),
             onPressed: () => setState(() => fontSize--),
           ),
           PopupMenuButton<Level>(

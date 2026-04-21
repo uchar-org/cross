@@ -3,6 +3,8 @@ import 'dart:io';
 
 import 'package:fluffychat/l10n/l10n.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:tabler_icons/tabler_icons.dart';
 import 'package:qr_code_scanner_plus/qr_code_scanner_plus.dart';
 
 class QrScannerModal extends StatefulWidget {
@@ -32,7 +34,7 @@ class QrScannerModalState extends State<QrScannerModal> {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          icon: const Icon(Icons.close_outlined),
+          icon: const Icon(TablerIcons.x),
           onPressed: Navigator.of(context).pop,
           tooltip: L10n.of(context).close,
         ),

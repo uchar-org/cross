@@ -1,6 +1,8 @@
 import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/utils/localized_exception_extension.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:tabler_icons/tabler_icons.dart';
 import 'package:go_router/go_router.dart';
 import 'package:matrix/matrix.dart';
 
@@ -45,7 +47,7 @@ class ChatMembersView extends StatelessWidget {
           if (room.canInvite)
             IconButton(
               onPressed: () => context.go('/rooms/${room.id}/invite'),
-              icon: const Icon(Icons.person_add_outlined),
+              icon: const Icon(TablerIcons.user_plus),
             ),
         ],
       ),
@@ -59,12 +61,12 @@ class ChatMembersView extends StatelessWidget {
                   child: Column(
                     mainAxisSize: .min,
                     children: [
-                      const Icon(Icons.error_outline),
+                      const Icon(TablerIcons.alert_circle),
                       Text(error.toLocalizedString(context)),
                       const SizedBox(height: 8),
                       OutlinedButton.icon(
                         onPressed: controller.refreshMembers,
-                        icon: const Icon(Icons.refresh_outlined),
+                        icon: const Icon(TablerIcons.refresh),
                         label: Text(L10n.of(context).tryAgain),
                       ),
                     ],
@@ -114,7 +116,7 @@ class ChatMembersView extends StatelessWidget {
                                 color: theme.colorScheme.onPrimaryContainer,
                                 fontWeight: FontWeight.normal,
                               ),
-                              prefixIcon: const Icon(Icons.search_outlined),
+                              prefixIcon: const Icon(TablerIcons.search),
                               hintText: L10n.of(context).search,
                             ),
                           ),

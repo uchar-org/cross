@@ -3,6 +3,8 @@ import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/utils/url_launcher.dart';
 import 'package:fluffychat/widgets/mxc_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:tabler_icons/tabler_icons.dart';
 import 'package:matrix/matrix.dart';
 
 import '../../widgets/avatar.dart';
@@ -128,7 +130,7 @@ class StickerPickerDialogState extends State<StickerPickerDialog> {
                   decoration: InputDecoration(
                     filled: true,
                     hintText: L10n.of(context).search,
-                    prefixIcon: const Icon(Icons.search_outlined),
+                    prefixIcon: const Icon(TablerIcons.search),
                     contentPadding: EdgeInsets.zero,
                   ),
                   onChanged: (s) => setState(() => searchFilter = s),
@@ -148,7 +150,7 @@ class StickerPickerDialogState extends State<StickerPickerDialog> {
                           context,
                           AppConfig.howDoIGetStickersTutorial,
                         ).launchUrl(),
-                        icon: const Icon(Icons.explore_outlined),
+                        icon: const Icon(TablerIcons.compass),
                         label: Text(L10n.of(context).discover),
                       ),
                     ],

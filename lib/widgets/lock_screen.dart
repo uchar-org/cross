@@ -4,6 +4,8 @@ import 'package:fluffychat/config/themes.dart';
 import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/widgets/app_lock.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:tabler_icons/tabler_icons.dart';
 import 'package:flutter/services.dart';
 
 class LockScreen extends StatefulWidget {
@@ -96,7 +98,7 @@ class _LockScreenState extends State<LockScreen> {
                       errorText: _errorText,
                       hintText: '****',
                       suffix: IconButton(
-                        icon: const Icon(Icons.lock_open_outlined),
+                        icon: const Icon(TablerIcons.lock_open),
                         onPressed: () => tryUnlock(_textEditingController.text),
                       ),
                     ),
