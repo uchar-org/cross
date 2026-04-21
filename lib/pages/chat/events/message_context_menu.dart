@@ -270,11 +270,9 @@ class MessageContextMenu extends StatelessWidget {
     final isDesktopOrWeb = PlatformInfos.isDesktop || PlatformInfos.isWeb;
 
     return GestureDetector(
-      onDoubleTap: isDesktopOrWeb
-          ? null
-          : event.status.isSent && controller.room.canSendDefaultMessages
-              ? () => controller.replyAction(replyTo: event)
-              : null,
+      onDoubleTap: event.status.isSent && controller.room.canSendDefaultMessages
+          ? () => controller.replyAction(replyTo: event)
+          : null,
       onSecondaryTapUp: (details) {
         _showContextMenu(context, details.globalPosition);
       },
