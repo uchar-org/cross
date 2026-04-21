@@ -1,5 +1,7 @@
 import 'package:fluffychat/l10n/l10n.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:tabler_icons/tabler_icons.dart';
 import 'package:go_router/go_router.dart';
 
 class StartChatFab extends StatelessWidget {
@@ -7,13 +9,13 @@ class StartChatFab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FloatingActionButton(
+    return FloatingActionButton.small(
       heroTag: 'start_chat_fab',
       backgroundColor: Theme.of(context).colorScheme.primary,
       foregroundColor: Theme.of(context).colorScheme.onPrimary,
       onPressed: () => context.go('/rooms/newprivatechat'),
       tooltip: L10n.of(context).newChat,
-      child: const Icon(Icons.edit_square),
+      child: const Icon(TablerIcons.edit),
     );
   }
 }

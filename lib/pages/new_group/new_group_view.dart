@@ -5,6 +5,8 @@ import 'package:fluffychat/utils/localized_exception_extension.dart';
 import 'package:fluffychat/widgets/avatar.dart';
 import 'package:fluffychat/widgets/layouts/max_width_body.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:tabler_icons/tabler_icons.dart';
 
 class NewGroupView extends StatelessWidget {
   final NewGroupController controller;
@@ -58,7 +60,7 @@ class NewGroupView extends StatelessWidget {
               child: CircleAvatar(
                 radius: Avatar.defaultSize,
                 child: avatar == null
-                    ? const Icon(Icons.add_a_photo_outlined)
+                    ? const Icon(TablerIcons.camera)
                     : ClipRRect(
                         borderRadius: BorderRadius.circular(90),
                         child: Image.memory(
@@ -79,7 +81,7 @@ class NewGroupView extends StatelessWidget {
                 autocorrect: false,
                 readOnly: controller.loading,
                 decoration: InputDecoration(
-                  prefixIcon: const Icon(Icons.people_outlined),
+                  prefixIcon: const Icon(TablerIcons.users),
                   labelText: controller.createGroupType == CreateGroupType.space
                       ? L10n.of(context).spaceName
                       : L10n.of(context).groupName,
@@ -89,7 +91,7 @@ class NewGroupView extends StatelessWidget {
             const SizedBox(height: 16),
             SwitchListTile.adaptive(
               contentPadding: const EdgeInsets.symmetric(horizontal: 32),
-              secondary: const Icon(Icons.public_outlined),
+              secondary: const Icon(TablerIcons.world),
               title: Text(
                 controller.createGroupType == CreateGroupType.space
                     ? L10n.of(context).spaceIsPublic
@@ -106,7 +108,7 @@ class NewGroupView extends StatelessWidget {
                       contentPadding: const EdgeInsets.symmetric(
                         horizontal: 32,
                       ),
-                      secondary: const Icon(Icons.search_outlined),
+                      secondary: const Icon(TablerIcons.search),
                       title: Text(L10n.of(context).groupCanBeFoundViaSearch),
                       value: controller.groupCanBeFound,
                       onChanged: controller.loading
@@ -125,7 +127,7 @@ class NewGroupView extends StatelessWidget {
                         horizontal: 32,
                       ),
                       secondary: Icon(
-                        Icons.lock_outlined,
+                        TablerIcons.lock,
                         color: theme.colorScheme.onSurface,
                       ),
                       title: Text(
@@ -146,7 +148,7 @@ class NewGroupView extends StatelessWidget {
                       ),
                       trailing: const Padding(
                         padding: EdgeInsets.symmetric(horizontal: 16.0),
-                        child: Icon(Icons.info_outlined),
+                        child: Icon(TablerIcons.info_circle),
                       ),
                       subtitle: Text(L10n.of(context).newSpaceDescription),
                     )
@@ -177,7 +179,7 @@ class NewGroupView extends StatelessWidget {
                   ? const SizedBox.shrink()
                   : ListTile(
                       leading: Icon(
-                        Icons.warning_outlined,
+                        TablerIcons.alert_triangle,
                         color: theme.colorScheme.error,
                       ),
                       title: Text(

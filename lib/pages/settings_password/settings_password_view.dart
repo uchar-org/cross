@@ -2,6 +2,8 @@ import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/pages/settings_password/settings_password.dart';
 import 'package:fluffychat/widgets/layouts/max_width_body.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:tabler_icons/tabler_icons.dart';
 import 'package:go_router/go_router.dart';
 
 class SettingsPasswordView extends StatelessWidget {
@@ -29,7 +31,7 @@ class SettingsPasswordView extends StatelessWidget {
                   autofocus: true,
                   readOnly: controller.loading,
                   decoration: InputDecoration(
-                    prefixIcon: const Icon(Icons.lock_outlined),
+                    prefixIcon: const Icon(TablerIcons.lock),
                     hintText: '********',
                     labelText: L10n.of(context).pleaseEnterYourCurrentPassword,
                     errorText: controller.oldPasswordError,
@@ -42,7 +44,7 @@ class SettingsPasswordView extends StatelessWidget {
                   autocorrect: false,
                   readOnly: controller.loading,
                   decoration: InputDecoration(
-                    prefixIcon: const Icon(Icons.lock_reset_outlined),
+                    prefixIcon: const Icon(TablerIcons.rotate_clockwise),
                     hintText: '********',
                     labelText: L10n.of(context).newPassword,
                     errorText: controller.newPassword1Error,
@@ -55,7 +57,7 @@ class SettingsPasswordView extends StatelessWidget {
                   autocorrect: false,
                   readOnly: controller.loading,
                   decoration: InputDecoration(
-                    prefixIcon: const Icon(Icons.repeat_outlined),
+                    prefixIcon: const Icon(TablerIcons.repeat),
                     hintText: '********',
                     labelText: L10n.of(context).repeatPassword,
                     errorText: controller.newPassword2Error,

@@ -12,6 +12,7 @@ import 'package:fluffychat/utils/size_string.dart';
 import 'package:fluffychat/widgets/adaptive_dialogs/adaptive_dialog_action.dart';
 import 'package:fluffychat/widgets/adaptive_dialogs/dialog_text_field.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:tabler_icons/tabler_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart' hide Result;
 import 'package:mime/mime.dart';
@@ -197,7 +198,7 @@ class SendFileDialogState extends State<SendFileDialog> {
               width: 220,
               height: 220,
               child: Center(
-                child: Icon(Icons.broken_image_outlined, size: 64),
+                child: Icon(TablerIcons.photo, size: 64),
               ),
             );
           }
@@ -210,7 +211,7 @@ class SendFileDialogState extends State<SendFileDialog> {
               width: 220,
               height: 220,
               child: Center(
-                child: Icon(Icons.broken_image_outlined, size: 64),
+                child: Icon(TablerIcons.photo, size: 64),
               ),
             ),
           );
@@ -271,7 +272,7 @@ class SendFileDialogState extends State<SendFileDialog> {
                             errorBuilder: (_, __, ___) => Container(
                               color: Colors.grey.shade300,
                               child: const Icon(
-                                Icons.broken_image_outlined,
+                                TablerIcons.photo,
                               ),
                             ),
                           ),
@@ -281,7 +282,7 @@ class SendFileDialogState extends State<SendFileDialog> {
                         ? Container(
                             color: Colors.grey.shade300,
                             child: const Icon(
-                              Icons.broken_image_outlined,
+                              TablerIcons.photo,
                             ),
                           )
                         : Container(
@@ -369,12 +370,12 @@ class SendFileDialogState extends State<SendFileDialog> {
                         children: [
                           Icon(
                             uniqueFileType == null
-                                ? Icons.description_outlined
+                                ? TablerIcons.file_text
                                 : uniqueFileType == 'video'
-                                ? Icons.video_file_outlined
+                                ? TablerIcons.video
                                 : uniqueFileType == 'audio'
-                                ? Icons.audio_file_outlined
-                                : Icons.description_outlined,
+                                ? TablerIcons.music
+                                : TablerIcons.file_text,
                             size: 32,
                           ),
                           const SizedBox(width: 8),

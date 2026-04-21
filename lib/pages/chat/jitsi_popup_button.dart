@@ -4,6 +4,8 @@ import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_locals.dart';
 import 'package:fluffychat/widgets/adaptive_dialogs/show_ok_cancel_alert_dialog.dart';
 import 'package:fluffychat/widgets/future_loading_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:tabler_icons/tabler_icons.dart';
 import 'package:matrix/matrix.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -110,7 +112,7 @@ class JitsiPopupButton extends StatelessWidget {
             child: Row(
               mainAxisSize: .min,
               children: [
-                Icon(call.isAudioOnly ? Icons.add_call : Icons.video_call),
+                Icon(call.isAudioOnly ? TablerIcons.phone_plus : TablerIcons.video),
                 const SizedBox(width: 12),
                 Text(
                   call.isAudioOnly ? l10n.joinVoiceCall : l10n.joinVideoCall,
@@ -126,7 +128,7 @@ class JitsiPopupButton extends StatelessWidget {
               child: Row(
                 mainAxisSize: .min,
                 children: [
-                  const Icon(Icons.add_call),
+                  const Icon(TablerIcons.phone_plus),
                   const SizedBox(width: 12),
                   Text(l10n.startVoiceCall),
                 ],
@@ -137,7 +139,7 @@ class JitsiPopupButton extends StatelessWidget {
               child: Row(
                 mainAxisSize: .min,
                 children: [
-                  const Icon(Icons.video_call),
+                  const Icon(TablerIcons.video),
                   const SizedBox(width: 12),
                   Text(l10n.startVideoCall),
                 ],
@@ -150,7 +152,7 @@ class JitsiPopupButton extends StatelessWidget {
                 mainAxisSize: .min,
                 children: [
                   Icon(
-                    Icons.call_end_outlined,
+                    TablerIcons.phone_off,
                     color: Theme.of(context).colorScheme.error,
                   ),
                   const SizedBox(width: 12),
@@ -168,7 +170,7 @@ class JitsiPopupButton extends StatelessWidget {
       icon: Badge(
         label: Text(l10n.live),
         isLabelVisible: activeJitsiCalls.isNotEmpty,
-        child: Icon(Icons.video_call_outlined),
+        child: Icon(TablerIcons.video),
       ),
     );
   }

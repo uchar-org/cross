@@ -4,6 +4,8 @@ import 'package:fluffychat/pages/chat_permissions_settings/permission_list_tile.
 import 'package:fluffychat/widgets/layouts/max_width_body.dart';
 import 'package:fluffychat/widgets/matrix.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:tabler_icons/tabler_icons.dart';
 import 'package:matrix/matrix.dart';
 
 class ChatPermissionsSettingsView extends StatelessWidget {
@@ -42,7 +44,7 @@ class ChatPermissionsSettingsView extends StatelessWidget {
             return Column(
               children: [
                 ListTile(
-                  leading: const Icon(Icons.info_outlined),
+                  leading: const Icon(TablerIcons.info_circle),
                   subtitle: Text(L10n.of(context).chatPermissionsDescription),
                 ),
                 Divider(color: theme.dividerColor),

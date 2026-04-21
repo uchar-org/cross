@@ -19,6 +19,8 @@ import 'package:fluffychat/widgets/avatar.dart';
 import 'package:fluffychat/widgets/future_loading_dialog.dart';
 import 'package:fluffychat/widgets/share_scaffold_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:tabler_icons/tabler_icons.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
 import 'package:flutter_shortcuts_new/flutter_shortcuts_new.dart';
@@ -609,8 +611,8 @@ class ChatListController extends State<ChatList>
               children: [
                 Icon(
                   room.pushRuleState == PushRuleState.notify
-                      ? Icons.notifications_off_outlined
-                      : Icons.notifications_off,
+                      ? TablerIcons.bell_off
+                      : TablerIcons.bell_off,
                 ),
                 const SizedBox(width: 12),
                 Text(
@@ -628,8 +630,8 @@ class ChatListController extends State<ChatList>
               children: [
                 Icon(
                   room.markedUnread
-                      ? Icons.mark_as_unread
-                      : Icons.mark_as_unread_outlined,
+                      ? TablerIcons.mail
+                      : TablerIcons.mail,
                 ),
                 const SizedBox(width: 12),
                 Text(
@@ -647,7 +649,7 @@ class ChatListController extends State<ChatList>
                 mainAxisSize: .min,
                 children: [
                   Icon(
-                    room.isFavourite ? Icons.push_pin : Icons.push_pin_outlined,
+                    room.isFavourite ? TablerIcons.pin_filled : TablerIcons.pin,
                   ),
                   const SizedBox(width: 12),
                   Text(
@@ -666,8 +668,8 @@ class ChatListController extends State<ChatList>
                 children: [
                   Icon(
                     room.isLowPriority
-                        ? Icons.low_priority
-                        : Icons.low_priority_outlined,
+                        ? TablerIcons.arrow_bar_to_down
+                        : TablerIcons.arrow_bar_to_down,
                   ),
                   const SizedBox(width: 12),
                   Text(
@@ -684,7 +686,7 @@ class ChatListController extends State<ChatList>
               child: Row(
                 mainAxisSize: .min,
                 children: [
-                  const Icon(Icons.group_work_outlined),
+                  const Icon(TablerIcons.box),
                   const SizedBox(width: 12),
                   Text(L10n.of(context).addToSpace),
                 ],
@@ -697,7 +699,7 @@ class ChatListController extends State<ChatList>
             mainAxisSize: .min,
             children: [
               Icon(
-                Icons.delete_outlined,
+                TablerIcons.trash,
                 color: Theme.of(context).colorScheme.onErrorContainer,
               ),
               const SizedBox(width: 12),
@@ -719,7 +721,7 @@ class ChatListController extends State<ChatList>
               mainAxisSize: .min,
               children: [
                 Icon(
-                  Icons.block_outlined,
+                  TablerIcons.ban,
                   color: Theme.of(context).colorScheme.onErrorContainer,
                 ),
                 const SizedBox(width: 12),

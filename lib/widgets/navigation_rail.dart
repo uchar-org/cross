@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:tabler_icons/tabler_icons.dart';
 
 import 'package:go_router/go_router.dart';
 import 'package:matrix/matrix.dart';
@@ -57,11 +59,11 @@ class SpacesNavigationRail extends StatelessWidget {
                             onTap: onGoToChats,
                             icon: const Padding(
                               padding: EdgeInsets.all(8.0),
-                              child: Icon(Icons.forum_outlined),
+                              child: Icon(TablerIcons.messages),
                             ),
                             selectedIcon: const Padding(
                               padding: EdgeInsets.all(8.0),
-                              child: Icon(Icons.forum),
+                              child: Icon(TablerIcons.messages),
                             ),
                             toolTip: L10n.of(context).chats,
                             unreadBadgeFilter: (room) => true,
@@ -74,7 +76,7 @@ class SpacesNavigationRail extends StatelessWidget {
                             onTap: () => context.go('/rooms/newspace'),
                             icon: const Padding(
                               padding: EdgeInsets.all(6.0),
-                              child: Icon(Icons.add),
+                              child: Icon(TablerIcons.plus),
                             ),
                             toolTip: L10n.of(context).createNewSpace,
                           );

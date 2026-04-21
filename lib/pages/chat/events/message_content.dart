@@ -13,6 +13,8 @@ import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_locals.dart';
 import 'package:fluffychat/widgets/avatar.dart';
 import 'package:fluffychat/widgets/matrix.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:tabler_icons/tabler_icons.dart';
 import 'package:go_router/go_router.dart';
 import 'package:matrix/matrix.dart';
 
@@ -101,7 +103,7 @@ class MessageContent extends StatelessWidget {
                 ),
                 title: Text(sender.calcDisplayname()),
                 subtitle: Text(event.originServerTs.localizedTime(context)),
-                trailing: const Icon(Icons.lock_outlined),
+                trailing: const Icon(TablerIcons.lock),
               ),
               const Divider(),
               Text(event.calcLocalizedBodyFallback(MatrixLocals(l10n))),
@@ -237,7 +239,7 @@ class MessageContent extends StatelessWidget {
                     ),
                     const SizedBox(height: 6),
                     OutlinedButton.icon(
-                      icon: Icon(Icons.location_on_outlined, color: textColor),
+                      icon: Icon(TablerIcons.map_pin, color: textColor),
                       onPressed: UrlLauncher(
                         context,
                         geoUri.toString(),

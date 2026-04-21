@@ -5,6 +5,7 @@ import 'package:fluffychat/utils/beautify_string_extension.dart';
 import 'package:fluffychat/widgets/avatar.dart';
 import 'package:fluffychat/widgets/layouts/max_width_body.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:tabler_icons/tabler_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:matrix/matrix.dart';
@@ -27,7 +28,7 @@ class ChatEncryptionSettingsView extends StatelessWidget {
       builder: (context, _) => Scaffold(
         appBar: AppBar(
           leading: IconButton(
-            icon: const Icon(Icons.close_outlined),
+            icon: const Icon(TablerIcons.x),
             onPressed: () => context.go('/rooms/${controller.roomId!}'),
           ),
           title: Text(L10n.of(context).encryption),
@@ -46,14 +47,14 @@ class ChatEncryptionSettingsView extends StatelessWidget {
                 secondary: CircleAvatar(
                   foregroundColor: theme.colorScheme.onPrimaryContainer,
                   backgroundColor: theme.colorScheme.primaryContainer,
-                  child: const Icon(Icons.lock_outlined),
+                  child: const Icon(TablerIcons.lock),
                 ),
                 title: Text(L10n.of(context).encryptThisChat),
                 value: room.encrypted,
                 onChanged: controller.enableEncryption,
               ),
               Icon(
-                CupertinoIcons.lock_shield,
+                TablerIcons.shield_lock,
                 size: 128,
                 color: theme.colorScheme.onInverseSurface,
               ),
@@ -64,7 +65,7 @@ class ChatEncryptionSettingsView extends StatelessWidget {
                     width: double.infinity,
                     child: ElevatedButton.icon(
                       onPressed: controller.startVerification,
-                      icon: const Icon(Icons.verified_outlined),
+                      icon: const Icon(TablerIcons.discount_check),
                       label: Text(L10n.of(context).verifyStart),
                     ),
                   ),
