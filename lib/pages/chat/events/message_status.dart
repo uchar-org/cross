@@ -19,7 +19,7 @@ class MessageStatusWidget extends StatelessWidget {
             }
           case MessageStatus.seen:
             {
-              return Icon(TablerIcons.check, size: 14, color: iconColor);
+              return Icon(TablerIcons.checks, size: 14, color: iconColor);
             }
           case MessageStatus.pending:
             {
