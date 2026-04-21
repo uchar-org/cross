@@ -6,6 +6,7 @@ import 'package:fluffychat/utils/room_status_extension.dart';
 import 'package:fluffychat/widgets/adaptive_dialogs/show_ok_cancel_alert_dialog.dart';
 import 'package:fluffychat/widgets/future_loading_dialog.dart';
 import 'package:fluffychat/widgets/hover_builder.dart';
+import 'package:fluffychat/widgets/mxc_image.dart';
 import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart';
 
@@ -318,60 +319,14 @@ class ChatListItem extends StatelessWidget {
                             maxLines: 1,
                             softWrap: false,
                           )
-                        : FutureBuilder(
-                            key: ValueKey(
-                              '${lastEvent?.eventId}_${lastEvent?.type}_${lastEvent?.redacted}',
-                            ),
-                            future: needLastEventSender
-                                ? lastEvent.calcLocalizedBody(
-                                    MatrixLocals(L10n.of(context)),
-                                    hideReply: true,
-                                    hideEdit: true,
-                                    plaintextBody: true,
-                                    removeMarkdown: true,
-                                    withSenderNamePrefix:
-                                        (!isDirectChat ||
-                                        directChatMatrixId !=
-                                            room.lastEvent?.senderId),
-                                  )
-                                : null,
-                            initialData: lastEvent?.calcLocalizedBodyFallback(
-                              MatrixLocals(L10n.of(context)),
-                              hideReply: true,
-                              hideEdit: true,
-                              plaintextBody: true,
-                              removeMarkdown: true,
-                              withSenderNamePrefix:
-                                  (!isDirectChat ||
-                                  directChatMatrixId !=
-                                      room.lastEvent?.senderId),
-                            ),
-                            builder: (context, snapshot) => Text(
-                              room.membership == Membership.invite
-                                  ? room
-                                            .getState(
-                                              EventTypes.RoomMember,
-                                              room.client.userID!,
-                                            )
-                                            ?.content
-                                            .tryGet<String>('reason') ??
-                                        (isDirectChat
-                                            ? L10n.of(context).newChatRequest
-                                            : L10n.of(context).inviteGroupChat)
-                                  : snapshot.data ??
-                                        L10n.of(context).noMessagesYet,
-                              softWrap: false,
-                              maxLines: room.notificationCount >= 1 ? 2 : 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                color: unread || room.hasNewMessages
-                                    ? theme.colorScheme.onSurface
-                                    : theme.colorScheme.outline,
-                                decoration: room.lastEvent?.redacted == true
-                                    ? TextDecoration.lineThrough
-                                    : null,
-                              ),
-                            ),
+                        : _buildLastEventPreview(
+                            context,
+                            theme,
+                            lastEvent,
+                            needLastEventSender,
+                            isDirectChat,
+                            directChatMatrixId,
+                            unread,
                           ),
                   ),
                   const SizedBox(width: 8),
@@ -409,6 +364,112 @@ class ChatListItem extends StatelessWidget {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildLastEventPreview(
+    BuildContext context,
+    ThemeData theme,
+    Event? lastEvent,
+    bool needLastEventSender,
+    bool isDirectChat,
+    String? directChatMatrixId,
+    bool unread,
+  ) {
+    final msgType = lastEvent?.messageType;
+    final isImage = msgType == MessageTypes.Image;
+    final isVideo = msgType == MessageTypes.Video;
+    final isMedia = isImage || isVideo;
+
+    final textStyle = TextStyle(
+      color: unread || room.hasNewMessages
+          ? theme.colorScheme.onSurface
+          : theme.colorScheme.outline,
+      decoration:
+          room.lastEvent?.redacted == true ? TextDecoration.lineThrough : null,
+    );
+
+    if (isMedia && lastEvent != null) {
+      final caption = lastEvent.body.isNotEmpty &&
+              lastEvent.body != lastEvent.content
+                  .tryGet<Map<String, Object?>>('info')
+                  ?.tryGet<String>('mimetype')
+          ? lastEvent.body
+          : null;
+
+      final label = caption != null && caption != lastEvent.content.tryGet<String>('filename')
+          ? caption
+          : (isVideo ? L10n.of(context).video : L10n.of(context).photo);
+
+      return Row(
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(2),
+            child: MxcImage(
+              event: lastEvent,
+              width: 18,
+              height: 18,
+              fit: BoxFit.cover,
+              isThumbnail: true,
+            ),
+          ),
+          const SizedBox(width: 4),
+          Expanded(
+            child: Text(
+              label,
+              maxLines: 1,
+              softWrap: false,
+              overflow: TextOverflow.ellipsis,
+              style: textStyle,
+            ),
+          ),
+        ],
+      );
+    }
+
+    return FutureBuilder(
+      key: ValueKey(
+        '${lastEvent?.eventId}_${lastEvent?.type}_${lastEvent?.redacted}',
+      ),
+      future: needLastEventSender
+          ? lastEvent?.calcLocalizedBody(
+              MatrixLocals(L10n.of(context)),
+              hideReply: true,
+              hideEdit: true,
+              plaintextBody: true,
+              removeMarkdown: true,
+              withSenderNamePrefix:
+                  (!isDirectChat ||
+                  directChatMatrixId != room.lastEvent?.senderId),
+            )
+          : null,
+      initialData: lastEvent?.calcLocalizedBodyFallback(
+        MatrixLocals(L10n.of(context)),
+        hideReply: true,
+        hideEdit: true,
+        plaintextBody: true,
+        removeMarkdown: true,
+        withSenderNamePrefix:
+            (!isDirectChat || directChatMatrixId != room.lastEvent?.senderId),
+      ),
+      builder: (context, snapshot) => Text(
+        room.membership == Membership.invite
+            ? room
+                      .getState(
+                        EventTypes.RoomMember,
+                        room.client.userID!,
+                      )
+                      ?.content
+                      .tryGet<String>('reason') ??
+                  (isDirectChat
+                      ? L10n.of(context).newChatRequest
+                      : L10n.of(context).inviteGroupChat)
+            : snapshot.data ?? L10n.of(context).noMessagesYet,
+        softWrap: false,
+        maxLines: room.notificationCount >= 1 ? 2 : 1,
+        overflow: TextOverflow.ellipsis,
+        style: textStyle,
       ),
     );
   }

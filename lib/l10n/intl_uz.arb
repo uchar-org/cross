@@ -3173,5 +3173,7 @@
     "logs": "Jurnallar",
     "advancedConfigs": "Kengaytirilgan konfiguratsiyalar",
     "advancedConfigurations": "Kengaytirilgan sozlamalar",
-    "signInWithLabel": "Kirish:"
+    "signInWithLabel": "Kirish:",
+    "photo": "Rasm",
+    "video": "Video"
 }

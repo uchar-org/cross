@@ -2809,5 +2809,7 @@
     "joinVideoCall": "Batu bideo-deira",
     "live": "Zuzenean",
     "playSoundOnNotification": "Jo soinua jakinarazpenekin",
-    "skipSupportingFluffyChat": "Muzin egin FluffyChat-en laguntza eskaerari"
+    "skipSupportingFluffyChat": "Muzin egin FluffyChat-en laguntza eskaerari",
+    "photo": "Argazkia",
+    "video": "Bideoa"
 }
