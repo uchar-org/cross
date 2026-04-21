@@ -53,7 +53,10 @@ class ChatEventList extends StatelessWidget {
 
     return SelectionArea(
       contextMenuBuilder: isDesktopOrWeb
-          ? null
+          ? (context, selectableRegionState) =>
+              AdaptiveTextSelectionToolbar.selectableRegion(
+                selectableRegionState: selectableRegionState,
+              )
           : (context, selectableRegionState) => const SizedBox.shrink(),
       child: ListView.custom(
         padding: EdgeInsets.only(
