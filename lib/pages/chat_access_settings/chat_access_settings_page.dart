@@ -1,3 +1,5 @@
+import 'package:flutter/cupertino.dart' hide Visibility;
+import 'package:tabler_icons/tabler_icons.dart';
 import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/pages/chat_access_settings/chat_access_settings_controller.dart';
 import 'package:fluffychat/utils/fluffy_share.dart';
@@ -145,7 +147,7 @@ class ChatAccessSettingsPageView extends StatelessWidget {
                       ),
                     ),
                     trailing: IconButton(
-                      icon: const Icon(Icons.add_outlined),
+                      icon: const Icon(TablerIcons.plus),
                       tooltip: L10n.of(context).createNewAddress,
                       onPressed: controller.addAlias,
                     ),
@@ -214,7 +216,7 @@ class ChatAccessSettingsPageView extends StatelessWidget {
                   title: Text(L10n.of(context).globalChatId),
                   subtitle: SelectableText(room.id),
                   trailing: IconButton(
-                    icon: const Icon(Icons.copy_outlined),
+                    icon: const Icon(TablerIcons.copy),
                     onPressed: () => FluffyShare.share(room.id, context),
                   ),
                 ),
@@ -229,7 +231,7 @@ class ChatAccessSettingsPageView extends StatelessWidget {
                   ),
                   trailing: room.canSendEvent(EventTypes.RoomTombstone)
                       ? IconButton(
-                          icon: const Icon(Icons.upgrade_outlined),
+                          icon: const Icon(TablerIcons.arrow_big_up),
                           onPressed: controller.updateRoomAction,
                         )
                       : null,
@@ -262,8 +264,8 @@ class _AliasListTile extends StatelessWidget {
 
     return ListTile(
       leading: isCanonicalAlias
-          ? const Icon(Icons.star)
-          : const Icon(Icons.link_outlined),
+          ? const Icon(TablerIcons.star_filled)
+          : const Icon(TablerIcons.link),
       title: InkWell(
         onTap: () => FluffyShare.share('https://matrix.to/#/$alias', context),
         child: SelectableText(
@@ -279,7 +281,7 @@ class _AliasListTile extends StatelessWidget {
       trailing: onDelete != null
           ? IconButton(
               color: theme.colorScheme.error,
-              icon: const Icon(Icons.delete_outlined),
+              icon: const Icon(TablerIcons.trash),
               onPressed: onDelete,
             )
           : null,

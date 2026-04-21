@@ -4,6 +4,8 @@ import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/widgets/adaptive_dialogs/show_ok_cancel_alert_dialog.dart';
 import 'package:fluffychat/widgets/future_loading_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:tabler_icons/tabler_icons.dart';
 import 'package:go_router/go_router.dart';
 import 'package:matrix/matrix.dart';
 
@@ -104,7 +106,7 @@ class ChatSettingsPopupMenuState extends State<ChatSettingsPopupMenu> {
                 value: ChatPopupMenuActions.details,
                 child: Row(
                   children: [
-                    const Icon(Icons.info_outline_rounded),
+                    const Icon(TablerIcons.info_circle),
                     const SizedBox(width: 12),
                     Text(L10n.of(context).chatDetails),
                   ],
@@ -115,7 +117,7 @@ class ChatSettingsPopupMenuState extends State<ChatSettingsPopupMenu> {
                 value: ChatPopupMenuActions.mute,
                 child: Row(
                   children: [
-                    const Icon(Icons.notifications_off_outlined),
+                    const Icon(TablerIcons.bell_off),
                     const SizedBox(width: 12),
                     Text(L10n.of(context).muteChat),
                   ],
@@ -126,7 +128,7 @@ class ChatSettingsPopupMenuState extends State<ChatSettingsPopupMenu> {
                 value: ChatPopupMenuActions.unmute,
                 child: Row(
                   children: [
-                    const Icon(Icons.notifications_on_outlined),
+                    const Icon(TablerIcons.bell_filled),
                     const SizedBox(width: 12),
                     Text(L10n.of(context).unmuteChat),
                   ],
@@ -136,7 +138,7 @@ class ChatSettingsPopupMenuState extends State<ChatSettingsPopupMenu> {
               value: ChatPopupMenuActions.search,
               child: Row(
                 children: [
-                  const Icon(Icons.search_outlined),
+                  const Icon(TablerIcons.search),
                   const SizedBox(width: 12),
                   Text(L10n.of(context).search),
                 ],
@@ -146,7 +148,7 @@ class ChatSettingsPopupMenuState extends State<ChatSettingsPopupMenu> {
               value: ChatPopupMenuActions.emote,
               child: Row(
                 children: [
-                  const Icon(Icons.emoji_emotions_outlined),
+                  const Icon(TablerIcons.mood_smile),
                   const SizedBox(width: 12),
                   Text(L10n.of(context).emoteSettings),
                 ],
@@ -156,7 +158,7 @@ class ChatSettingsPopupMenuState extends State<ChatSettingsPopupMenu> {
               value: ChatPopupMenuActions.leave,
               child: Row(
                 children: [
-                  const Icon(Icons.delete_outlined),
+                  const Icon(TablerIcons.trash),
                   const SizedBox(width: 12),
                   Text(L10n.of(context).leave),
                 ],

@@ -9,6 +9,8 @@ import 'package:fluffychat/utils/url_launcher.dart';
 import 'package:fluffychat/widgets/blur_hash.dart';
 import 'package:fluffychat/widgets/mxc_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:tabler_icons/tabler_icons.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:matrix/matrix.dart';
 
@@ -104,8 +106,8 @@ class EventVideoPlayer extends StatelessWidget {
                     Center(
                       child: CircleAvatar(
                         child: supportsVideoPlayer
-                            ? const Icon(Icons.play_arrow_outlined)
-                            : const Icon(Icons.file_download_outlined),
+                            ? const Icon(TablerIcons.player_play)
+                            : const Icon(TablerIcons.cloud_download),
                       ),
                     ),
                     if (duration != null)

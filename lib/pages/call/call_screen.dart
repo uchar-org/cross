@@ -8,6 +8,8 @@ import 'package:fluffychat/widgets/matrix.dart';
 import 'package:fluffychat/widgets/theme_builder.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:tabler_icons/tabler_icons.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:go_router/go_router.dart';
@@ -197,7 +199,7 @@ class _CallScreenState extends State<CallScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(Icons.error_outline, size: 64, color: Colors.red),
+                const Icon(TablerIcons.alert_circle, size: 64, color: Colors.red),
                 const SizedBox(height: 16),
                 Text(
                   _error!,

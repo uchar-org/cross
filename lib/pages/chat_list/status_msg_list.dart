@@ -5,6 +5,8 @@ import 'package:fluffychat/widgets/avatar.dart';
 import 'package:fluffychat/widgets/hover_builder.dart';
 import 'package:fluffychat/widgets/matrix.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:tabler_icons/tabler_icons.dart';
 import 'package:matrix/matrix.dart';
 
 import '../../widgets/adaptive_dialogs/user_dialog.dart';
@@ -186,7 +188,7 @@ class PresenceAvatar extends StatelessWidget {
                                         borderRadius: BorderRadius.circular(8),
                                       ),
                                       child: const Icon(
-                                        Icons.add_outlined,
+                                        TablerIcons.plus,
                                         size: 16,
                                       ),
                                     ),

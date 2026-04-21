@@ -15,6 +15,8 @@ import 'package:fluffychat/widgets/future_loading_dialog.dart';
 import 'package:fluffychat/widgets/hover_builder.dart';
 import 'package:fluffychat/widgets/matrix.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:tabler_icons/tabler_icons.dart';
 import 'package:go_router/go_router.dart';
 import 'package:matrix/matrix.dart' as sdk;
 import 'package:matrix/matrix.dart';
@@ -243,8 +245,8 @@ class _SpaceViewState extends State<SpaceView> {
               children: [
                 Icon(
                   room.pushRuleState == PushRuleState.notify
-                      ? Icons.notifications_off_outlined
-                      : Icons.notifications_on_outlined,
+                      ? TablerIcons.bell_off
+                      : TablerIcons.bell_filled,
                 ),
                 const SizedBox(width: 12),
                 Text(
@@ -264,8 +266,8 @@ class _SpaceViewState extends State<SpaceView> {
               children: [
                 Icon(
                   room.markedUnread
-                      ? Icons.mark_as_unread
-                      : Icons.mark_as_unread_outlined,
+                      ? TablerIcons.mail
+                      : TablerIcons.mail,
                 ),
                 const SizedBox(width: 12),
                 Text(
@@ -282,7 +284,7 @@ class _SpaceViewState extends State<SpaceView> {
               mainAxisSize: .min,
               children: [
                 Icon(
-                  Icons.delete_outlined,
+                  TablerIcons.trash,
                   color: Theme.of(context).colorScheme.onErrorContainer,
                 ),
                 const SizedBox(width: 12),
@@ -303,7 +305,7 @@ class _SpaceViewState extends State<SpaceView> {
               mainAxisSize: .min,
               children: [
                 Icon(
-                  Icons.remove,
+                  TablerIcons.minus,
                   color: Theme.of(context).colorScheme.onErrorContainer,
                 ),
                 const SizedBox(width: 12),
@@ -402,7 +404,7 @@ class _SpaceViewState extends State<SpaceView> {
         actions: [
           if (isAdmin)
             IconButton(
-              icon: Icon(Icons.add_outlined),
+              icon: Icon(TablerIcons.plus),
               tooltip: L10n.of(context).addChatOrSubSpace,
               onPressed: () =>
                   context.go('/rooms/newgroup?space_id=${widget.spaceId}'),
@@ -416,7 +418,7 @@ class _SpaceViewState extends State<SpaceView> {
                 child: Row(
                   mainAxisSize: .min,
                   children: [
-                    const Icon(Icons.settings_outlined),
+                    const Icon(TablerIcons.settings),
                     const SizedBox(width: 12),
                     Text(L10n.of(context).settings),
                   ],
@@ -427,7 +429,7 @@ class _SpaceViewState extends State<SpaceView> {
                 child: Row(
                   mainAxisSize: .min,
                   children: [
-                    const Icon(Icons.person_add_outlined),
+                    const Icon(TablerIcons.user_plus),
                     const SizedBox(width: 12),
                     Text(L10n.of(context).invite),
                   ],
@@ -438,7 +440,7 @@ class _SpaceViewState extends State<SpaceView> {
                 child: Row(
                   mainAxisSize: .min,
                   children: [
-                    const Icon(Icons.group_outlined),
+                    const Icon(TablerIcons.users),
                     const SizedBox(width: 12),
                     Text(
                       L10n.of(context).countParticipants(
@@ -453,7 +455,7 @@ class _SpaceViewState extends State<SpaceView> {
                 child: Row(
                   mainAxisSize: .min,
                   children: [
-                    const Icon(Icons.delete_outlined),
+                    const Icon(TablerIcons.trash),
                     const SizedBox(width: 12),
                     Text(L10n.of(context).leave),
                   ],
@@ -464,7 +466,7 @@ class _SpaceViewState extends State<SpaceView> {
         ],
       ),
       body: room == null
-          ? const Center(child: Icon(Icons.search_outlined, size: 80))
+          ? const Center(child: Icon(TablerIcons.search, size: 80))
           : StreamBuilder(
               stream: room.client.onSync.stream
                   .where((s) => s.hasRoomUpdate)
@@ -499,7 +501,7 @@ class _SpaceViewState extends State<SpaceView> {
                           prefixIcon: IconButton(
                             onPressed: () {},
                             icon: Icon(
-                              Icons.search_outlined,
+                              TablerIcons.search,
                               color: theme.colorScheme.onPrimaryContainer,
                             ),
                           ),
@@ -595,7 +597,7 @@ class _SpaceViewState extends State<SpaceView> {
                                                   item.roomId,
                                                 )
                                               : null,
-                                          icon: const Icon(Icons.edit_outlined),
+                                          icon: const Icon(TablerIcons.pencil),
                                         ),
                                       )
                                     : Avatar(
@@ -645,7 +647,7 @@ class _SpaceViewState extends State<SpaceView> {
                                       const Padding(
                                         padding: EdgeInsets.only(left: 4.0),
                                         child: Icon(
-                                          Icons.notifications_off_outlined,
+                                          TablerIcons.bell_off,
                                           size: 16,
                                         ),
                                       ),

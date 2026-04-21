@@ -5,7 +5,10 @@ import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_locals.dart';
 import 'package:fluffychat/utils/room_status_extension.dart';
 import 'package:fluffychat/widgets/adaptive_dialogs/show_ok_cancel_alert_dialog.dart';
 import 'package:fluffychat/widgets/future_loading_dialog.dart';
+import 'package:fluffychat/widgets/hover_builder.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:tabler_icons/tabler_icons.dart';
 import 'package:matrix/matrix.dart';
 
 import '../../config/themes.dart';
@@ -18,7 +21,7 @@ class ChatListItem extends StatelessWidget {
   final Room room;
   final Room? space;
   final bool activeChat;
-  final void Function(BuildContext context, Offset? tapPosition)? onLongPress;
+  final void Function(BuildContext context)? onLongPress;
   final void Function()? onForget;
   final void Function() onTap;
   final String? filter;
@@ -70,20 +73,21 @@ class ChatListItem extends StatelessWidget {
         color: backgroundColor,
         child: FutureBuilder(
           future: room.name.isEmpty ? room.loadHeroUsers() : null,
-          builder: (context, _) => GestureDetector(
-            behavior: HitTestBehavior.translucent,
-            onSecondaryTapDown: (details) =>
-                onLongPress?.call(context, details.globalPosition),
-            onLongPressStart: (details) =>
-                onLongPress?.call(context, details.globalPosition),
-            child: ListTile(
+          builder: (context, _) => HoverBuilder(
+            builder: (context, listTileHovered) => ListTile(
               visualDensity: const VisualDensity(vertical: -0.5),
               contentPadding: const EdgeInsets.symmetric(horizontal: 8),
-              leading: SizedBox(
-                width: Avatar.defaultSize,
-                height: Avatar.defaultSize,
-                child: Stack(
-                  children: [
+              onLongPress: () => onLongPress?.call(context),
+              leading: HoverBuilder(
+                builder: (context, hovered) => AnimatedScale(
+                  duration: FluffyThemes.animationDuration,
+                  curve: FluffyThemes.animationCurve,
+                  scale: hovered ? 1.1 : 1.0,
+                  child: SizedBox(
+                    width: Avatar.defaultSize,
+                    height: Avatar.defaultSize,
+                    child: Stack(
+                      children: [
                         if (space != null)
                           Positioned(
                             top: 0,
@@ -106,7 +110,7 @@ class ChatListItem extends StatelessWidget {
                               mxContent: space.avatar,
                               size: Avatar.defaultSize * 0.75,
                               name: space.getLocalizedDisplayname(),
-                              onTap: () => onLongPress?.call(context, null),
+                              onTap: () => onLongPress?.call(context),
                             ),
                           ),
                         Positioned(
@@ -148,10 +152,32 @@ class ChatListItem extends StatelessWidget {
                             name: displayname,
                             presenceUserId: directChatMatrixId,
                             presenceBackgroundColor: backgroundColor,
-                            onTap: () => onLongPress?.call(context, null),
+                            onTap: () => onLongPress?.call(context),
                           ),
                         ),
-                  ],
+                        Positioned(
+                          top: 0,
+                          right: 0,
+                          child: GestureDetector(
+                            onTap: () => onLongPress?.call(context),
+                            child: AnimatedScale(
+                              duration: FluffyThemes.animationDuration,
+                              curve: FluffyThemes.animationCurve,
+                              scale: listTileHovered ? 1.0 : 0.0,
+                              child: Material(
+                                color: backgroundColor,
+                                borderRadius: BorderRadius.circular(16),
+                                child: const Icon(
+                                  TablerIcons.circle_chevron_down,
+                                  size: 18,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
               title: Row(
@@ -172,7 +198,7 @@ class ChatListItem extends StatelessWidget {
                   if (isMuted)
                     const Padding(
                       padding: EdgeInsets.only(left: 4.0),
-                      child: Icon(Icons.notifications_off_outlined, size: 16),
+                      child: Icon(TablerIcons.bell_off, size: 16),
                     ),
                   if (room.isLowPriority)
                     Padding(
@@ -180,7 +206,7 @@ class ChatListItem extends StatelessWidget {
                         right: hasNotifications ? 4.0 : 0.0,
                       ),
                       child: Icon(
-                        Icons.low_priority,
+                        TablerIcons.arrow_bar_to_down,
                         size: 16,
                         color: theme.colorScheme.primary,
                       ),
@@ -191,7 +217,7 @@ class ChatListItem extends StatelessWidget {
                         right: hasNotifications ? 4.0 : 0.0,
                       ),
                       child: Icon(
-                        Icons.push_pin,
+                        TablerIcons.pin_filled,
                         size: 16,
                         color: theme.colorScheme.primary,
                       ),
@@ -238,7 +264,7 @@ class ChatListItem extends StatelessWidget {
                         ? Padding(
                             padding: const EdgeInsets.only(right: 4.0),
                             child: Icon(
-                              Icons.edit_outlined,
+                              TablerIcons.pencil,
                               color: theme.colorScheme.secondary,
                               size: 16,
                             ),
@@ -262,7 +288,7 @@ class ChatListItem extends StatelessWidget {
                               mainAxisSize: .min,
                               children: [
                                 Icon(
-                                  Icons.message_outlined,
+                                  TablerIcons.message,
                                   size: 12,
                                   color: theme.colorScheme.outline,
                                 ),
@@ -359,7 +385,7 @@ class ChatListItem extends StatelessWidget {
                   ? room.membership == Membership.invite
                         ? IconButton(
                             tooltip: L10n.of(context).declineInvitation,
-                            icon: const Icon(Icons.delete_forever_outlined),
+                            icon: const Icon(TablerIcons.trash_filled),
                             color: theme.colorScheme.error,
                             onPressed: () async {
                               final consent = await showOkCancelAlertDialog(
@@ -379,7 +405,7 @@ class ChatListItem extends StatelessWidget {
                           )
                         : null
                   : IconButton(
-                      icon: const Icon(Icons.delete_outlined),
+                      icon: const Icon(TablerIcons.trash),
                       onPressed: onForget,
                     ),
             ),

@@ -2,6 +2,8 @@ import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/widgets/future_loading_dialog.dart';
 import 'package:fluffychat/widgets/layouts/max_width_body.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:tabler_icons/tabler_icons.dart';
 
 import '../../widgets/matrix.dart';
 import 'settings_ignore_list.dart';
@@ -55,7 +57,7 @@ class SettingsIgnoreListView extends StatelessWidget {
                           labelText: L10n.of(context).blockUsername,
                           suffixIcon: IconButton(
                             tooltip: L10n.of(context).block,
-                            icon: const Icon(Icons.add),
+                            icon: const Icon(TablerIcons.plus),
                             onPressed: () => controller.ignoreUser(context),
                           ),
                         ),
@@ -76,7 +78,7 @@ class SettingsIgnoreListView extends StatelessWidget {
                       title: Text(client.ignoredUsers[i]),
                       trailing: IconButton(
                         tooltip: L10n.of(context).delete,
-                        icon: const Icon(Icons.delete_outlined),
+                        icon: const Icon(TablerIcons.trash),
                         onPressed: () => showFutureLoadingDialog(
                           context: context,
                           future: () =>

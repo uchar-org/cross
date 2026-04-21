@@ -3,6 +3,8 @@ import 'package:fluffychat/pages/chat_list/chat_list_body.dart';
 import 'package:fluffychat/pages/chat_list/search_title.dart';
 import 'package:fluffychat/pages/invitation_selection/invitation_selection_view.dart';
 
+import 'package:flutter/cupertino.dart';
+import 'package:tabler_icons/tabler_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
@@ -91,8 +93,8 @@ void main() {
             );
           } catch (_) {
             // in case the homeserver sends the username as search result
-            if (find.byIcon(Icons.send_outlined).evaluate().isNotEmpty) {
-              await tester.tap(find.byIcon(Icons.send_outlined));
+            if (find.byIcon(TablerIcons.send).evaluate().isNotEmpty) {
+              await tester.tap(find.byIcon(TablerIcons.send));
               await tester.pumpAndSettle();
             }
           }
@@ -101,8 +103,8 @@ void main() {
           await tester.enterText(find.byType(TextField).last, 'Test');
           await tester.pumpAndSettle();
           try {
-            await tester.waitFor(find.byIcon(Icons.send_outlined));
-            await tester.tap(find.byIcon(Icons.send_outlined));
+            await tester.waitFor(find.byIcon(TablerIcons.send));
+            await tester.tap(find.byIcon(TablerIcons.send));
           } catch (_) {
             await tester.testTextInput.receiveAction(TextInputAction.done);
           }
@@ -120,8 +122,8 @@ void main() {
         await tester.tap(find.byTooltip('Show menu'));
         await tester.pumpAndSettle();
 
-        await tester.waitFor(find.byIcon(Icons.workspaces_outlined));
-        await tester.tap(find.byIcon(Icons.workspaces_outlined));
+        await tester.waitFor(find.byIcon(TablerIcons.layout_grid));
+        await tester.tap(find.byIcon(TablerIcons.layout_grid));
         await tester.pumpAndSettle();
 
         await tester.waitFor(find.byType(TextField));

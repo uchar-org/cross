@@ -10,6 +10,8 @@ import 'package:fluffychat/widgets/adaptive_dialogs/show_ok_cancel_alert_dialog.
 import 'package:fluffychat/widgets/adaptive_dialogs/show_text_input_dialog.dart';
 import 'package:fluffychat/widgets/future_loading_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:tabler_icons/tabler_icons.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:matrix/encryption.dart';
@@ -93,19 +95,19 @@ class SettingsController extends State<Settings> {
           value: AvatarAction.camera,
           label: l10n.openCamera,
           isDefaultAction: true,
-          icon: const Icon(Icons.camera_alt_outlined),
+          icon: const Icon(TablerIcons.camera),
         ),
       AdaptiveModalAction(
         value: AvatarAction.file,
         label: l10n.openGallery,
-        icon: const Icon(Icons.photo_outlined),
+        icon: const Icon(TablerIcons.photo),
       ),
       if (profile?.avatarUrl != null)
         AdaptiveModalAction(
           value: AvatarAction.remove,
           label: l10n.removeYourAvatar,
           isDestructive: true,
-          icon: const Icon(Icons.delete_outlined),
+          icon: const Icon(TablerIcons.trash),
         ),
     ];
     final action = actions.length == 1

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:tabler_icons/tabler_icons.dart';
 
 import 'package:matrix/matrix.dart';
 
@@ -83,17 +85,17 @@ class CallNotifyEventWidget extends StatelessWidget {
       displayText = isRinging
           ? l10n.incomingCall(senderName)
           : l10n.startedACall(senderName);
-      icon = Icons.call;
+      icon = TablerIcons.phone;
       actionText = l10n.joinCall;
     } else {
       // Call has ended - distinguish between ended and missed
       if (wasAnswered) {
         displayText = l10n.callEnded;
-        icon = Icons.call_end;
+        icon = TablerIcons.phone_off;
         actionText = onJoinCall != null ? l10n.callBack : null;
       } else {
         displayText = l10n.missedCall(senderName);
-        icon = Icons.call_missed;
+        icon = TablerIcons.phone_off;
         actionText = onJoinCall != null ? l10n.callBack : null;
       }
     }

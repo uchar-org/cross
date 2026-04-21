@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:tabler_icons/tabler_icons.dart';
 import 'package:flutter/services.dart';
 
 import 'package:matrix/matrix.dart';
@@ -133,7 +135,7 @@ class MessageContextMenu extends StatelessWidget {
     if (canSendMessages && event.status.isSent) {
       items.add(_ContextMenuItem(
         action: _ContextAction.reply,
-        icon: Icons.reply_outlined,
+        icon: TablerIcons.arrow_back_up,
         label: l10n.reply,
       ));
     }
@@ -143,7 +145,7 @@ class MessageContextMenu extends StatelessWidget {
         controller.activeThreadId == null) {
       items.add(_ContextMenuItem(
         action: _ContextAction.replyInThread,
-        icon: Icons.message_outlined,
+        icon: TablerIcons.message,
         label: l10n.replyInThread,
       ));
     }
@@ -151,7 +153,7 @@ class MessageContextMenu extends StatelessWidget {
     if (_canEdit && event.messageType == MessageTypes.Text) {
       items.add(_ContextMenuItem(
         action: _ContextAction.edit,
-        icon: Icons.edit_outlined,
+        icon: TablerIcons.pencil,
         label: l10n.edit,
       ));
     }
@@ -160,7 +162,7 @@ class MessageContextMenu extends StatelessWidget {
         .contains(event.messageType)) {
       items.add(_ContextMenuItem(
         action: _ContextAction.copy,
-        icon: Icons.copy_outlined,
+        icon: TablerIcons.copy,
         label: l10n.copyToClipboard,
       ));
     }
@@ -168,7 +170,7 @@ class MessageContextMenu extends StatelessWidget {
     if (event.status.isSent) {
       items.add(_ContextMenuItem(
         action: _ContextAction.forward,
-        icon: Icons.shortcut_outlined,
+        icon: TablerIcons.corner_down_right,
         label: l10n.forward,
       ));
     }
@@ -176,7 +178,7 @@ class MessageContextMenu extends StatelessWidget {
     if (_canPin) {
       items.add(_ContextMenuItem(
         action: _ContextAction.pin,
-        icon: _isPinned ? Icons.push_pin : Icons.push_pin_outlined,
+        icon: _isPinned ? TablerIcons.pin_filled : TablerIcons.pin,
         label: _isPinned ? l10n.unpin : l10n.pinMessage,
       ));
     }
@@ -184,21 +186,21 @@ class MessageContextMenu extends StatelessWidget {
     if (_canSave) {
       items.add(_ContextMenuItem(
         action: _ContextAction.download,
-        icon: Icons.download_outlined,
+        icon: TablerIcons.cloud_download,
         label: l10n.downloadFile,
       ));
     }
 
     items.add(_ContextMenuItem(
       action: _ContextAction.select,
-      icon: Icons.check_circle_outline,
+      icon: TablerIcons.circle_check,
       label: l10n.select,
     ));
 
     if (_canRedact) {
       items.add(_ContextMenuItem(
         action: _ContextAction.delete,
-        icon: Icons.delete_outlined,
+        icon: TablerIcons.trash,
         label: l10n.redactMessage,
         isDestructive: true,
       ));
@@ -206,14 +208,14 @@ class MessageContextMenu extends StatelessWidget {
 
     items.add(_ContextMenuItem(
       action: _ContextAction.info,
-      icon: Icons.info_outlined,
+      icon: TablerIcons.info_circle,
       label: l10n.messageInfo,
     ));
 
     if (event.status.isSent && event.senderId != room.client.userID) {
       items.add(_ContextMenuItem(
         action: _ContextAction.report,
-        icon: Icons.shield_outlined,
+        icon: TablerIcons.shield,
         label: l10n.reportMessage,
         isDestructive: true,
       ));

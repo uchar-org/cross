@@ -8,6 +8,8 @@ import 'package:fluffychat/utils/client_manager.dart';
 import 'package:fluffychat/widgets/adaptive_dialogs/show_ok_cancel_alert_dialog.dart';
 import 'package:fluffychat/widgets/matrix.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:tabler_icons/tabler_icons.dart';
 import 'package:flutter/services.dart';
 import 'package:matrix/matrix.dart';
 
@@ -229,7 +231,7 @@ class _EmojiImportPreviewState extends State<_EmojiImportPreview> {
       children: [
         IconButton(
           onPressed: widget.onRemove,
-          icon: const Icon(Icons.remove_circle),
+          icon: const Icon(TablerIcons.circle_minus),
           tooltip: L10n.of(context).remove,
         ),
         ValueListenableBuilder(
@@ -314,7 +316,7 @@ class _ImageFileError extends StatelessWidget {
           mainAxisSize: .min,
           crossAxisAlignment: .center,
           children: [
-            const Icon(Icons.error),
+            const Icon(TablerIcons.alert_circle_filled),
             Text(
               L10n.of(context).notAnImage,
               textAlign: TextAlign.center,

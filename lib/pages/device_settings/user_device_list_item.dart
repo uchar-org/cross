@@ -2,6 +2,8 @@ import 'package:fluffychat/config/app_config.dart';
 import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/widgets/adaptive_dialogs/show_modal_action_popup.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:tabler_icons/tabler_icons.dart';
 import 'package:matrix/matrix.dart';
 
 import '../../utils/date_time_extension.dart';
@@ -50,26 +52,26 @@ class UserDeviceListItem extends StatelessWidget {
               actions: [
                 AdaptiveModalAction(
                   value: UserDeviceListItemAction.rename,
-                  icon: const Icon(Icons.edit_outlined),
+                  icon: const Icon(TablerIcons.pencil),
                   label: L10n.of(context).changeDeviceName,
                 ),
                 if (!isOwnDevice && keys != null) ...{
                   AdaptiveModalAction(
                     value: UserDeviceListItemAction.verify,
-                    icon: const Icon(Icons.verified_outlined),
+                    icon: const Icon(TablerIcons.discount_check),
                     label: L10n.of(context).verifyStart,
                   ),
                   if (!keys.blocked)
                     AdaptiveModalAction(
                       value: UserDeviceListItemAction.block,
-                      icon: const Icon(Icons.block_outlined),
+                      icon: const Icon(TablerIcons.ban),
                       label: L10n.of(context).blockDevice,
                       isDestructive: true,
                     ),
                   if (keys.blocked)
                     AdaptiveModalAction(
                       value: UserDeviceListItemAction.unblock,
-                      icon: const Icon(Icons.block),
+                      icon: const Icon(TablerIcons.ban),
                       label: L10n.of(context).unblockDevice,
                       isDestructive: true,
                     ),
@@ -77,7 +79,7 @@ class UserDeviceListItem extends StatelessWidget {
                 if (!isOwnDevice)
                   AdaptiveModalAction(
                     value: UserDeviceListItemAction.remove,
-                    icon: const Icon(Icons.delete_outlined),
+                    icon: const Icon(TablerIcons.trash),
                     label: L10n.of(context).delete,
                     isDestructive: true,
                   ),

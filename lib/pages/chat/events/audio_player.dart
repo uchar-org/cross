@@ -10,6 +10,8 @@ import 'package:fluffychat/utils/localized_exception_extension.dart';
 import 'package:fluffychat/utils/url_launcher.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:tabler_icons/tabler_icons.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:matrix/matrix.dart';
@@ -77,8 +79,8 @@ class AudioPlayerState extends State<AudioPlayerWidget> {
                     }
                   },
                   icon: audioPlayer.playing && !audioPlayer.isAtEndPosition
-                      ? const Icon(Icons.pause_outlined)
-                      : const Icon(Icons.play_arrow_outlined),
+                      ? const Icon(TablerIcons.player_pause)
+                      : const Icon(TablerIcons.player_play),
                 ),
               ),
               content: StreamBuilder(
@@ -108,7 +110,7 @@ class AudioPlayerState extends State<AudioPlayerWidget> {
                       ).clearMaterialBanners();
                     });
                   },
-                  icon: const Icon(Icons.close_outlined),
+                  icon: const Icon(TablerIcons.x),
                 ),
               ],
             ),
@@ -351,8 +353,8 @@ class AudioPlayerState extends State<AudioPlayerWidget> {
                                       audioPlayer?.playing == true &&
                                               audioPlayer?.isAtEndPosition ==
                                                   false
-                                          ? Icons.pause_outlined
-                                          : Icons.play_arrow_outlined,
+                                          ? TablerIcons.player_pause
+                                          : TablerIcons.player_play,
                                       color: widget.color,
                                     ),
                                   ),
@@ -440,7 +442,7 @@ class AudioPlayerState extends State<AudioPlayerWidget> {
                           firstChild: Padding(
                             padding: const EdgeInsets.only(right: 8.0),
                             child: Icon(
-                              Icons.mic_none_outlined,
+                              TablerIcons.microphone,
                               color: widget.color,
                             ),
                           ),

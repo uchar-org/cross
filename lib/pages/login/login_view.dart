@@ -1,6 +1,8 @@
 import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/widgets/layouts/login_scaffold.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:tabler_icons/tabler_icons.dart';
 
 import 'login.dart';
 
@@ -52,7 +54,7 @@ class LoginView extends StatelessWidget {
                         ? null
                         : [AutofillHints.username],
                     decoration: InputDecoration(
-                      prefixIcon: const Icon(Icons.account_box_outlined),
+                      prefixIcon: const Icon(TablerIcons.user),
                       errorText: controller.usernameError,
                       errorStyle: const TextStyle(color: Colors.orange),
                       hintText: '@username:domain',
@@ -74,15 +76,15 @@ class LoginView extends StatelessWidget {
                     obscureText: !controller.showPassword,
                     onSubmitted: (_) => controller.login(),
                     decoration: InputDecoration(
-                      prefixIcon: const Icon(Icons.lock_outlined),
+                      prefixIcon: const Icon(TablerIcons.lock),
                       errorText: controller.passwordError,
                       errorStyle: const TextStyle(color: Colors.orange),
                       suffixIcon: IconButton(
                         onPressed: controller.toggleShowPassword,
                         icon: Icon(
                           controller.showPassword
-                              ? Icons.visibility_off_outlined
-                              : Icons.visibility_outlined,
+                              ? TablerIcons.eye_off
+                              : TablerIcons.eye,
                           color: Colors.black,
                         ),
                       ),
