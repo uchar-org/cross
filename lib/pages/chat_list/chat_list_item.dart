@@ -159,6 +159,18 @@ class ChatListItem extends StatelessWidget {
                 ),
               title: Row(
                 children: <Widget>[
+                  if (!isDirectChat) ...[
+                    Icon(
+                      room.isSpace
+                          ? TablerIcons.layout_grid
+                          : room.joinRules == JoinRules.public
+                          ? TablerIcons.speakerphone
+                          : TablerIcons.users,
+                      size: 16,
+                      color: theme.colorScheme.outline,
+                    ),
+                    const SizedBox(width: 4),
+                  ],
                   Expanded(
                     child: Text(
                       displayname,
