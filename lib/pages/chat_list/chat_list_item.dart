@@ -49,6 +49,12 @@ class ChatListItem extends StatelessWidget {
     final directChatMatrixId = room.directChatMatrixID;
     final isDirectChat = directChatMatrixId != null;
     final hasNotifications = room.notificationCount > 0;
+    final isReadByOthers = ownMessage &&
+        lastEvent != null &&
+        (lastEvent.status == EventStatus.synced ||
+            lastEvent.status == EventStatus.sent) &&
+        room.receiptState.global.otherUsers.values
+            .any((r) => r.ts >= lastEvent.originServerTs.millisecondsSinceEpoch);
     final backgroundColor = activeChat
         ? theme.colorScheme.secondaryContainer
         : null;
@@ -232,7 +238,7 @@ class ChatListItem extends StatelessWidget {
                 ],
               ),
               subtitle: Row(
-                crossAxisAlignment: .start,
+                crossAxisAlignment: .center,
                 mainAxisAlignment: .center,
                 children: <Widget>[
                   if (typingText.isEmpty &&
@@ -319,6 +325,20 @@ class ChatListItem extends StatelessWidget {
                             unread,
                           ),
                   ),
+                  if (typingText.isEmpty &&
+                      ownMessage &&
+                      lastEvent != null &&
+                      (lastEvent.status == EventStatus.synced ||
+                          lastEvent.status == EventStatus.sent)) ...[
+                    const SizedBox(width: 4),
+                    Icon(
+                      isReadByOthers ? TablerIcons.checks : TablerIcons.check,
+                      size: 14,
+                      color: isReadByOthers
+                          ? theme.colorScheme.primary
+                          : theme.colorScheme.outline,
+                    ),
+                  ],
                   const SizedBox(width: 8),
                   UnreadBubble(room: room),
                 ],
