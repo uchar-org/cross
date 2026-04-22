@@ -2395,5 +2395,7 @@
     "notificationRuleInviteForMeDescription": "ユーザーが部屋に招待されたときに通知します。",
     "notificationRuleMasterDescription": "全ルールを上書きして通知をすべて無効にします。",
     "notificationRuleIsUserMention": "ユーザーの言及",
-    "notificationRuleIsUserMentionDescription": "ユーザーがメッセージ内で直接言及されたときに通知します。"
+    "notificationRuleIsUserMentionDescription": "ユーザーがメッセージ内で直接言及されたときに通知します。",
+    "photo": "写真",
+    "video": "動画"
 }

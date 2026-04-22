@@ -2187,5 +2187,7 @@
             }
         }
     },
-    "startVideoCall": "Bdu asiwel n uvidyu"
+    "startVideoCall": "Bdu asiwel n uvidyu",
+    "photo": "Tugna",
+    "video": "Vidyu"
 }

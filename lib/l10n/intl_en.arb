@@ -3579,5 +3579,7 @@
   "addTag": "Add tag",
   "removeTag": "Remove tag",
   "tagName": "Tag name",
-  "createNewTag": "Create new tag"
+  "createNewTag": "Create new tag",
+  "photo": "Photo",
+  "video": "Video"
 }

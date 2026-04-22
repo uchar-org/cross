@@ -2808,6 +2808,7 @@
     "joinVoiceCall": "Fica't a la trucada",
     "joinVideoCall": "Fica't a la videotrucada",
     "live": "En directe",
-    "playSoundOnNotification": "Notificacions sonores"
+    "playSoundOnNotification": "Notificacions sonores",
+    "photo": "Foto",
+    "video": "Vídeo"
 }
-

@@ -3571,5 +3571,7 @@
     "loadingMessages": "Загрузка сообщений",
     "@loadingMessages": {},
     "setupChatBackup": "Настроить резервную копию чата",
-    "@setupChatBackup": {}
+    "@setupChatBackup": {},
+    "photo": "Фото",
+    "video": "Видео"
 }

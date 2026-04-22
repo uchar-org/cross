@@ -2809,5 +2809,7 @@
     "joinVoiceCall": "Liitu häälkõnega",
     "joinVideoCall": "Liitu videokõnega",
     "live": "Reaalajas",
-    "playSoundOnNotification": "Lisa teavitusele helimärguanne"
+    "playSoundOnNotification": "Lisa teavitusele helimärguanne",
+    "photo": "Foto",
+    "video": "Video"
 }

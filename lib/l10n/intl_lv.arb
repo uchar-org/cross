@@ -3121,5 +3121,7 @@
     "logs": "Žurnāli",
     "advancedConfigs": "Izvērsta konfigurācijas",
     "advancedConfigurations": "Izvērstas konfigurācijas",
-    "signInWithLabel": "Pieteikties ar:"
+    "signInWithLabel": "Pieteikties ar:",
+    "photo": "Foto",
+    "video": "Video"
 }

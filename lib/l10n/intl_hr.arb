@@ -3138,5 +3138,7 @@
     "logs": "Zapisi",
     "advancedConfigs": "Napredne konfiguracije",
     "advancedConfigurations": "Napredne konfiguracije",
-    "signInWithLabel": "Prijavi se sa:"
+    "signInWithLabel": "Prijavi se sa:",
+    "photo": "Fotografija",
+    "video": "Video"
 }

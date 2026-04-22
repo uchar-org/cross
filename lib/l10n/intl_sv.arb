@@ -2643,5 +2643,7 @@
     },
     "logs": "Loggar",
     "signIn": "Logga in",
-    "createNewAccount": "Skapa nytt konto"
+    "createNewAccount": "Skapa nytt konto",
+    "photo": "Foto",
+    "video": "Video"
 }

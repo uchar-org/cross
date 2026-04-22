@@ -2815,5 +2815,7 @@
     "joinVoiceCall": "Glac páirt i nglao gutha",
     "joinVideoCall": "Glac páirt i nglao físe",
     "live": "Beo",
-    "playSoundOnNotification": "Seinn fuaim ar fhógra"
+    "playSoundOnNotification": "Seinn fuaim ar fhógra",
+    "photo": "Grianghraf",
+    "video": "Físeán"
 }
