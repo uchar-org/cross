@@ -80,7 +80,17 @@ class Avatar extends StatelessWidget {
               placeholder: (_) => noPic
                   ? Container(
                       decoration: BoxDecoration(
-                        color: backgroundColor ?? name?.lightColorAvatar,
+                        gradient: backgroundColor == null
+                            ? LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                colors: [
+                                  name?.lightColorAvatar ?? Colors.grey,
+                                  name?.color ?? Colors.grey.shade700,
+                                ],
+                              )
+                            : null,
+                        color: backgroundColor,
                       ),
                       alignment: Alignment.center,
                       child: Text(
