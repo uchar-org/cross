@@ -561,28 +561,6 @@ class ChatListController extends State<ChatList>
       context: posContext,
       position: position,
       items: [
-        PopupMenuItem(
-          value: ChatContextAction.open,
-          child: Row(
-            mainAxisSize: .min,
-            spacing: 12.0,
-            children: [
-              Avatar(mxContent: room.avatar, name: displayname),
-              ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 128),
-                child: Text(
-                  displayname,
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.onSurface,
-                  ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ],
-          ),
-        ),
-        const PopupMenuDivider(),
         if (space != null)
           PopupMenuItem(
             value: ChatContextAction.goToSpace,

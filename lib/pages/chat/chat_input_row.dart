@@ -57,7 +57,11 @@ class ChatInputRow extends StatelessWidget {
             onSend: controller.onVoiceMessageSend,
           );
         }
-        return Row(
+        return Padding(
+          padding: controller.selectMode
+              ? const EdgeInsets.symmetric(horizontal: 8)
+              : EdgeInsets.zero,
+          child: Row(
           crossAxisAlignment: .end,
           mainAxisAlignment: .spaceBetween,
           children: controller.selectMode
@@ -67,30 +71,43 @@ class ChatInputRow extends StatelessWidget {
                   ))
                     SizedBox(
                       height: height,
-                      child: TextButton(
-                        style: TextButton.styleFrom(
-                          foregroundColor: theme.colorScheme.error,
-                        ),
-                        onPressed: controller.deleteErrorEventsAction,
-                        child: Row(
-                          children: <Widget>[
-                            const Icon(TablerIcons.trash_filled),
-                            Text(L10n.of(context).delete),
-                          ],
+                      child: Center(
+                        child: TextButton(
+                          style: TextButton.styleFrom(
+                            foregroundColor: theme.colorScheme.error,
+                            padding: const EdgeInsets.symmetric(horizontal: 12),
+                            minimumSize: const Size(0, 36),
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          ),
+                          onPressed: controller.deleteErrorEventsAction,
+                          child: Row(
+                            children: <Widget>[
+                              const Icon(TablerIcons.trash_filled),
+                              Text(L10n.of(context).delete),
+                            ],
+                          ),
                         ),
                       ),
                     )
                   else
                     SizedBox(
                       height: height,
-                      child: TextButton(
-                        style: selectedTextButtonStyle,
-                        onPressed: controller.forwardEventsAction,
-                        child: Row(
-                          children: <Widget>[
-                            const Icon(TablerIcons.chevron_left),
-                            Text(L10n.of(context).forward),
-                          ],
+                      child: Center(
+                        child: TextButton(
+                          style: selectedTextButtonStyle.copyWith(
+                            padding: const WidgetStatePropertyAll(
+                              EdgeInsets.symmetric(horizontal: 12),
+                            ),
+                            minimumSize: const WidgetStatePropertyAll(Size(0, 36)),
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          ),
+                          onPressed: controller.forwardEventsAction,
+                          child: Row(
+                            children: <Widget>[
+                              const Icon(TablerIcons.chevron_left),
+                              Text(L10n.of(context).forward),
+                            ],
+                          ),
                         ),
                       ),
                     ),
@@ -101,28 +118,44 @@ class ChatInputRow extends StatelessWidget {
                                 .isSent
                             ? SizedBox(
                                 height: height,
-                                child: TextButton(
-                                  style: selectedTextButtonStyle,
-                                  onPressed: controller.replyAction,
-                                  child: Row(
-                                    children: <Widget>[
-                                      Text(L10n.of(context).reply),
-                                      const Icon(TablerIcons.chevron_right),
-                                    ],
+                                child: Center(
+                                  child: TextButton(
+                                    style: selectedTextButtonStyle.copyWith(
+                                      padding: const WidgetStatePropertyAll(
+                                        EdgeInsets.symmetric(horizontal: 12),
+                                      ),
+                                      minimumSize: const WidgetStatePropertyAll(Size(0, 36)),
+                                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                    ),
+                                    onPressed: controller.replyAction,
+                                    child: Row(
+                                      children: <Widget>[
+                                        Text(L10n.of(context).reply),
+                                        const Icon(TablerIcons.chevron_right),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               )
                             : SizedBox(
                                 height: height,
-                                child: TextButton(
-                                  style: selectedTextButtonStyle,
-                                  onPressed: controller.sendAgainAction,
-                                  child: Row(
-                                    children: <Widget>[
-                                      Text(L10n.of(context).tryToSendAgain),
-                                      const SizedBox(width: 4),
-                                      const Icon(TablerIcons.send, size: 16),
-                                    ],
+                                child: Center(
+                                  child: TextButton(
+                                    style: selectedTextButtonStyle.copyWith(
+                                      padding: const WidgetStatePropertyAll(
+                                        EdgeInsets.symmetric(horizontal: 12),
+                                      ),
+                                      minimumSize: const WidgetStatePropertyAll(Size(0, 36)),
+                                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                    ),
+                                    onPressed: controller.sendAgainAction,
+                                    child: Row(
+                                      children: <Widget>[
+                                        Text(L10n.of(context).tryToSendAgain),
+                                        const SizedBox(width: 4),
+                                        const Icon(TablerIcons.send, size: 14),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               )
@@ -404,6 +437,7 @@ class ChatInputRow extends StatelessWidget {
                           ),
                   ),
                 ],
+        ),
         );
       },
     );
