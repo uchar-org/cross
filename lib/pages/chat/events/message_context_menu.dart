@@ -9,6 +9,7 @@ import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/pages/chat/chat.dart';
 import 'package:fluffychat/utils/matrix_sdk_extensions/event_extension.dart';
 import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_locals.dart';
+import 'package:fluffychat/utils/platform_infos.dart';
 import 'package:fluffychat/widgets/matrix.dart';
 
 enum _ContextAction {
@@ -268,6 +269,8 @@ class MessageContextMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDesktopOrWeb = PlatformInfos.isDesktop || PlatformInfos.isWeb;
+
     return GestureDetector(
       onDoubleTap: event.status.isSent && controller.room.canSendDefaultMessages
           ? () => controller.replyAction(replyTo: event)
@@ -275,12 +278,14 @@ class MessageContextMenu extends StatelessWidget {
       onSecondaryTapUp: (details) {
         _showContextMenu(context, details.globalPosition);
       },
-      onLongPressStart: controller.selectedEvents.isNotEmpty
+      onLongPressStart: isDesktopOrWeb
           ? null
-          : (details) {
-              HapticFeedback.heavyImpact();
-              _showContextMenu(context, details.globalPosition);
-            },
+          : controller.selectedEvents.isNotEmpty
+              ? null
+              : (details) {
+                  HapticFeedback.heavyImpact();
+                  _showContextMenu(context, details.globalPosition);
+                },
       child: child,
     );
   }
