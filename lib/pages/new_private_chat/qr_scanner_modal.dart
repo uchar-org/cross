@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:fluffychat/l10n/l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:tabler_icons/tabler_icons.dart';
+import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 import 'package:qr_code_scanner_plus/qr_code_scanner_plus.dart';
 
 class QrScannerModal extends StatefulWidget {

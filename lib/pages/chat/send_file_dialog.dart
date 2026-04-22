@@ -12,7 +12,7 @@ import 'package:fluffychat/utils/size_string.dart';
 import 'package:fluffychat/widgets/adaptive_dialogs/adaptive_dialog_action.dart';
 import 'package:fluffychat/widgets/adaptive_dialogs/dialog_text_field.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:tabler_icons/tabler_icons.dart';
+import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:matrix/matrix.dart' hide Result;
 import 'package:mime/mime.dart';
