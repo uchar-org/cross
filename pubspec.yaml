@@ -18,7 +18,7 @@ dependencies:
   collection: ^1.18.0
   cross_file: ^0.3.5
   cupertino_icons: ^1.0.8
-  tabler_icons: ^2.5.0+1
+  flutter_tabler_icons: ^1.43.0
   desktop_drop: ^0.7.0
   desktop_notifications: ^0.6.3
   device_info_plus: ^12.3.0
