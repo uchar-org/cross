@@ -126,12 +126,13 @@ class PresenceAvatar extends StatelessWidget {
         final statusMsgBubbleShadowColor = theme.colorScheme.surfaceBright;
         final statusMsgBubbleColor = Colors.white.withAlpha(212);
         return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+          padding: const EdgeInsets.symmetric(horizontal: 4.0),
           child: SizedBox(
-            width: avatarSize,
+            width: avatarSize + 10,
             child: Column(
               children: [
-                InkWell(
+                Center(
+                child: InkWell(
                   borderRadius: BorderRadius.circular(avatarSize),
                   onTap: profile == null ? null : () => onTap(profile),
                   child: Material(
@@ -139,6 +140,8 @@ class PresenceAvatar extends StatelessWidget {
                     child: Stack(
                             children: [
                               Container(
+                                width: avatarSize,
+                                height: avatarSize,
                                 padding: const EdgeInsets.all(3),
                                 decoration: BoxDecoration(
                                   gradient: presence.gradient,
@@ -215,7 +218,7 @@ class PresenceAvatar extends StatelessWidget {
                                             overflow: TextOverflow.ellipsis,
                                             style: const TextStyle(
                                               color: Colors.black,
-                                              fontSize: 9,
+                                              fontSize: 7,
                                             ),
                                           ),
                                         ),
@@ -261,6 +264,7 @@ class PresenceAvatar extends StatelessWidget {
                             ],
                           ),
                         ),
+                ),
                 ),
                 const Spacer(),
                 Padding(
