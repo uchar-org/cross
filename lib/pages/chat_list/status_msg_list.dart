@@ -2,7 +2,6 @@ import 'package:fluffychat/config/app_config.dart';
 import 'package:fluffychat/config/themes.dart';
 import 'package:fluffychat/utils/stream_extension.dart';
 import 'package:fluffychat/widgets/avatar.dart';
-import 'package:fluffychat/widgets/hover_builder.dart';
 import 'package:fluffychat/widgets/matrix.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
@@ -16,7 +15,7 @@ class StatusMessageList extends StatelessWidget {
 
   const StatusMessageList({required this.onStatusEdit, super.key});
 
-  static const double height = 116;
+  static const double height = 92;
 
   void _onStatusTab(BuildContext context, Profile profile) {
     final client = Matrix.of(context).client;
@@ -132,18 +131,12 @@ class PresenceAvatar extends StatelessWidget {
             width: avatarSize,
             child: Column(
               children: [
-                HoverBuilder(
-                  builder: (context, hovered) {
-                    return AnimatedScale(
-                      scale: hovered ? 1.15 : 1.0,
-                      duration: FluffyThemes.animationDuration,
-                      curve: FluffyThemes.animationCurve,
-                      child: InkWell(
-                        borderRadius: BorderRadius.circular(avatarSize),
-                        onTap: profile == null ? null : () => onTap(profile),
-                        child: Material(
-                          borderRadius: BorderRadius.circular(avatarSize),
-                          child: Stack(
+                InkWell(
+                  borderRadius: BorderRadius.circular(avatarSize),
+                  onTap: profile == null ? null : () => onTap(profile),
+                  child: Material(
+                    borderRadius: BorderRadius.circular(avatarSize),
+                    child: Stack(
                             children: [
                               Container(
                                 padding: const EdgeInsets.all(3),
@@ -268,9 +261,6 @@ class PresenceAvatar extends StatelessWidget {
                             ],
                           ),
                         ),
-                      ),
-                    );
-                  },
                 ),
                 const Spacer(),
                 Padding(
