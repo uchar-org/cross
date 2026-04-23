@@ -83,7 +83,7 @@
         "type": "String",
         "placeholders": {}
     },
-    "areGuestsAllowedToJoin": "Разрешено ли гостям присоединяться",
+    "areGuestsAllowedToJoin": "Разрешено ли гостям присоединяться?",
     "@areGuestsAllowedToJoin": {
         "type": "String",
         "placeholders": {}
@@ -2518,9 +2518,9 @@
     "@importNow": {},
     "importEmojis": "Импортировать эмодзи",
     "@importEmojis": {},
-    "importFromZipFile": "Импортировать из ZIP-файла",
+    "importFromZipFile": "Импортировать из zip-файла",
     "@importFromZipFile": {},
-    "exportEmotePack": "Экспортировать набор эмодзи как ZIP",
+    "exportEmotePack": "Экспортировать набор эмодзи как zip",
     "@exportEmotePack": {},
     "replace": "Заменить",
     "@replace": {},
@@ -3105,7 +3105,7 @@
     "@strikeThrough": {},
     "pleaseFillOut": "Пожалуйста, заполните",
     "@pleaseFillOut": {},
-    "invalidUrl": "Не верный URL",
+    "invalidUrl": "Неверный url-адрес",
     "@invalidUrl": {},
     "addLink": "Добавить ссылку",
     "@addLink": {},
@@ -3127,7 +3127,7 @@
     "@contactServerAdmin": {},
     "contactServerSecurity": "Безопасность контактов сервера",
     "@contactServerSecurity": {},
-    "supportPage": "Поддержка",
+    "supportPage": "Страница поддержки",
     "@supportPage": {},
     "name": "Имя",
     "@name": {},
@@ -3571,6 +3571,146 @@
     "loadingMessages": "Загрузка сообщений",
     "@loadingMessages": {},
     "setupChatBackup": "Настроить резервную копию чата",
+    "createNewAccount": "Создать новый аккаунт",
+    "theProcessWasCanceled": "Процесс был отменен.",
+    "noMoreResultsFound": "Ничего не найдено",
+    "countInvited": "{count} приглашенных",
+    "@countInvited": {
+        "type": "String",
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
+    },
+    "loadCountMoreParticipants": "Загрузить ещё {count} участников",
+    "@loadCountMoreParticipants": {
+        "type": "String",
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
+    },
+    "versionWithNumber": "Версия: {version}",
+    "@versionWithNumber": {
+        "type": "String",
+        "placeholders": {
+            "version": {
+                "type": "String"
+            }
+        }
+    },
+    "logs": "Архивные записи",
+    "advancedConfigs": "Расширенные Настройки",
+    "advancedConfigurations": "Расширенные конфигурации",
+    "signUpGreeting": "FluffyChat децентрализорован! Выберите сервер, где вы хотите сделать свой аккаунт и заходите!",
+    "signInGreeting": "У вас есть уже аккаунт в Matrix? Добро пожаловать! Выберите свой сервер и войдите.",
+    "appIntro": "С FluffyChat'ом вы можете говорить со своими друзьями. Это защищённый децентрализорованный [matrix] мессенджер! Узнайте больше на https://matrix.org, если вам нравится или просто зарегистрироваться.",
+    "join": "Присоединиться",
+    "countFiles": "{count} файлов",
+    "@countFiles": {
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
+    },
+    "unreadChatsInApp": "{appname}: {unread} непрочитанных чатов",
+    "@unreadChatsInApp": {
+        "type": "String",
+        "placeholders": {
+            "appname": {
+                "type": "String"
+            },
+            "unread": {
+                "type": "String"
+            }
+        }
+    },
+    "thereAreCountUsersBlocked": "Сейчас {count} пользователей заблокировано.",
+    "@thereAreCountUsersBlocked": {
+        "type": "String",
+        "count": {}
+    },
+    "serverLimitReached": "Достигнут серверный лимит! Подождите {seconds} секунд...",
+    "@serverLimitReached": {
+        "type": "integer",
+        "placeholders": {
+            "seconds": {
+                "type": "int"
+            }
+        }
+    },
+    "countVotes": "{count, plural, =1{Один голос} other{{count} голоса(-ов)}}",
+    "@countVotes": {
+        "type": "int",
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
+    },
+    "countReplies": "{count, plural, =1{Один ответ} other{{count} ответа(-ов)}}",
+    "@countReplies": {
+        "type": "int",
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
+    },
+    "chatSearchedUntil": "Чат индексируется до {time}",
+    "@chatSearchedUntil": {
+        "type": "String",
+        "placeholders": {
+            "time": {
+                "type": "String"
+            }
+        }
+    },
+    "federationBaseUrl": "Основной URL федерации",
+    "clientWellKnownInformation": "Client-Well-Known Информация:",
+    "baseUrl": "Базовый URL",
+    "identityServer": "Сервер профилей:",
+    "signIn": "Войти",
+    "searchOrEnterHomeserverAddress": "Поищите или введите адрес домашнего сервера",
+    "matrixId": "Matrix ID",
+    "setPowerLevel": "Установить уровень возможностей",
+    "makeModerator": "Назначить модератором",
+    "makeAdmin": "Назначить администратором",
+    "removeModeratorRights": "Удалить права модератора",
+    "removeAdminRights": "Удалить права администратора",
+    "powerLevel": "Уровень энергии",
+    "setPowerLevelDescription": "Уровни прав определяют, что участнику разрешено делать в этой комнате, и обычно варьируются от 0 до 100.",
+    "owner": "Владелец",
+    "mute": "Мут",
+    "@mute": {
+        "description": "This should be a very short string because there is not much space in the button!"
+    },
+    "createNewChat": "Создать новый чат",
+    "reset": "Сброс",
+    "supportFluffyChat": "Поддержите FluffyChat",
+    "support": "Поддержка",
+    "fluffyChatSupportBannerMessage": "Uchar нуждается в ВАШЕЙ помощи!\n❤️❤️❤️\nUchar всегда будет бесплатным, но разработка и хостинг всё равно требуют затрат.\nБудущее проекта зависит от поддержки таких людей, как вы.",
+    "skipSupportingFluffyChat": "Пропустить помощь FluffyChat",
+    "iAlreadySupportFluffyChat": "Я уже поддерживаю FluffyChat",
+    "iDoNotWantToSupport": "Я не хочу поддерживать",
+    "setLowPriority": "Установить низкий приоритет",
+    "unsetLowPriority": "Неопределенный приоритет",
+    "removeCallFromChat": "Удалить сообщение из чата",
+    "removeCallFromChatDescription": "Вы хотите удалить это сообщение из чата для всех участников?",
+    "removeCallForEveryone": "Отменить вызов для всех",
+    "startVoiceCall": "Начать голосовой вызов",
+    "startVideoCall": "Начать видеозвонок",
+    "joinVoiceCall": "Присоединиться к голосовому звонку",
+    "joinVideoCall": "Присоединиться к видеозвонку",
+    "live": "Прямой эфир",
+    "playSoundOnNotification": "Воспроизвести звук при получении уведомления",
+    "addTag": "Добавить тег",
+    "removeTag": "Удалить тег",
+    "tagName": "Название тега",
+    "createNewTag": "Создать новый тег",
     "@setupChatBackup": {},
     "photo": "Фото",
     "video": "Видео"

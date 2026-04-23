@@ -2,7 +2,7 @@
 
 rm -rf .vodozemac
 version=$(yq ".dependencies.flutter_vodozemac" < pubspec.yaml)
-version=$(expr "$version" : '\^*\(.*\)')
+version=$(printf "%s" "$version" | tr -d '"^')
 git clone https://github.com/famedly/dart-vodozemac.git -b ${version} .vodozemac
 cd .vodozemac
 cargo install flutter_rust_bridge_codegen
@@ -19,7 +19,7 @@ dart compile js ./web/native_executor.dart -o ./web/native_executor.js -m
 # Without these, custom_image_resizer.dart's `await native.init()` crashes
 # with "dart.global.Imaging is undefined" and image upload fails.
 version=$(yq ".dependencies.native_imaging" < pubspec.yaml)
-version=$(expr "$version" : '\^*\(.*\)')
+version=$(printf "%s" "$version" | tr -d '"^')
 curl -L "https://github.com/famedly/dart_native_imaging/releases/download/v${version}/native_imaging.zip" > native_imaging.zip
 unzip -o native_imaging.zip
 mv js/* web/

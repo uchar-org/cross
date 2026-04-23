@@ -1,6 +1,4 @@
 import 'dart:async';
-import 'dart:developer';
-import 'dart:io';
 
 import 'package:collection/collection.dart';
 import 'package:cross_file/cross_file.dart';
@@ -44,7 +42,7 @@ enum PopupMenuAction {
   archive,
 }
 
-enum ActiveFilter { allChats, messages, groups, unread, spaces }
+enum ActiveFilter { allChats, messages, groups, unread, spaces, tag }
 
 extension LocalizedActiveFilter on ActiveFilter {
   String toLocalizedString(BuildContext context) {
@@ -59,6 +57,8 @@ extension LocalizedActiveFilter on ActiveFilter {
         return L10n.of(context).groups;
       case ActiveFilter.spaces:
         return L10n.of(context).spaces;
+      case ActiveFilter.tag:
+        throw 'Tags should not directly be displayed!';
     }
   }
 }
@@ -89,6 +89,7 @@ class ChatListController extends State<ChatList>
   StreamSubscription? _intentUriStreamSubscription;
 
   late ActiveFilter activeFilter;
+  String? activeTag;
 
   String? _activeSpaceId;
   String? get activeSpaceId => _activeSpaceId;
@@ -157,6 +158,8 @@ class ChatListController extends State<ChatList>
         return (room) => room.isUnreadOrInvited;
       case ActiveFilter.spaces:
         return (room) => room.isSpace;
+      case ActiveFilter.tag:
+        return (room) => room.tags.keys.contains(activeTag);
     }
   }
 
@@ -382,13 +385,10 @@ class ChatListController extends State<ChatList>
     }
   }
 
+  StreamSubscription? _onRoomTagUpdate;
+
   @override
   void initState() {
-    activeFilter =
-        ActiveFilter.values.singleWhereOrNull(
-          (filter) => AppSettings.chatFilter.value == filter.name,
-        ) ??
-        ActiveFilter.allChats;
     _initReceiveSharingIntent();
     _activeSpaceId = widget.activeSpace;
 
@@ -421,11 +421,37 @@ class ChatListController extends State<ChatList>
         // Workaround for system UI overlay style not applied on app start
         SystemChrome.setSystemUIOverlayStyle(
           Theme.of(context).appBarTheme.systemOverlayStyle!,
-        ); 
+        );
       } else {
         Logs().v('appBar does not change because context unmounted');
       }
     });
+
+    _updateRoomTags();
+    _onRoomTagUpdate = Matrix.of(context).client.onSync.stream
+        .where(
+          (syncUpdate) =>
+              syncUpdate.rooms?.join?.values.any(
+                (roomUpdate) =>
+                    roomUpdate.accountData?.any(
+                      (accountData) => accountData.type == 'm.tag',
+                    ) ??
+                    false,
+              ) ??
+              false,
+        )
+        .listen(_updateRoomTags);
+
+    if (roomTags.containsKey(AppSettings.chatFilter.value)) {
+      activeFilter = ActiveFilter.tag;
+      activeTag = AppSettings.chatFilter.value;
+    } else {
+      activeFilter =
+          ActiveFilter.values.singleWhereOrNull(
+            (filter) => AppSettings.chatFilter.value == filter.name,
+          ) ??
+          ActiveFilter.allChats;
+    }
 
     super.initState();
   }
@@ -435,6 +461,7 @@ class ChatListController extends State<ChatList>
     _intentDataStreamSubscription?.cancel();
     _intentFileStreamSubscription?.cancel();
     _intentUriStreamSubscription?.cancel();
+    _onRoomTagUpdate?.cancel();
     scrollController.removeListener(_onScroll);
     super.dispose();
   }
@@ -561,6 +588,19 @@ class ChatListController extends State<ChatList>
       context: posContext,
       position: position,
       items: [
+        PopupMenuItem(
+          value: ChatContextAction.open,
+          child: Row(
+            spacing: 12.0,
+            children: [
+              Avatar(mxContent: room.avatar, name: displayname, size: 24),
+              ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 200),
+                child: Text(displayname, maxLines: 1, overflow: .ellipsis),
+              ),
+            ],
+          ),
+        ),
         if (space != null)
           PopupMenuItem(
             value: ChatContextAction.goToSpace,
@@ -798,7 +838,66 @@ class ChatListController extends State<ChatList>
           future: () => room.setLowPriority(!room.isLowPriority),
         );
         return;
+      case ChatContextAction.addTag:
+        final existingTags = List.of(roomTags.keys);
+        existingTags.removeWhere(room.tags.containsKey);
+        String? tag;
+        if (existingTags.isNotEmpty) {
+          tag = await showModalActionPopup<String?>(
+            context: context,
+            actions: [
+              ...existingTags.map((tag) {
+                final displayTag = tag.replaceFirst('u.', '');
+                return AdaptiveModalAction(
+                  label: displayTag,
+                  value: displayTag,
+                );
+              }),
+              AdaptiveModalAction(
+                label: L10n.of(context).createNewTag,
+                value: null,
+              ),
+            ],
+          );
+          if (!mounted) return;
+        }
+        tag ??= await showTextInputDialog(
+          context: context,
+          title: L10n.of(context).addTag,
+          hintText: L10n.of(context).tagName,
+        );
+        final newTag = tag;
+        if (!mounted) return;
+        if (newTag == null) return;
+        await showFutureLoadingDialog(
+          context: context,
+          future: () => room.addTag('u.$newTag'),
+        );
+        return;
+      case ChatContextAction.removeTag:
+        await showFutureLoadingDialog(
+          context: context,
+          future: () => room.removeTag(activeTag!),
+        );
+        return;
     }
+  }
+
+  Map<String, int> roomTags = {};
+
+  void _updateRoomTags([_]) {
+    roomTags.clear();
+    for (final room in Matrix.of(context).client.rooms) {
+      for (final tag in room.tags.keys) {
+        if (tag.startsWith('u.')) roomTags[tag] = (roomTags[tag] ?? 0) + 1;
+      }
+    }
+    setState(() {
+      if (activeTag != null && !roomTags.keys.contains(activeTag)) {
+        activeTag = null;
+        activeFilter = ActiveFilter.allChats;
+      }
+    });
   }
 
   Future<void> dismissStatusList() async {
@@ -894,11 +993,17 @@ class ChatListController extends State<ChatList>
     }
   }
 
-  void setActiveFilter(ActiveFilter filter) {
+  void setActiveFilter(ActiveFilter filter, String? tag) {
+    if (filter == ActiveFilter.tag && tag == null) {
+      throw ('Must set a tag when setting filter to tags!');
+    }
     setState(() {
+      activeTag = tag;
       activeFilter = filter;
     });
-    AppSettings.chatFilter.setItem(filter.name);
+    AppSettings.chatFilter.setItem(
+      filter == ActiveFilter.tag ? tag! : filter.name,
+    );
   }
 
   void setActiveClient(Client client) {
@@ -1015,9 +1120,12 @@ enum ChatContextAction {
   open,
   goToSpace,
   favorite,
+  lowPriority,
+  addTag,
+  removeTag,
   markUnread,
   mute,
   leave,
   addToSpace,
-  block, lowPriority,
+  block,
 }
