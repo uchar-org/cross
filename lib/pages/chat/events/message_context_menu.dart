@@ -797,10 +797,10 @@ class _EditedAtRow extends StatelessWidget {
     final theme = Theme.of(context);
     final color = theme.colorScheme.onSurface.withValues(alpha: 0.5);
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
       child: Row(
         children: [
-          Icon(TablerIcons.pencil, size: 16, color: color),
+          Icon(TablerIcons.clock_edit, size: 16, color: color),
           const SizedBox(width: 10),
           Text(
             editedAt.localizedTime(context),
