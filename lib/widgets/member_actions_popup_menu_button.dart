@@ -37,6 +37,8 @@ void showMemberActionsPopupMenu({
     Offset.zero & overlay.size,
   );
 
+  const defaultPowerLevels = {0, 50, 100, 9007199254740991};
+
   final action = await showMenu<_MemberActions>(
     context: context,
     position: position,
@@ -134,11 +136,11 @@ void showMemberActionsPopupMenu({
               children: [
                 Text(L10n.of(context).chatPermissions),
                 Text(
-                  user.powerLevel < 50
-                      ? L10n.of(context).userLevel(user.powerLevel)
-                      : user.powerLevel < 100
-                      ? L10n.of(context).moderatorLevel(user.powerLevel)
-                      : L10n.of(context).adminLevel(user.powerLevel),
+                  user.powerLevel.level < 50
+                      ? L10n.of(context).userLevel(user.powerLevel.level)
+                      : user.powerLevel.level < 100
+                      ? L10n.of(context).moderatorLevel(user.powerLevel.level)
+                      : L10n.of(context).adminLevel(user.powerLevel.level),
                   style: const TextStyle(fontSize: 10),
                 ),
               ],
@@ -249,6 +251,28 @@ void showMemberActionsPopupMenu({
   switch (action) {
     case _MemberActions.mention:
       onMention?.call();
+      return;
+    case _MemberActions.setPowerLevel:
+      final power = await showPermissionChooser(
+        context,
+        currentLevel: user.powerLevel.level,
+        maxLevel: user.room.ownPowerLevel.level,
+      );
+      if (power == null) return;
+      if (!context.mounted) return;
+      if (power >= 100) {
+        final consent = await showOkCancelAlertDialog(
+          context: context,
+          title: L10n.of(context).areYouSure,
+          message: L10n.of(context).makeAdminDescription,
+        );
+        if (consent != OkCancelResult.ok) return;
+        if (!context.mounted) return;
+      }
+      await showFutureLoadingDialog(
+        context: context,
+        future: () => user.setPower(power),
+      );
       return;
     case _MemberActions.setRole:
       final power = await showPermissionChooser(
@@ -401,13 +425,18 @@ void showMemberActionsPopupMenu({
 enum _MemberActions {
   info,
   mention,
-  setRole,
-  grantCallPermission,
+  setPowerLevel,
+  makeAdmin,
+  makeModerator,
+  removeAdmin,
+  removeModerator,
   kick,
   ban,
   approve,
   unban,
   report,
+  setRole,
+  grantCallPermission,
 }
 
 /// Get required power level for call.member state events

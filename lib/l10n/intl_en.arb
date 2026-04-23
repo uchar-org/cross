@@ -6,6 +6,7 @@
         "description": "Set to true to always display time of day in 24 hour format."
     },
     "repeatPassword": "Repeat password",
+    "setCustomPermissionLevel": "Set custom permission level",
     "notAnImage": "Not an image file.",
     "ignoreUser": "Ignore user",
     "remove": "Remove",
@@ -13,6 +14,7 @@
         "type": "String",
         "placeholders": {}
     },
+    "normalUser": "Normal user",
     "importNow": "Import now",
     "importEmojis": "Import Emojis",
     "importFromZipFile": "Import from .zip file",
@@ -2100,10 +2102,13 @@
     "emojis": "Emojis",
     "placeCall": "Place call",
     "voiceCall": "Voice call",
+    "noCallPermission": "You don't have permission to start or join calls. Ask an admin to grant you call permissions.",
+    "@noCallPermission": {},
     "unsupportedAndroidVersion": "Unsupported Android version",
     "unsupportedAndroidVersionLong": "This feature requires a newer Android version. Please check for updates or Lineage OS support.",
     "videoCallsBetaWarning": "Please note that video calls are currently in beta. They might not work as expected or work at all on all platforms.",
     "experimentalVideoCalls": "Experimental video calls",
+    "emailOrUsername": "Email or username",
     "youRejectedTheInvitation": "You rejected the invitation",
     "youJoinedTheChat": "You joined the chat",
     "youAcceptedTheInvitation": "👍 You accepted the invitation",
@@ -2495,6 +2500,12 @@
     "changelog": "Changelog",
     "sendCanceled": "Sending canceled",
     "loginWithMatrixId": "Login with Matrix-ID",
+    "discoverHomeservers": "Discover homeservers",
+    "@discoverHomeservers": {},
+    "whatIsAHomeserver": "What is a homeserver?",
+    "@whatIsAHomeserver": {},
+    "homeserverDescription": "All your data is stored on the homeserver, just like an email provider. You can choose which homeserver you want to use, while you can still communicate with everyone. Learn more at at https://matrix.org.",
+    "@homeserverDescription": {},
     "doesNotSeemToBeAValidHomeserver": "Doesn't seem to be a compatible homeserver. Wrong URL?",
     "calculatingFileSize": "Calculating file size...",
     "prepareSendingAttachment": "Prepare sending attachment...",
@@ -2560,6 +2571,7 @@
     "appWantsToUseForLoginDescription": "You hereby allow the app and website to share information about you.",
     "open": "Open",
     "waitingForServer": "Waiting for server...",
+    "appIntroduction": "Uchar lets you chat with your friends across different messengers. Learn more at https://matrix.org or just tap *Continue*.",
     "newChatRequest": "📩 New chat request",
     "contentNotificationSettings": "Content notification settings",
     "generalNotificationSettings": "General notification settings",
@@ -2760,6 +2772,15 @@
     "advancedConfigs": "Advanced Configs",
     "advancedConfigurations": "Advanced configurations",
     "signIn": "Sign in",
+    "signInWith": "{provider} bilan kiring",
+    "@signInWith": {
+        "type": "String",
+        "placeholders": {
+            "provider": {
+                "type": "String"
+            }
+        }
+    },
     "createNewAccount": "Create new account",
     "signUpGreeting": "FluffyChat is decentralized! Select a server where you want to create your account and let's go!",
     "signInGreeting": "You already have an account in Matrix? Welcome back! Select your homeserver and sign in.",
@@ -2784,7 +2805,7 @@
     "reset": "Reset",
     "supportFluffyChat": "Support FluffyChat",
     "support": "Support",
-    "fluffyChatSupportBannerMessage": "FluffyChat needs YOUR help!\n❤️❤️❤️\nFluffyChat will always be free, but development and hosting still cost money.\nThe future of the project depends on support from people like you.",
+    "fluffyChatSupportBannerMessage": "Uchar needs YOUR help!\n❤️❤️❤️\nUchar will always be free, but development and hosting still cost money.\nThe future of the project depends on support from people like you.",
     "skipSupportingFluffyChat": "Skip supporting FluffyChat",
     "iDoNotWantToSupport": "I do not want to support",
     "iAlreadySupportFluffyChat": "I already support FluffyChat",
@@ -2802,5 +2823,53 @@
     "addTag": "Add tag",
     "removeTag": "Remove tag",
     "tagName": "Tag name",
-    "createNewTag": "Create new tag"
+    "createNewTag": "Create new tag",
+    "photo": "Photo",
+    "video": "Video",
+    "joinCall": "Join",
+    "@joinCall": {},
+    "missedCall": "Missed call from {senderName}",
+    "@missedCall": {
+        "type": "String",
+        "placeholders": {
+            "senderName": {
+                "type": "String"
+            }
+        }
+    },
+    "incomingCall": "{senderName} is calling",
+    "@incomingCall": {
+        "type": "String",
+        "placeholders": {
+            "senderName": {
+                "type": "String"
+            }
+        }
+    },
+    "callBack": "Call back",
+    "@callBack": {},
+    "callInProgress": "Call in progress",
+    "@callInProgress": {},
+    "callEnded": "Call ended",
+    "@callEnded": {},
+    "startFirstChat": "Start your first chat",
+    "@startFirstChat": {},
+    "addWidget": "Add widget",
+    "@addWidget": {},
+    "widgetVideo": "Video",
+    "@widgetVideo": {},
+    "widgetEtherpad": "Text note",
+    "@widgetEtherpad": {},
+    "widgetJitsi": "Jitsi Meet",
+    "@widgetJitsi": {},
+    "widgetCustom": "Custom",
+    "@widgetCustom": {},
+    "widgetName": "Name",
+    "@widgetName": {},
+    "widgetUrlError": "This is not a valid URL.",
+    "@widgetUrlError": {},
+    "widgetNameError": "Please provide a display name.",
+    "@widgetNameError": {},
+    "errorAddingWidget": "Error adding the widget.",
+    "@errorAddingWidget": {}
 }

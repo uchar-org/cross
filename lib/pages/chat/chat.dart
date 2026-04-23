@@ -1,11 +1,25 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:fluffychat/widgets/fluffy_chat_app.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
+import 'package:flutter/services.dart';
+
 import 'package:collection/collection.dart';
 import 'package:desktop_drop/desktop_drop.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:matrix/matrix.dart';
+import 'package:mime/mime.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:scroll_to_index/scroll_to_index.dart';
+
 import 'package:fluffychat/config/setting_keys.dart';
 import 'package:fluffychat/config/themes.dart';
 import 'package:fluffychat/l10n/l10n.dart';
@@ -14,13 +28,14 @@ import 'package:fluffychat/pages/chat/event_info_dialog.dart';
 import 'package:fluffychat/pages/chat/start_poll_bottom_sheet.dart';
 import 'package:fluffychat/pages/chat_details/chat_details.dart';
 import 'package:fluffychat/utils/adaptive_bottom_sheet.dart';
+import 'package:fluffychat/utils/callkit/callkit_service.dart';
 import 'package:fluffychat/utils/error_reporter.dart';
 import 'package:fluffychat/utils/file_selector.dart';
+import 'package:fluffychat/utils/platform_infos.dart';
 import 'package:fluffychat/utils/matrix_sdk_extensions/event_extension.dart';
 import 'package:fluffychat/utils/matrix_sdk_extensions/filtered_timeline_extension.dart';
 import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_locals.dart';
 import 'package:fluffychat/utils/other_party_can_receive.dart';
-import 'package:fluffychat/utils/platform_infos.dart';
 import 'package:fluffychat/utils/show_scaffold_dialog.dart';
 import 'package:fluffychat/widgets/adaptive_dialogs/show_modal_action_popup.dart';
 import 'package:fluffychat/widgets/adaptive_dialogs/show_ok_cancel_alert_dialog.dart';
@@ -28,19 +43,13 @@ import 'package:fluffychat/widgets/adaptive_dialogs/show_text_input_dialog.dart'
 import 'package:fluffychat/widgets/future_loading_dialog.dart';
 import 'package:fluffychat/widgets/matrix.dart';
 import 'package:fluffychat/widgets/share_scaffold_dialog.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:go_router/go_router.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:matrix/matrix.dart';
-import 'package:mime/mime.dart';
-import 'package:scroll_to_index/scroll_to_index.dart';
-
 import '../../utils/account_bundles.dart';
 import '../../utils/localized_exception_extension.dart';
+import '../../utils/element_call/call_service.dart';
 import 'send_file_dialog.dart';
 import 'send_location_dialog.dart';
+
+import 'package:pasteboard/pasteboard.dart';
 
 class ChatPage extends StatelessWidget {
   final String roomId;
@@ -113,17 +122,19 @@ class ChatController extends State<ChatPageWithRoom>
   final AutoScrollController scrollController = AutoScrollController();
 
   late final FocusNode inputFocus;
+  StreamSubscription<SyncUpdate>? _syncSubscription;
 
   Timer? typingCoolDown;
   Timer? typingTimeout;
   bool currentlyTyping = false;
   bool dragging = false;
+  bool hasActiveCall = false;
 
-  void onDragEntered(_) => setState(() => dragging = true);
+  void onDragEntered(dynamic _) => setState(() => dragging = true);
 
-  void onDragExited(_) => setState(() => dragging = false);
+  void onDragExited(dynamic _) => setState(() => dragging = false);
 
-  Future<void> onDragDone(DropDoneDetails details) async {
+  void onDragDone(DropDoneDetails details) async {
     setState(() => dragging = false);
     if (details.files.isEmpty) return;
 
@@ -131,6 +142,63 @@ class ChatController extends State<ChatPageWithRoom>
       context: context,
       builder: (c) => SendFileDialog(
         files: details.files,
+        room: room,
+        outerContext: context,
+        threadRootEventId: activeThreadId,
+        threadLastEventId: threadLastEventId,
+      ),
+    );
+  }
+
+  Future<void> handlePaste() async {
+    final imageBytes = await Pasteboard.image;
+    final files = await Pasteboard.files();
+
+    if (imageBytes != null || files.isNotEmpty) {
+      debugPrint("imageBytes: ${imageBytes?.length}");
+      _showUploadDialog(imageBytes, files);
+    } else {
+      final data = await Clipboard.getData(Clipboard.kTextPlain);
+      if (data?.text != null) {
+        final currentText = sendController.text;
+        final selection = sendController.selection;
+        final newText = currentText.replaceRange(
+          selection.start,
+          selection.end,
+          data!.text!,
+        );
+        sendController.text = newText;
+      }
+    }
+  }
+
+  void _showUploadDialog(Uint8List? image, List<String>? files) async {
+    final imageFiles = <XFile>[];
+
+    if (files != null) {
+      imageFiles.addAll(
+        files.map<XFile>((String path) => XFile(path)).toList(),
+      );
+    }
+
+    if (image != null && image.isNotEmpty) {
+      final ts = DateTime.now().millisecondsSinceEpoch;
+      imageFiles.add(
+        XFile.fromData(
+          image,
+          name: 'clipboard_$ts.png',
+          mimeType: 'image/png',
+          length: image.length,
+        ),
+      );
+    }
+
+    if (imageFiles.isEmpty) return;
+
+    await showAdaptiveDialog(
+      context: context,
+      builder: (c) => SendFileDialog(
+        files: imageFiles,
         room: room,
         outerContext: context,
         threadRootEventId: activeThreadId,
@@ -153,6 +221,8 @@ class ChatController extends State<ChatPageWithRoom>
       selectedEvents.single.saveFile(context);
 
   List<Event> selectedEvents = [];
+
+  VoidCallback? closeContextMenu;
 
   final Set<String> unfolded = {};
 
@@ -192,7 +262,7 @@ class ChatController extends State<ChatPageWithRoom>
     selectedEvents.clear();
   });
 
-  Future<void> recreateChat() async {
+  void recreateChat() async {
     final room = this.room;
     final userId = room.directChatMatrixID;
     if (userId == null) {
@@ -216,7 +286,7 @@ class ChatController extends State<ChatPageWithRoom>
     context.go('/rooms');
   }
 
-  Future<void> requestHistory([_]) async {
+  Future<void> requestHistory([dynamic _]) async {
     Logs().v('Requesting history...');
     await timeline?.requestHistory(historyCount: _loadHistoryCount);
   }
@@ -268,7 +338,7 @@ class ChatController extends State<ChatPageWithRoom>
     }
   }
 
-  void _shareItems([_]) {
+  void _shareItems([dynamic _]) {
     final shareItems = widget.shareItems;
     if (shareItems == null || shareItems.isEmpty) return;
     if (!room.otherPartyCanReceiveMessages) {
@@ -309,6 +379,15 @@ class ChatController extends State<ChatPageWithRoom>
   }
 
   KeyEventResult _customEnterKeyHandling(FocusNode node, KeyEvent evt) {
+    // turn on latest message edit mode on Arrow up
+    if (evt.logicalKey == LogicalKeyboardKey.arrowUp &&
+        evt is KeyDownEvent &&
+        sendController.text.isEmpty &&
+        editEvent == null) {
+      _editLastSentMessage();
+      return KeyEventResult.handled;
+    }
+
     if (!HardwareKeyboard.instance.isShiftPressed &&
         evt.logicalKey.keyLabel == 'Enter' &&
         AppSettings.sendOnEnter.value) {
@@ -381,6 +460,19 @@ class ChatController extends State<ChatPageWithRoom>
         : '';
     WidgetsBinding.instance.addObserver(this);
     _tryLoadTimeline();
+
+    // Listen for call state updates
+    _syncSubscription = room.client.onSync.stream.listen((_) {
+      _updateCallState();
+    });
+    _updateCallState();
+  }
+
+  void _updateCallState() {
+    final newState = CallService.hasActiveCall(room);
+    if (newState != hasActiveCall) {
+      setState(() => hasActiveCall = newState);
+    }
   }
 
   final Set<String> expandedEventIds = {};
@@ -403,7 +495,7 @@ class ChatController extends State<ChatPageWithRoom>
     });
   }
 
-  Future<void> _tryLoadTimeline() async {
+  void _tryLoadTimeline() async {
     final initialEventId = widget.eventId;
     loadTimelineFuture = _getTimeline();
     try {
@@ -465,6 +557,15 @@ class ChatController extends State<ChatPageWithRoom>
 
   bool firstUpdateReceived = false;
 
+  int? animateInEventIndex;
+
+  void _insert(int index) {
+    if (index > 0) return;
+    animateInEventId = timeline?.events.firstOrNull?.eventId;
+  }
+
+  String? animateInEventId;
+
   void updateView() {
     if (!mounted) return;
     setReadMarker();
@@ -487,6 +588,7 @@ class ChatController extends State<ChatPageWithRoom>
       timeline?.cancelSubscriptions();
       timeline = await room.getTimeline(
         onUpdate: updateView,
+        onInsert: _insert,
         eventContextId: eventContextId,
       );
     } catch (e, s) {
@@ -552,9 +654,12 @@ class ChatController extends State<ChatPageWithRoom>
 
   @override
   void dispose() {
+    closeContextMenu?.call();
+    closeContextMenu = null;
     timeline?.cancelSubscriptions();
     timeline = null;
     inputFocus.removeListener(_inputFocusListener);
+    _syncSubscription?.cancel();
     if (currentlyTyping) room.setTyping(false);
     super.dispose();
   }
@@ -632,6 +737,7 @@ class ChatController extends State<ChatPageWithRoom>
   }
 
   Future<void> sendFileAction({FileType type = FileType.any}) async {
+    final reply = replyEvent;
     final files = await selectFiles(context, allowMultiple: true, type: type);
     if (files.isEmpty) return;
     if (!mounted) return;
@@ -641,24 +747,33 @@ class ChatController extends State<ChatPageWithRoom>
         files: files,
         room: room,
         outerContext: context,
+        inReplyTo: reply,
         threadRootEventId: activeThreadId,
         threadLastEventId: threadLastEventId,
       ),
     );
+    if (reply != null) {
+      setState(() => replyEvent = null);
+    }
   }
 
   Future<void> sendImageFromClipBoard(Uint8List? image) async {
     if (image == null) return;
+    final reply = replyEvent;
     await showAdaptiveDialog(
       context: context,
       builder: (c) => SendFileDialog(
         files: [XFile.fromData(image)],
         room: room,
         outerContext: context,
+        inReplyTo: reply,
         threadRootEventId: activeThreadId,
         threadLastEventId: threadLastEventId,
       ),
     );
+    if (reply != null) {
+      setState(() => replyEvent = null);
+    }
   }
 
   Future<void> openCameraAction() async {
@@ -668,16 +783,21 @@ class ChatController extends State<ChatPageWithRoom>
     if (file == null) return;
     if (!mounted) return;
 
+    final reply = replyEvent;
     await showAdaptiveDialog(
       context: context,
       builder: (c) => SendFileDialog(
         files: [file],
         room: room,
         outerContext: context,
+        inReplyTo: reply,
         threadRootEventId: activeThreadId,
         threadLastEventId: threadLastEventId,
       ),
     );
+    if (reply != null) {
+      setState(() => replyEvent = null);
+    }
   }
 
   Future<void> openVideoCameraAction() async {
@@ -690,16 +810,21 @@ class ChatController extends State<ChatPageWithRoom>
     if (file == null) return;
     if (!mounted) return;
 
+    final reply = replyEvent;
     await showAdaptiveDialog(
       context: context,
       builder: (c) => SendFileDialog(
         files: [file],
         room: room,
         outerContext: context,
+        inReplyTo: reply,
         threadRootEventId: activeThreadId,
         threadLastEventId: threadLastEventId,
       ),
     );
+    if (reply != null) {
+      setState(() => replyEvent = null);
+    }
   }
 
   Future<void> onVoiceMessageSend(
@@ -748,7 +873,7 @@ class ChatController extends State<ChatPageWithRoom>
     } catch (e) {
       if (!mounted) return;
       scaffoldMessenger.showSnackBar(
-        SnackBar(content: Text(e.toLocalizedString(context))),
+        SnackBar(content: Text((e as Object).toLocalizedString(context))),
       );
       return;
     }
@@ -1078,7 +1203,7 @@ class ChatController extends State<ChatPageWithRoom>
     scrollController.jumpTo(0);
   }
 
-  void onEmojiSelected(_, Emoji? emoji) {
+  void onEmojiSelected(dynamic _, Emoji? emoji) {
     typeEmoji(emoji);
     onInputBarChanged(sendController.text);
   }
@@ -1142,6 +1267,36 @@ class ChatController extends State<ChatPageWithRoom>
     inputFocus.requestFocus();
   }
 
+  void _editLastSentMessage() {
+    final tl = timeline;
+    if (tl == null || isArchived) return;
+
+    final userId = sendingClient.userID;
+    final events = tl.events.filterByVisibleInGui(threadId: activeThreadId);
+
+    // find latest sent message
+    final lastOwnEvent = events.firstWhereOrNull(
+          (e) =>
+      e.senderId == userId &&
+          e.status.isSent &&
+          e.messageType == MessageTypes.Text,
+    );
+    if (lastOwnEvent == null) return;
+
+    setState(() {
+      pendingText = sendController.text;
+      editEvent = lastOwnEvent;
+      sendController.text = lastOwnEvent
+          .getDisplayEvent(tl)
+          .calcLocalizedBodyFallback(
+        MatrixLocals(L10n.of(context)),
+        withSenderNamePrefix: false,
+        hideReply: true,
+      );
+    });
+    inputFocus.requestFocus();
+  }
+
   Future<void> goToNewRoomAction() async {
     final result = await showFutureLoadingDialog(
       context: context,
@@ -1151,7 +1306,7 @@ class ChatController extends State<ChatPageWithRoom>
           true,
           false,
         );
-        users.sort((a, b) => a.powerLevel.compareTo(b.powerLevel));
+        users.sort((a, b) => a.powerLevel.level.compareTo(b.powerLevel.level));
         final via = users
             .map((user) => user.id.domain)
             .whereType<String>()
@@ -1187,6 +1342,14 @@ class ChatController extends State<ChatPageWithRoom>
     }
   }
 
+  void selectSingleEvent(Event event) {
+    setState(() {
+      selectedEvents
+        ..clear()
+        ..add(event);
+    });
+  }
+
   int? findChildIndexCallback(Key key, Map<String, int> thisEventsKeyMap) {
     // this method is called very often. As such, it has to be optimized for speed.
     if (key is! ValueKey) {
@@ -1210,7 +1373,7 @@ class ChatController extends State<ChatPageWithRoom>
     FocusScope.of(context).requestFocus(inputFocus);
   }
 
-  void onAddPopupMenuButtonSelected(AddPopupMenuActions choice) {
+  Future<void> onAddPopupMenuButtonSelected(AddPopupMenuActions choice) async {
     room.client.getConfig();
 
     switch (choice) {
@@ -1224,10 +1387,17 @@ class ChatController extends State<ChatPageWithRoom>
         sendFileAction();
         return;
       case AddPopupMenuActions.poll:
-        showAdaptiveBottomSheet(
+        final reply = replyEvent;
+        await showAdaptiveBottomSheet(
           context: context,
-          builder: (context) => StartPollBottomSheet(room: room),
+          builder: (context) => StartPollBottomSheet(
+            room: room,
+            inReplyTo: reply,
+          ),
         );
+        if (reply != null) {
+          setState(() => replyEvent = null);
+        }
         return;
       case AddPopupMenuActions.photoCamera:
         openCameraAction();
@@ -1337,51 +1507,50 @@ class ChatController extends State<ChatPageWithRoom>
       (event ?? selectedEvents.single).showInfoDialog(context);
 
   Future<void> onPhoneButtonTap() async {
-    // VoIP required Android SDK 21
-    if (PlatformInfos.isAndroid) {
-      final androidInfo = await DeviceInfoPlugin().androidInfo;
-      if (!mounted) return;
-      if (androidInfo.version.sdkInt < 21) {
-        Navigator.pop(context);
-        await showOkAlertDialog(
-          context: context,
-          title: L10n.of(context).unsupportedAndroidVersion,
-          message: L10n.of(context).unsupportedAndroidVersionLong,
-          okLabel: L10n.of(context).close,
+    // Check if user has permission to join/start calls
+    if (!CallService.canJoinCall(room)) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(L10n.of(context).noCallPermission)),
         );
-        return;
+      }
+      return;
+    }
+
+    // Request camera and microphone permissions
+    final cameraStatus = await Permission.camera.request();
+    final micStatus = await Permission.microphone.request();
+
+    if (!cameraStatus.isGranted || !micStatus.isGranted) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Camera and microphone permissions are required for calls',
+            ),
+          ),
+        );
+      }
+      return;
+    }
+
+    // Show outgoing CallKit call on mobile and capture UUID
+    String? callKitUuid;
+    if (PlatformInfos.isMobile && !hasActiveCall) {
+      try {
+        callKitUuid = await CallKitService.instance.showOutgoingCall(
+          room: room,
+        );
+      } catch (e, s) {
+        Logs().e('[Chat] Failed to show outgoing CallKit call', e, s);
+        // Continue anyway - will still navigate to call screen
       }
     }
-    final callType = await showModalActionPopup<CallType>(
-      context: context,
-      title: L10n.of(context).warning,
-      message: L10n.of(context).videoCallsBetaWarning,
-      cancelLabel: L10n.of(context).cancel,
-      actions: [
-        AdaptiveModalAction(
-          label: L10n.of(context).voiceCall,
-          icon: const Icon(Icons.phone_outlined),
-          value: CallType.kVoice,
-        ),
-        AdaptiveModalAction(
-          label: L10n.of(context).videoCall,
-          icon: const Icon(Icons.video_call_outlined),
-          value: CallType.kVideo,
-        ),
-      ],
-    );
-    if (callType == null) return;
-    if (!mounted) return;
 
-    final voipPlugin = Matrix.of(context).voipPlugin;
-    try {
-      await voipPlugin!.voip.inviteToCall(room, callType);
-    } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(e.toLocalizedString(context))));
-    }
+    FluffyChatApp.router.go(
+      '/rooms/$roomId/call',
+      extra: {'callKitUuid': callKitUuid},
+    );
   }
 
   void cancelReplyEventAction() => setState(() {
@@ -1426,7 +1595,7 @@ class ChatController extends State<ChatPageWithRoom>
             child: ChatDetails(
               roomId: roomId,
               embeddedCloseButton: IconButton(
-                icon: const Icon(Icons.close),
+                icon: const Icon(TablerIcons.x),
                 onPressed: toggleDisplayChatDetailsColumn,
               ),
             ),
