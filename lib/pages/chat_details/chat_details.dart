@@ -14,6 +14,7 @@ import 'package:fluffychat/widgets/future_loading_dialog.dart';
 import 'package:fluffychat/widgets/matrix.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
+import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:matrix/matrix.dart';
 
@@ -161,6 +162,53 @@ class ChatDetailsController extends State<ChatDetails> {
         scrollController.position.maxScrollExtent - 300) {
       setState(() => _displayedCount += _pageSize);
     }
+  }
+
+  Future<void> leaveRoom() async {
+    final l10n = L10n.of(context);
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(l10n.areYouSure),
+        content: Text(l10n.commandHint_leave),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text(l10n.cancel),
+          ),
+          TextButton(
+            style: TextButton.styleFrom(
+              foregroundColor: Theme.of(ctx).colorScheme.error,
+            ),
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: Text(l10n.leave),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+    final room = Matrix.of(context).client.getRoomById(widget.roomId);
+    if (room == null) return;
+    final success = await showFutureLoadingDialog(
+      context: context,
+      future: room.leave,
+    );
+    if (!mounted) return;
+    if (success.error == null) context.go('/rooms');
+  }
+
+  Future<void> muteUnmuteAction() async {
+    final room = Matrix.of(context).client.getRoomById(widget.roomId);
+    if (room == null) return;
+    final isMuted = room.pushRuleState != PushRuleState.notify;
+    await showFutureLoadingDialog(
+      context: context,
+      future: () => room.setPushRuleState(
+        isMuted ? PushRuleState.notify : PushRuleState.mentionsOnly,
+      ),
+    );
+    if (!mounted) return;
+    setState(() {});
   }
 
   Future<void> setDisplaynameAction() async {

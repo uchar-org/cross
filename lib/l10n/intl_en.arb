@@ -3557,6 +3557,10 @@
   "@mute": {
       "description": "This should be a very short string because there is not much space in the button!"
   },
+  "unmute": "Unmute",
+  "@unmute": {
+      "description": "This should be a very short string because there is not much space in the button!"
+  },
   "createNewChat": "Create new chat",
   "reset": "Reset",
   "supportFluffyChat": "Support Uchar",
