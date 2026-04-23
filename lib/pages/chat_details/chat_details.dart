@@ -1,17 +1,18 @@
+import 'dart:async';
+
 import 'package:collection/collection.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/pages/chat_details/chat_details_view.dart';
-import 'package:fluffychat/pages/settings/settings.dart';
 import 'package:fluffychat/utils/file_selector.dart';
 import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_locals.dart';
 import 'package:fluffychat/utils/platform_infos.dart';
 import 'package:fluffychat/widgets/adaptive_dialogs/show_modal_action_popup.dart';
 import 'package:fluffychat/widgets/adaptive_dialogs/show_text_input_dialog.dart';
+import 'package:fluffychat/pages/settings/settings.dart';
 import 'package:fluffychat/widgets/future_loading_dialog.dart';
 import 'package:fluffychat/widgets/matrix.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:matrix/matrix.dart';
@@ -39,6 +40,128 @@ class ChatDetailsController extends State<ChatDetails> {
       setState(() => displaySettings = !displaySettings);
 
   String? get roomId => widget.roomId;
+
+  // Member search state
+  bool showMemberSearch = false;
+  String memberSearchQuery = '';
+
+  void toggleMemberSearch() {
+    setState(() {
+      showMemberSearch = !showMemberSearch;
+      if (!showMemberSearch) {
+        memberSearchQuery = '';
+        _displayedCount = _pageSize;
+      }
+    });
+    _applyMemberFilter();
+  }
+
+  void setMemberSearchQuery(String query) {
+    setState(() {
+      memberSearchQuery = query;
+      _displayedCount = _pageSize;
+    });
+    _applyMemberFilter();
+  }
+
+  // Member list state
+  static const int _pageSize = 20;
+  List<User>? _allMembers;
+  List<User>? _filteredMembers;
+  int _displayedCount = _pageSize;
+  bool loadingMembers = false;
+
+  List<User> get displayedMembers {
+    final source = _filteredMembers ?? [];
+    return source.take(_displayedCount).toList();
+  }
+
+  bool get hasMoreMembers {
+    final source = _filteredMembers ?? [];
+    return _displayedCount < source.length;
+  }
+
+  // Scroll
+  late final ScrollController scrollController;
+  StreamSubscription? _memberSub;
+
+  @override
+  void initState() {
+    super.initState();
+    scrollController = ScrollController()..addListener(_onScroll);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_allMembers == null && !loadingMembers) {
+      _loadMembers();
+      _memberSub ??= Matrix.of(context).client.onSync.stream
+          .where(
+            (update) =>
+                update.rooms?.join?[widget.roomId]?.timeline?.events?.any(
+                  (e) => e.type == EventTypes.RoomMember,
+                ) ??
+                false,
+          )
+          .listen((_) => _loadMembers());
+    }
+  }
+
+  @override
+  void dispose() {
+    scrollController.dispose();
+    _memberSub?.cancel();
+    super.dispose();
+  }
+
+  Future<void> _loadMembers() async {
+    if (loadingMembers) return;
+    setState(() => loadingMembers = true);
+    try {
+      final room = Matrix.of(context).client.getRoomById(widget.roomId);
+      if (room == null) return;
+      final participants = await room.requestParticipants(
+        [Membership.join, Membership.invite, Membership.knock],
+      );
+      participants.sort((b, a) => a.powerLevel.compareTo(b.powerLevel));
+      if (!mounted) return;
+      setState(() {
+        _allMembers = participants;
+        loadingMembers = false;
+      });
+      _applyMemberFilter();
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => loadingMembers = false);
+    }
+  }
+
+  void _applyMemberFilter() {
+    if (_allMembers == null) return;
+    if (memberSearchQuery.isEmpty) {
+      setState(() => _filteredMembers = _allMembers);
+    } else {
+      final query = memberSearchQuery.toLowerCase();
+      setState(() {
+        _filteredMembers = _allMembers!
+            .where(
+              (m) =>
+                  (m.displayName ?? '').toLowerCase().contains(query) ||
+                  m.id.toLowerCase().contains(query),
+            )
+            .toList();
+      });
+    }
+  }
+
+  void _onScroll() {
+    if (!hasMoreMembers) return;
+    if (scrollController.position.pixels >=
+        scrollController.position.maxScrollExtent - 300) {
+      setState(() => _displayedCount += _pageSize);
+    }
+  }
 
   Future<void> setDisplaynameAction() async {
     final l10n = L10n.of(context);
