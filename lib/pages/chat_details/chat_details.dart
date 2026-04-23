@@ -125,7 +125,7 @@ class ChatDetailsController extends State<ChatDetails> {
       final participants = await room.requestParticipants(
         [Membership.join, Membership.invite, Membership.knock],
       );
-      participants.sort((b, a) => a.powerLevel.compareTo(b.powerLevel));
+      participants.sort((b, a) => a.powerLevel.level.compareTo(b.powerLevel.level));
       if (!mounted) return;
       setState(() {
         _allMembers = participants;

@@ -30,7 +30,7 @@ class CallService {
     Logs().d(
       '[ElementCall.CallService] canJoinCall: userPowerLevel=$userPowerLevel, requiredLevel=$requiredLevel',
     );
-    return userPowerLevel >= requiredLevel;
+    return userPowerLevel.level >= requiredLevel;
   }
 
   /// Detect if group call is already started in room.

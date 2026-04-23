@@ -21,7 +21,7 @@ Future<int?> showPermissionChooser(
           crossAxisAlignment: .stretch,
           spacing: 12.0,
           children: [
-            Text(L10n.of(context).setPermissionsLevelDescription),
+            Text(L10n.of(context).setPowerLevelDescription),
             ValueListenableBuilder(
               valueListenable: error,
               builder: (context, errorText, _) => DialogTextField(

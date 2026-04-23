@@ -557,6 +557,15 @@ class ChatController extends State<ChatPageWithRoom>
 
   bool firstUpdateReceived = false;
 
+  int? animateInEventIndex;
+
+  void _insert(int index) {
+    if (index > 0) return;
+    animateInEventId = timeline?.events.firstOrNull?.eventId;
+  }
+
+  String? animateInEventId;
+
   void updateView() {
     if (!mounted) return;
     setReadMarker();
@@ -567,16 +576,10 @@ class ChatController extends State<ChatPageWithRoom>
 
   Future<void>? loadTimelineFuture;
 
-  int? animateInEventIndex;
-
-  void onInsert(int i) {
-    // setState will be called by updateView() anyway
-    if (timeline?.allowNewEvent == true) animateInEventIndex = i;
-  }
-
   Future<void> _getTimeline({String? eventContextId}) async {
-    await Matrix.of(context).client.roomsLoading;
-    await Matrix.of(context).client.accountDataLoading;
+    final matrix = Matrix.of(context);
+    await matrix.client.roomsLoading;
+    await matrix.client.accountDataLoading;
     if (eventContextId != null &&
         (!eventContextId.isValidMatrixId || eventContextId.sigil != '\$')) {
       eventContextId = null;
@@ -585,16 +588,13 @@ class ChatController extends State<ChatPageWithRoom>
       timeline?.cancelSubscriptions();
       timeline = await room.getTimeline(
         onUpdate: updateView,
+        onInsert: _insert,
         eventContextId: eventContextId,
-        onInsert: onInsert,
       );
     } catch (e, s) {
       Logs().w('Unable to load timeline on event ID $eventContextId', e, s);
       if (!mounted) return;
-      timeline = await room.getTimeline(
-        onUpdate: updateView,
-        onInsert: onInsert,
-      );
+      timeline = await room.getTimeline(onUpdate: updateView);
       if (!mounted) return;
       if (e is TimeoutException || e is IOException) {
         _showScrollUpMaterialBanner(eventContextId!);
@@ -1306,7 +1306,7 @@ class ChatController extends State<ChatPageWithRoom>
           true,
           false,
         );
-        users.sort((a, b) => a.powerLevel.compareTo(b.powerLevel));
+        users.sort((a, b) => a.powerLevel.level.compareTo(b.powerLevel.level));
         final via = users
             .map((user) => user.id.domain)
             .whereType<String>()

@@ -62,9 +62,9 @@ class MatrixLocals extends MatrixLocalizations {
 
   @override
   String changedTheGuestAccessRulesTo(
-    String senderName,
-    String localizedString,
-  ) {
+      String senderName,
+      String localizedString,
+      ) {
     return l10n.changedTheGuestAccessRulesTo(senderName, localizedString);
   }
 
@@ -75,9 +75,9 @@ class MatrixLocals extends MatrixLocalizations {
 
   @override
   String changedTheHistoryVisibilityTo(
-    String senderName,
-    String localizedString,
-  ) {
+      String senderName,
+      String localizedString,
+      ) {
     return l10n.changedTheHistoryVisibilityTo(senderName, localizedString);
   }
 
@@ -185,7 +185,7 @@ class MatrixLocals extends MatrixLocalizations {
   String redactedAnEvent(Event redactedEvent) {
     return l10n.redactedAnEvent(
       redactedEvent.redactedBecause?.senderFromMemoryOrFallback
-              .calcDisplayname() ??
+          .calcDisplayname() ??
           l10n.user,
     );
   }
@@ -255,11 +255,6 @@ class MatrixLocals extends MatrixLocalizations {
 
   @override
   String unknownEvent(String typeKey) {
-    // Handle call notification events with proper descriptions
-    if (typeKey == 'org.matrix.msc4075.call.notify' ||
-        typeKey == 'org.matrix.msc4075.rtc.notification') {
-      return l10n.callNotification;
-    }
     return l10n.userSentUnknownEvent('User', typeKey);
   }
 
@@ -358,9 +353,9 @@ class MatrixLocals extends MatrixLocalizations {
 
   @override
   String voiceMessage(
-    String senderName,
-    Duration? duration,
-  ) => l10n.sentVoiceMessage(
+      String senderName,
+      Duration? duration,
+      ) => l10n.sentVoiceMessage(
     senderName,
     duration == null
         ? ''

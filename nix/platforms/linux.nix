@@ -17,10 +17,28 @@ in
     imagemagick
     copyDesktopItems
     webkitgtk_4_1
-    rustup
+    pkg-config
+    llvmPackages.bintools
+    clang
+    gnumake
+    cmake
+    llvm
+    # IMPORTANT: Never use glibc in buildInputs/etc. Because it breaks ld paths
+    # glibc
+    glib
+    pkg-config
+    gcc
   ];
 
-  buildInputs = [ vodozemac-wasm ];
+  buildInputs = [
+    vodozemac-wasm
+    pkgs.openssl
+    pkgs.zlib
+
+    pkgs.llvm
+    pkgs.rustup
+    pkgs.libpq
+  ];
 
   runtimeDependencies = with pkgs; [
     pulseaudio
@@ -32,9 +50,13 @@ in
 
   env.CPATH = "${pkgs.fribidi.dev}/include/fribidi";
 
+
+
   shellHook = ''
+    ls ${pkgs.gnumake}/
     export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:./build/linux/x64/debug/bundle/lib/"
   '';
+    # export LD_LIBRARY_PATH="${pkgs.lib.makeLibraryPath [ pkgs.openssl ]}:$LD_LIBRARY_PATH"
 
   desktopItems = [
     (pkgs.makeDesktopItem {

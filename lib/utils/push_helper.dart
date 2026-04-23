@@ -18,6 +18,8 @@ import 'package:flutter_shortcuts_new/flutter_shortcuts_new.dart';
 import 'package:matrix/matrix.dart';
 
 const notificationAvatarDimension = 128;
+const String groupKey = 'im.fluffychat.messages';
+const int summaryId = -1;
 
 // De-duplication tracking for call notifications
 final Map<String, DateTime> _seenCalls = {}; // roomId -> timestamp
@@ -57,6 +59,7 @@ Future<void> pushHelper(
             AppSettings.applicationName.value,
             (notification.counts?.unread ?? 0).toString(),
           ),
+          groupKey: groupKey,
           importance: Importance.high,
           priority: Priority.max,
           shortcutId: notification.roomId,
@@ -432,7 +435,7 @@ Future<void> _tryPushHelper(
     ),
     importance: Importance.high,
     priority: Priority.max,
-    groupKey: event.room.spaceParents.firstOrNull?.roomId ?? 'rooms',
+    groupKey: groupKey,
     actions: event.type == EventTypes.RoomMember || !useNotificationActions
         ? null
         : <AndroidNotificationAction>[
@@ -476,6 +479,41 @@ Future<void> _tryPushHelper(
       event.eventId,
     ).toString(),
   );
+
+  // Send summary notification on Android
+  if (PlatformInfos.isAndroid) {
+    final activeNotifications =
+        (await flutterLocalNotificationsPlugin.getActiveNotifications())
+            .where((n) => n.groupKey == groupKey)
+            .toList();
+
+    if (activeNotifications.isEmpty) {
+      return;
+    }
+
+    final title = l10n.unreadChatsInApp(
+      AppSettings.applicationName.value,
+      activeNotifications.length.toString(),
+    );
+
+    await flutterLocalNotificationsPlugin.show(
+      id: summaryId,
+      notificationDetails: NotificationDetails(
+        android: AndroidNotificationDetails(
+          AppConfig.pushNotificationsChannelId,
+          l10n.incomingMessages,
+          groupKey: groupKey,
+          setAsGroupSummary: true,
+          styleInformation: InboxStyleInformation(
+            activeNotifications.map((n) => n.body ?? '').toList(),
+            contentTitle: title,
+            summaryText: title,
+          ),
+          autoCancel: false,
+        ),
+      ),
+    );
+  }
   Logs().v('Push helper has been completed!');
 }
 

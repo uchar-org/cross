@@ -96,13 +96,13 @@ class GroupCall {
 
       // Create widget settings
       Logs().d('[CallKit.GroupCall] join: creating widget settings');
-      _settings = ElementCallWidget.create(
-        baseUrl: baseUrl,
-        parentUrl: parentUrl,
-        room: room,
-        deviceId: deviceId,
-        theme: theme,
-      );
+      // _settings = ElementCallWidget.create(
+      //   baseUrl: baseUrl,
+      //   parentUrl: parentUrl,
+      //   room: room,
+      //   deviceId: deviceId,
+      //   theme: theme,
+      // );
 
       // Create transport
       Logs().d('[CallKit.GroupCall] join: creating webview transport');
