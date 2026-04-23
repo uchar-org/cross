@@ -2,7 +2,6 @@ import 'package:fluffychat/config/app_config.dart';
 import 'package:fluffychat/config/themes.dart';
 import 'package:fluffychat/utils/stream_extension.dart';
 import 'package:fluffychat/widgets/avatar.dart';
-import 'package:fluffychat/widgets/hover_builder.dart';
 import 'package:fluffychat/widgets/matrix.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
@@ -16,7 +15,7 @@ class StatusMessageList extends StatelessWidget {
 
   const StatusMessageList({required this.onStatusEdit, super.key});
 
-  static const double height = 116;
+  static const double height = 92;
 
   void _onStatusTab(BuildContext context, Profile profile) {
     final client = Matrix.of(context).client;
@@ -127,25 +126,22 @@ class PresenceAvatar extends StatelessWidget {
         final statusMsgBubbleShadowColor = theme.colorScheme.surfaceBright;
         final statusMsgBubbleColor = Colors.white.withAlpha(212);
         return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+          padding: const EdgeInsets.symmetric(horizontal: 4.0),
           child: SizedBox(
-            width: avatarSize,
+            width: avatarSize + 10,
             child: Column(
               children: [
-                HoverBuilder(
-                  builder: (context, hovered) {
-                    return AnimatedScale(
-                      scale: hovered ? 1.15 : 1.0,
-                      duration: FluffyThemes.animationDuration,
-                      curve: FluffyThemes.animationCurve,
-                      child: InkWell(
-                        borderRadius: BorderRadius.circular(avatarSize),
-                        onTap: profile == null ? null : () => onTap(profile),
-                        child: Material(
-                          borderRadius: BorderRadius.circular(avatarSize),
-                          child: Stack(
+                Center(
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(avatarSize),
+                  onTap: profile == null ? null : () => onTap(profile),
+                  child: Material(
+                    borderRadius: BorderRadius.circular(avatarSize),
+                    child: Stack(
                             children: [
                               Container(
+                                width: avatarSize,
+                                height: avatarSize,
                                 padding: const EdgeInsets.all(3),
                                 decoration: BoxDecoration(
                                   gradient: presence.gradient,
@@ -222,7 +218,7 @@ class PresenceAvatar extends StatelessWidget {
                                             overflow: TextOverflow.ellipsis,
                                             style: const TextStyle(
                                               color: Colors.black,
-                                              fontSize: 9,
+                                              fontSize: 7,
                                             ),
                                           ),
                                         ),
@@ -268,9 +264,7 @@ class PresenceAvatar extends StatelessWidget {
                             ],
                           ),
                         ),
-                      ),
-                    );
-                  },
+                ),
                 ),
                 const Spacer(),
                 Padding(
@@ -317,22 +311,18 @@ extension on CachedPresence {
 
   LinearGradient get gradient => presence.isOnline == true
       ? LinearGradient(
-          colors: [Colors.green, Colors.green.shade200, Colors.green.shade900],
+          colors: [Colors.green.shade300, Colors.green.shade800],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         )
       : presence.isUnavailable
       ? LinearGradient(
-          colors: [
-            Colors.yellow,
-            Colors.yellow.shade200,
-            Colors.yellow.shade900,
-          ],
+          colors: [Colors.amber.shade300, Colors.orange.shade700],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         )
       : LinearGradient(
-          colors: [Colors.grey, Colors.grey.shade200, Colors.grey.shade900],
+          colors: [Colors.grey.shade400, Colors.grey.shade700],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         );
