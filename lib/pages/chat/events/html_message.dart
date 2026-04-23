@@ -1,4 +1,5 @@
 import 'package:collection/collection.dart';
+import 'package:fluffychat/config/setting_keys.dart';
 import 'package:fluffychat/utils/code_highlight_theme.dart';
 import 'package:fluffychat/utils/event_checkbox_extension.dart';
 import 'package:fluffychat/widgets/avatar.dart';
@@ -95,10 +96,27 @@ class HtmlMessage extends StatelessWidget {
   static const Set<String> ignoredHtmlTags = {'mx-reply'};
 
   /// We add line breaks before these tags:
-  static const Set<String> blockHtmlTags = {'p', 'ul', 'ol', 'pre', 'div', 'table', 'details', 'blockquote'};
+  static const Set<String> blockHtmlTags = {
+    'p',
+    'ul',
+    'ol',
+    'pre',
+    'div',
+    'table',
+    'details',
+    'blockquote',
+  };
 
   /// We add line breaks before these tags:
-  static const Set<String> fullLineHtmlTag = {'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'li'};
+  static const Set<String> fullLineHtmlTag = {
+    'h1',
+    'h2',
+    'h3',
+    'h4',
+    'h5',
+    'h6',
+    'li',
+  };
 
   /// Adding line breaks before block elements.
   List<InlineSpan> _renderWithLineBreaks(dom.NodeList nodes, BuildContext context, {int depth = 1}) {
@@ -108,9 +126,13 @@ class HtmlMessage extends StatelessWidget {
         // Actually render the node child:
         _renderHtml(nodes[i], context, depth: depth + 1),
         // Add linebreaks between blocks:
-        if (nodes[i] is dom.Element && onlyElements.indexOf(nodes[i] as dom.Element) < onlyElements.length - 1) ...[
-          if (blockHtmlTags.contains((nodes[i] as dom.Element).localName)) const TextSpan(text: '\n\n'),
-          if (fullLineHtmlTag.contains((nodes[i] as dom.Element).localName)) const TextSpan(text: '\n'),
+        if (nodes[i] is dom.Element &&
+            onlyElements.indexOf(nodes[i] as dom.Element) <
+                onlyElements.length - 1) ...[
+          if (blockHtmlTags.contains((nodes[i] as dom.Element).localName))
+            const TextSpan(text: '\n\n'),
+          if (fullLineHtmlTag.contains((nodes[i] as dom.Element).localName))
+            const TextSpan(text: '\n'),
         ],
       ],
     ];
@@ -120,9 +142,14 @@ class HtmlMessage extends StatelessWidget {
     if (node is! dom.Element) {
       return TextSpan(text: node.text);
     }
-    final style = atomOneDarkTheme[node.className.split('-').last] ?? atomOneDarkTheme['root'];
+    final style =
+        atomOneDarkTheme[node.className.split('-').last] ??
+        atomOneDarkTheme['root'];
 
-    return TextSpan(children: node.nodes.map(_renderCodeBlockNode).toList(), style: style);
+    return TextSpan(
+      children: node.nodes.map(_renderCodeBlockNode).toList(),
+      style: style,
+    );
   }
 
   /// Transforms a Node to an InlineSpan.
@@ -193,7 +220,11 @@ class HtmlMessage extends StatelessWidget {
               onTap: () => UrlLauncher(context, href, node.text).launchUrl(),
               child: Text.rich(
                 TextSpan(
-                  children: _renderWithLineBreaks(node.nodes, context, depth: depth),
+                  children: _renderWithLineBreaks(
+                    node.nodes,
+                    context,
+                    depth: depth,
+                  ),
                   style: linkStyle,
                 ),
                 style: const TextStyle(height: 1.25),
@@ -273,8 +304,18 @@ class HtmlMessage extends StatelessWidget {
               border: Border(left: BorderSide(color: textColor, width: 5)),
             ),
             child: Text.rich(
-              TextSpan(children: _renderWithLineBreaks(node.nodes, context, depth: depth)),
-              style: TextStyle(fontStyle: FontStyle.italic, fontSize: fontSize, color: textColor),
+              TextSpan(
+                children: _renderWithLineBreaks(
+                  node.nodes,
+                  context,
+                  depth: depth,
+                ),
+              ),
+              style: TextStyle(
+                fontStyle: FontStyle.italic,
+                fontSize: fontSize,
+                color: textColor,
+              ),
             ),
           ),
         );
@@ -283,7 +324,9 @@ class HtmlMessage extends StatelessWidget {
         final lang =
             node.className
                 .split(' ')
-                .singleWhereOrNull((className) => className.startsWith('language-'))
+                .singleWhereOrNull(
+                  (className) => className.startsWith('language-'),
+                )
                 ?.split('language-')
                 .last ??
             'md';
@@ -382,8 +425,18 @@ class HtmlMessage extends StatelessWidget {
                 obscure = !obscure;
               }),
               child: Text.rich(
-                TextSpan(children: _renderWithLineBreaks(node.nodes, context, depth: depth)),
-                style: TextStyle(fontSize: fontSize, color: textColor, backgroundColor: obscure ? textColor : null),
+                TextSpan(
+                  children: _renderWithLineBreaks(
+                    node.nodes,
+                    context,
+                    depth: depth,
+                  ),
+                ),
+                style: TextStyle(
+                  fontSize: fontSize,
+                  color: textColor,
+                  backgroundColor: obscure ? textColor : null,
+                ),
               ),
             ),
           ),
@@ -422,11 +475,15 @@ class HtmlMessage extends StatelessWidget {
     final element = parser.parse(html).body ?? dom.Element.html('');
     final trailingSpan = trailingWidget != null ? [WidgetSpan(child: trailingWidget!)] : <InlineSpan>[];
 
+    final configuredMaxLines = AppSettings.messagePreviewMaxLines.value;
+    final maxLines = !limitHeight || configuredMaxLines <= 0
+        ? null
+        : configuredMaxLines;
     return Text.rich(
       TextSpan(children: [_renderHtml(element, context), ...trailingSpan]),
       style: TextStyle(fontSize: fontSize, color: textColor),
-      maxLines: limitHeight ? 64 : null,
-      overflow: TextOverflow.fade,
+      maxLines: maxLines,
+      overflow: maxLines == null ? TextOverflow.visible : TextOverflow.fade,
       selectionColor: textColor.withAlpha(128),
       textWidthBasis: TextWidthBasis.longestLine,
     );

@@ -2810,6 +2810,8 @@
     "joinVideoCall": "Liitu videokõnega",
     "live": "Reaalajas",
     "playSoundOnNotification": "Lisa teavitusele helimärguanne",
-    "photo": "Foto",
-    "video": "Video"
+    "addTag": "Lisa silt",
+    "removeTag": "Eemalda silt",
+    "tagName": "Sildi nimi",
+    "createNewTag": "Lisa uus silt"
 }

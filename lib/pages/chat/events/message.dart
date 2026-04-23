@@ -221,6 +221,7 @@ class Message extends StatelessWidget {
 
     final enterThread = this.enterThread;
     final sender = event.senderFromMemoryOrFallback;
+    final fileSendingStatus = event.fileSendingStatus;
 
     return Center(
       child: MySwipeable(
@@ -334,9 +335,35 @@ class Message extends StatelessWidget {
                                           width: 16,
                                           height: 16,
                                           child: event.status == EventStatus.error
-                                              ? const Icon(TablerIcons.alert_circle_filled, color: Colors.red)
-                                              : event.fileSendingStatus != null
-                                              ? const CircularProgressIndicator.adaptive(strokeWidth: 1)
+                                              ? const Icon(Icons.error, color: Colors.red)
+                                              : fileSendingStatus != null
+                                              ? Stack(
+                                            children: [
+                                              Center(
+                                                child: switch (fileSendingStatus) {
+                                                  FileSendingStatus
+                                                      .generatingThumbnail =>
+                                                      Icon(
+                                                        Icons.compress_outlined,
+                                                        size: 14,
+                                                      ),
+                                                  FileSendingStatus.encrypting =>
+                                                      Icon(
+                                                        Icons.lock_outlined,
+                                                        size: 14,
+                                                      ),
+                                                  FileSendingStatus.uploading =>
+                                                      Icon(
+                                                        Icons.upload_outlined,
+                                                        size: 14,
+                                                      ),
+                                                },
+                                              ),
+                                              const CircularProgressIndicator.adaptive(
+                                                strokeWidth: 1,
+                                              ),
+                                            ],
+                                          )
                                               : null,
                                         ),
                                       ),
@@ -850,15 +877,10 @@ class __AnimateInState extends State<_AnimateIn> {
         });
       });
     }
-    return AnimatedOpacity(
+    return AnimatedSize(
       duration: FluffyThemes.animationDuration,
       curve: FluffyThemes.animationCurve,
-      opacity: _animationFinished ? 1 : 0,
-      child: AnimatedSize(
-        duration: FluffyThemes.animationDuration,
-        curve: FluffyThemes.animationCurve,
-        child: _animationFinished ? widget.child : const SizedBox.shrink(),
-      ),
+      child: _animationFinished ? widget.child : const SizedBox.shrink(),
     );
   }
 }

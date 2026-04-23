@@ -2816,7 +2816,11 @@
     "joinVoiceCall": "Bli med i lydsamtale",
     "joinVideoCall": "Bli med i videosamtale",
     "live": "Direkte",
-    "playSoundOnNotification": "Spill av lyd ved varsling",
     "photo": "Bilde",
-    "video": "Video"
+    "video": "Video",
+    "playSoundOnNotification": "Spill av lyd ved varsling",
+    "addTag": "Legg til emneknagg",
+    "removeTag": "Fjern emneknagg",
+    "tagName": "Navn på emneknagg",
+    "createNewTag": "Opprett ny emneknagg"
 }
