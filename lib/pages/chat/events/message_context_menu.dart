@@ -13,6 +13,7 @@ import 'package:fluffychat/utils/date_time_extension.dart';
 import 'package:fluffychat/utils/matrix_sdk_extensions/event_extension.dart';
 import 'package:fluffychat/utils/matrix_sdk_extensions/matrix_locals.dart';
 import 'package:fluffychat/utils/platform_infos.dart';
+import 'package:fluffychat/utils/room_status_extension.dart';
 import 'package:fluffychat/widgets/adaptive_dialogs/user_dialog.dart';
 import 'package:fluffychat/widgets/avatar.dart';
 import 'package:fluffychat/widgets/matrix.dart';
@@ -239,9 +240,17 @@ class MessageContextMenu extends StatelessWidget {
     // Close any previously open context menu
     controller.closeContextMenu?.call();
 
-    final seenByReceipts = event.receipts
-        .where((r) => r.user.id != event.room.client.userID)
-        .toList();
+    final seenUsers = event.room.getSeenByUsers(
+      timeline,
+      eventId: event.eventId,
+    );
+    final otherUserReceipts = event.room.receiptState.global.otherUsers;
+    final seenByReceipts = seenUsers.map((user) {
+      final time =
+          otherUserReceipts[user.id]?.timestamp ??
+          DateTime.fromMillisecondsSinceEpoch(0);
+      return Receipt(user, time);
+    }).toList();
 
     late OverlayEntry overlayEntry;
     final menuKey = GlobalKey<_ContextMenuOverlayState>();
