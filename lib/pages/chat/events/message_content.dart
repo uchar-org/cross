@@ -44,6 +44,8 @@ class MessageContent extends StatelessWidget {
   final Set<String> bigEmojis;
   final MessageStatus? messageStatus;
   final bool isReplied;
+  final bool isEdited;
+  final DateTime? originalSendTime;
 
   const MessageContent(
     this.event, {
@@ -58,6 +60,8 @@ class MessageContent extends StatelessWidget {
     required this.bigEmojis,
     required this.messageStatus,
     required this.isReplied,
+    this.isEdited = false,
+    this.originalSendTime,
   });
 
   Future<void> _verifyOrRequestKey(BuildContext context) async {
@@ -282,7 +286,7 @@ class MessageContent extends StatelessWidget {
               html = '* $html';
             }
 
-            final messageTime = event.originServerTs;
+            final messageTime = originalSendTime ?? event.originServerTs;
             final formattedTime =
                 "${messageTime.hour.toString().padLeft(2, '0')}:${messageTime.minute.toString().padLeft(2, '0')}";
 
@@ -299,8 +303,8 @@ class MessageContent extends StatelessWidget {
             final timeRowWidth = isReplied
                 ? double.infinity
                 : messageStatus == null
-                ? 46.0
-                : 60.0;
+                ? (isEdited ? 92.0 : 46.0)
+                : (isEdited ? 108.0 : 60.0);
 
             return Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -352,6 +356,17 @@ class MessageContent extends StatelessWidget {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
+                        if (isEdited) ...[
+                          Text(
+                            'edited',
+                            style: TextStyle(
+                              color: textColor.withValues(alpha: 0.6),
+                              fontSize: 11,
+                              fontStyle: FontStyle.italic,
+                            ),
+                          ),
+                          const SizedBox(width: 4),
+                        ],
                         Text(formattedTime, style: TextStyle(color: textColor, fontSize: 12)),
                         if (messageStatus != null) const SizedBox(width: 3),
                         if (messageStatus != null) MessageStatusWidget(status: messageStatus, iconColor: textColor),

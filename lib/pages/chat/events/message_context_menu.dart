@@ -268,12 +268,17 @@ class MessageContextMenu extends StatelessWidget {
       removeOverlay();
     }
 
+    final editedAt = event.hasAggregatedEvents(timeline, RelationshipTypes.edit)
+        ? event.getDisplayEvent(timeline).originServerTs
+        : null;
+
     overlayEntry = OverlayEntry(
       builder: (overlayContext) => _ContextMenuOverlay(
         key: menuKey,
         position: position,
         items: items,
         seenByReceipts: seenByReceipts,
+        editedAt: editedAt,
         onSelected: (action) async {
           await animateClose();
           if (context.mounted) _onSelected(context, action);
@@ -328,6 +333,7 @@ class _ContextMenuOverlay extends StatefulWidget {
   final Offset position;
   final List<_ContextMenuItem> items;
   final List<Receipt> seenByReceipts;
+  final DateTime? editedAt;
   final void Function(_ContextAction) onSelected;
   final VoidCallback onDismiss;
 
@@ -336,6 +342,7 @@ class _ContextMenuOverlay extends StatefulWidget {
     required this.position,
     required this.items,
     required this.seenByReceipts,
+    this.editedAt,
     required this.onSelected,
     required this.onDismiss,
   });
@@ -465,13 +472,24 @@ class _ContextMenuOverlayState extends State<_ContextMenuOverlay>
                             ),
                           );
                         }),
-                        if (widget.seenByReceipts.isNotEmpty) ...[
+                        if (widget.seenByReceipts.isNotEmpty ||
+                            widget.editedAt != null) ...[
                           Divider(
                             height: 1,
                             thickness: 1,
                             color: theme.colorScheme.outline.withValues(alpha: 0.15),
                           ),
-                          _SeenByMenuRow(receipts: widget.seenByReceipts),
+                          if (widget.seenByReceipts.isNotEmpty)
+                            _SeenByMenuRow(receipts: widget.seenByReceipts),
+                          if (widget.seenByReceipts.isNotEmpty &&
+                              widget.editedAt != null)
+                            Divider(
+                              height: 1,
+                              thickness: 1,
+                              color: theme.colorScheme.outline.withValues(alpha: 0.08),
+                            ),
+                          if (widget.editedAt != null)
+                            _EditedAtRow(editedAt: widget.editedAt!),
                         ],
                       ],
                     ),
@@ -764,6 +782,31 @@ class _SeenByUserRow extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _EditedAtRow extends StatelessWidget {
+  final DateTime editedAt;
+
+  const _EditedAtRow({required this.editedAt});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final color = theme.colorScheme.onSurface.withValues(alpha: 0.5);
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      child: Row(
+        children: [
+          Icon(TablerIcons.pencil, size: 16, color: color),
+          const SizedBox(width: 10),
+          Text(
+            editedAt.localizedTime(context),
+            style: TextStyle(fontSize: 13, color: color),
+          ),
+        ],
       ),
     );
   }
