@@ -240,17 +240,23 @@ class MessageContextMenu extends StatelessWidget {
     // Close any previously open context menu
     controller.closeContextMenu?.call();
 
-    final seenUsers = event.room.getSeenByUsers(
-      timeline,
-      eventId: event.eventId,
-    );
-    final otherUserReceipts = event.room.receiptState.global.otherUsers;
-    final seenByReceipts = seenUsers.map((user) {
-      final time =
-          otherUserReceipts[user.id]?.timestamp ??
-          DateTime.fromMillisecondsSinceEpoch(0);
-      return Receipt(user, time);
-    }).toList();
+    final isOwnMessage = event.senderId == event.room.client.userID;
+    final seenByReceipts = isOwnMessage
+        ? () {
+            final seenUsers = event.room.getSeenByUsers(
+              timeline,
+              eventId: event.eventId,
+            );
+            final otherUserReceipts =
+                event.room.receiptState.global.otherUsers;
+            return seenUsers.map((user) {
+              final time =
+                  otherUserReceipts[user.id]?.timestamp ??
+                  DateTime.fromMillisecondsSinceEpoch(0);
+              return Receipt(user, time);
+            }).toList();
+          }()
+        : <Receipt>[];
 
     late OverlayEntry overlayEntry;
     final menuKey = GlobalKey<_ContextMenuOverlayState>();
