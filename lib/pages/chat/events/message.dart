@@ -562,6 +562,10 @@ class Message extends StatelessWidget {
                                                               myMessageStatus = null;
                                                             }
 
+                                                            final isEdited = event.hasAggregatedEvents(
+                                                              timeline,
+                                                              RelationshipTypes.edit,
+                                                            );
                                                             return MessageContent(
                                                               displayEvent,
                                                               textColor: textColor,
@@ -576,37 +580,11 @@ class Message extends StatelessWidget {
                                                                   event.inReplyToEventId(includingFallback: false) !=
                                                                   null,
                                                               bigEmojis: bigEmojis,
+                                                              isEdited: isEdited,
+                                                              originalSendTime: event.originServerTs,
                                                             );
                                                           },
                                                         ),
-                                                        if (event.hasAggregatedEvents(timeline, RelationshipTypes.edit))
-                                                          Padding(
-                                                            padding: const EdgeInsets.only(
-                                                              bottom: 8.0,
-                                                              left: 16.0,
-                                                              right: 16.0,
-                                                            ),
-                                                            child: Row(
-                                                              mainAxisSize: MainAxisSize.min,
-                                                              spacing: 4.0,
-                                                              children: [
-                                                                Icon(
-                                                                  TablerIcons.pencil,
-                                                                  color: textColor.withAlpha(164),
-                                                                  size: 14,
-                                                                ),
-                                                                Text(
-                                                                  displayEvent.originServerTs.localizedTimeShort(
-                                                                    context,
-                                                                  ),
-                                                                  style: TextStyle(
-                                                                    color: textColor.withAlpha(164),
-                                                                    fontSize: 11,
-                                                                  ),
-                                                                ),
-                                                              ],
-                                                            ),
-                                                          ),
                                                       ],
                                                     ),
                                                   ),
