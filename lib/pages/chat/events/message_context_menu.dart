@@ -280,6 +280,21 @@ class MessageContextMenu extends StatelessWidget {
             final otherUserReceipts =
                 event.room.receiptState.global.otherUsers;
             final entries = <_SeenEntry>[];
+
+            final ownUserId = event.room.client.userID;
+            if (ownUserId != null) {
+              final ownReactions = reactionsByUser[ownUserId] ?? [];
+              if (ownReactions.isNotEmpty) {
+                final ownUser = event.room.unsafeGetUserFromMemoryOrFallback(ownUserId);
+                for (final r in ownReactions) {
+                  entries.add(_SeenEntry(
+                    receipt: Receipt(ownUser, r.time ?? DateTime.fromMillisecondsSinceEpoch(0)),
+                    reaction: r,
+                  ));
+                }
+              }
+            }
+
             for (final user in seenUsers) {
               final time =
                   otherUserReceipts[user.id]?.timestamp ??
