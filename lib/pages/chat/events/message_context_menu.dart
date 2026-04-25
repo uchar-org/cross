@@ -683,10 +683,12 @@ class _SeenByMenuRowState extends State<_SeenByMenuRow> {
 
     final iconColor = theme.colorScheme.onSurface;
 
-    return MouseRegion(
-      onEnter: (_) => _showSubmenu(),
-      onExit: (_) => _scheduleClose(),
-      child: AnimatedContainer(
+    return GestureDetector(
+      onTap: () => _submenu == null ? _showSubmenu() : _scheduleClose(),
+      child: MouseRegion(
+        onEnter: (_) => _showSubmenu(),
+        onExit: (_) => _scheduleClose(),
+        child: AnimatedContainer(
         duration: const Duration(milliseconds: 80),
         color: isOpen
             ? theme.colorScheme.onSurface.withValues(alpha: 0.08)
@@ -736,6 +738,7 @@ class _SeenByMenuRowState extends State<_SeenByMenuRow> {
             ],
           ),
         ),
+      ),
       ),
     );
   }
