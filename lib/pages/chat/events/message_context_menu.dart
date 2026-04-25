@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' show min;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
@@ -17,6 +18,7 @@ import 'package:fluffychat/utils/room_status_extension.dart';
 import 'package:fluffychat/widgets/adaptive_dialogs/user_dialog.dart';
 import 'package:fluffychat/widgets/avatar.dart';
 import 'package:fluffychat/widgets/matrix.dart';
+import 'package:fluffychat/widgets/mxc_image.dart';
 
 enum _ContextAction {
   reply,
@@ -30,6 +32,21 @@ enum _ContextAction {
   select,
   info,
   report,
+}
+
+class _UserReaction {
+  final String key;
+  final DateTime? time;
+  const _UserReaction({required this.key, this.time});
+}
+
+class _SeenEntry {
+  final Receipt receipt;
+  final _UserReaction? reaction;
+
+  const _SeenEntry({required this.receipt, this.reaction});
+
+  bool get hasReaction => reaction != null;
 }
 
 class MessageContextMenu extends StatelessWidget {
@@ -241,7 +258,20 @@ class MessageContextMenu extends StatelessWidget {
     controller.closeContextMenu?.call();
 
     final isOwnMessage = event.senderId == event.room.client.userID;
-    final seenByReceipts = isOwnMessage
+
+    final reactionsByUser = <String, List<_UserReaction>>{};
+    for (final re in event.aggregatedEvents(timeline, RelationshipTypes.reaction)) {
+      final key = re.content
+          .tryGetMap<String, dynamic>('m.relates_to')
+          ?.tryGet<String>('key');
+      if (key != null) {
+        reactionsByUser
+            .putIfAbsent(re.senderId, () => [])
+            .add(_UserReaction(key: key, time: re.originServerTs));
+      }
+    }
+
+    final seenEntries = isOwnMessage
         ? () {
             final seenUsers = event.room.getSeenByUsers(
               timeline,
@@ -249,14 +279,44 @@ class MessageContextMenu extends StatelessWidget {
             );
             final otherUserReceipts =
                 event.room.receiptState.global.otherUsers;
-            return seenUsers.map((user) {
+            final entries = <_SeenEntry>[];
+
+            final ownUserId = event.room.client.userID;
+            if (ownUserId != null) {
+              final ownReactions = reactionsByUser[ownUserId] ?? [];
+              if (ownReactions.isNotEmpty) {
+                final ownUser = event.room.unsafeGetUserFromMemoryOrFallback(ownUserId);
+                for (final r in ownReactions) {
+                  entries.add(_SeenEntry(
+                    receipt: Receipt(ownUser, r.time ?? DateTime.now()),
+                    reaction: r,
+                  ));
+                }
+              }
+            }
+
+            for (final user in seenUsers) {
               final time =
                   otherUserReceipts[user.id]?.timestamp ??
-                  DateTime.fromMillisecondsSinceEpoch(0);
-              return Receipt(user, time);
-            }).toList();
+                  DateTime.now();
+              final receipt = Receipt(user, time);
+              final userReactions = reactionsByUser[user.id] ?? [];
+              if (userReactions.isNotEmpty) {
+                for (final r in userReactions) {
+                  entries.add(_SeenEntry(receipt: receipt, reaction: r));
+                }
+              } else {
+                entries.add(_SeenEntry(receipt: receipt));
+              }
+            }
+            entries.sort((a, b) {
+              if (a.hasReaction && !b.hasReaction) return -1;
+              if (!a.hasReaction && b.hasReaction) return 1;
+              return 0;
+            });
+            return entries;
           }()
-        : <Receipt>[];
+        : <_SeenEntry>[];
 
     late OverlayEntry overlayEntry;
     final menuKey = GlobalKey<_ContextMenuOverlayState>();
@@ -283,7 +343,7 @@ class MessageContextMenu extends StatelessWidget {
         key: menuKey,
         position: position,
         items: items,
-        seenByReceipts: seenByReceipts,
+        seenEntries: seenEntries,
         editedAt: editedAt,
         onSelected: (action) async {
           await animateClose();
@@ -338,7 +398,7 @@ class _ContextMenuItem {
 class _ContextMenuOverlay extends StatefulWidget {
   final Offset position;
   final List<_ContextMenuItem> items;
-  final List<Receipt> seenByReceipts;
+  final List<_SeenEntry> seenEntries;
   final DateTime? editedAt;
   final void Function(_ContextAction) onSelected;
   final VoidCallback onDismiss;
@@ -347,7 +407,7 @@ class _ContextMenuOverlay extends StatefulWidget {
     super.key,
     required this.position,
     required this.items,
-    required this.seenByReceipts,
+    required this.seenEntries,
     this.editedAt,
     required this.onSelected,
     required this.onDismiss,
@@ -399,8 +459,10 @@ class _ContextMenuOverlayState extends State<_ContextMenuOverlay>
     const menuWidth = 220.0;
     const itemHeight = 44.0;
     const seenByRowHeight = 40.0;
+    const editedAtRowHeight = 30.0;
     final menuHeight = widget.items.length * itemHeight +
-        (widget.seenByReceipts.isNotEmpty ? seenByRowHeight + 1 : 0);
+        (widget.seenEntries.isNotEmpty ? seenByRowHeight + 1 : 0) +
+        (widget.editedAt != null ? editedAtRowHeight + 1 : 0);
 
     var left = widget.position.dx;
     var top = widget.position.dy;
@@ -478,16 +540,16 @@ class _ContextMenuOverlayState extends State<_ContextMenuOverlay>
                             ),
                           );
                         }),
-                        if (widget.seenByReceipts.isNotEmpty ||
+                        if (widget.seenEntries.isNotEmpty ||
                             widget.editedAt != null) ...[
                           Divider(
                             height: 1,
                             thickness: 1,
                             color: theme.colorScheme.outline.withValues(alpha: 0.15),
                           ),
-                          if (widget.seenByReceipts.isNotEmpty)
-                            _SeenByMenuRow(receipts: widget.seenByReceipts),
-                          if (widget.seenByReceipts.isNotEmpty &&
+                          if (widget.seenEntries.isNotEmpty)
+                            _SeenByMenuRow(entries: widget.seenEntries),
+                          if (widget.seenEntries.isNotEmpty &&
                               widget.editedAt != null)
                             Divider(
                               height: 1,
@@ -511,9 +573,9 @@ class _ContextMenuOverlayState extends State<_ContextMenuOverlay>
 }
 
 class _SeenByMenuRow extends StatefulWidget {
-  final List<Receipt> receipts;
+  final List<_SeenEntry> entries;
 
-  const _SeenByMenuRow({required this.receipts});
+  const _SeenByMenuRow({required this.entries});
 
   @override
   State<_SeenByMenuRow> createState() => _SeenByMenuRowState();
@@ -523,7 +585,7 @@ class _SeenByMenuRowState extends State<_SeenByMenuRow> {
   OverlayEntry? _submenu;
   Timer? _closeTimer;
 
-  static const _submenuWidth = 220.0;
+  static const _submenuWidth = 240.0;
   static const _gap = 6.0;
 
   void _showSubmenu() {
@@ -545,15 +607,20 @@ class _SeenByMenuRowState extends State<_SeenByMenuRow> {
         : rowTopLeft.dx - _submenuWidth - _gap;
 
     const itemHeight = 52.0;
-    final submenuHeight = widget.receipts.length * itemHeight + 16.0;
-    final top = (rowTopLeft.dy).clamp(8.0, screen.height - submenuHeight - 8);
+    const maxSubmenuHeight = 360.0;
+    final submenuHeight = min(
+      widget.entries.length * itemHeight + 16.0,
+      maxSubmenuHeight,
+    );
+    final topMax = (screen.height - submenuHeight - 8).clamp(8.0, double.infinity);
+    final top = rowTopLeft.dy.clamp(8.0, topMax);
 
     _submenu = OverlayEntry(
       builder: (ctx) => _SeenBySubmenuOverlay(
         left: left,
         top: top,
         openRight: openRight,
-        receipts: widget.receipts,
+        entries: widget.entries,
         onMouseEnter: _cancelClose,
         onMouseExit: _scheduleClose,
       ),
@@ -588,23 +655,42 @@ class _SeenByMenuRowState extends State<_SeenByMenuRow> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final receipts = widget.receipts;
+    final entries = widget.entries;
     final isOpen = _submenu != null;
+
+    final seenUserIds = entries.map((e) => e.receipt.user.id).toSet();
+    final reactedUserIds = entries
+        .where((e) => e.hasReaction)
+        .map((e) => e.receipt.user.id)
+        .toSet();
+
+    final totalUsers = seenUserIds.length;
+    final reactedUsers = reactedUserIds.length;
+    final hasAnyReaction = reactedUsers > 0;
+
+    final seenSet = <String>{};
+    final uniqueUsers = entries
+        .where((e) => seenSet.add(e.receipt.user.id))
+        .toList();
 
     const maxAvatars = 3;
     const avatarSize = 18.0;
     const ringWidth = 1.5;
     const totalAvatarSize = avatarSize + ringWidth * 2;
-    const step = 12.0; // left-edge distance between consecutive avatars
+    const step = 12.0;
 
-    final displayReceipts = receipts.take(maxAvatars).toList();
+    final displayEntries = uniqueUsers.take(maxAvatars).toList();
     final stackWidth =
-        totalAvatarSize + (displayReceipts.length - 1) * step;
+        totalAvatarSize + (displayEntries.length - 1) * step;
 
-    return MouseRegion(
-      onEnter: (_) => _showSubmenu(),
-      onExit: (_) => _scheduleClose(),
-      child: AnimatedContainer(
+    final iconColor = theme.colorScheme.onSurface;
+
+    return GestureDetector(
+      onTap: () => _submenu == null ? _showSubmenu() : _scheduleClose(),
+      child: MouseRegion(
+        onEnter: (_) => _showSubmenu(),
+        onExit: (_) => _scheduleClose(),
+        child: AnimatedContainer(
         duration: const Duration(milliseconds: 80),
         color: isOpen
             ? theme.colorScheme.onSurface.withValues(alpha: 0.08)
@@ -614,17 +700,14 @@ class _SeenByMenuRowState extends State<_SeenByMenuRow> {
           child: Row(
             children: [
               Icon(
-                TablerIcons.eye,
+                hasAnyReaction ? TablerIcons.mood_smile : TablerIcons.eye,
                 size: 20,
-                color: theme.colorScheme.onSurface,
+                color: iconColor,
               ),
               const SizedBox(width: 12),
               Text(
-                '${receipts.length}',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: theme.colorScheme.onSurface,
-                ),
+                hasAnyReaction ? '$reactedUsers/$totalUsers' : '$totalUsers',
+                style: TextStyle(fontSize: 14, color: iconColor),
               ),
               const Spacer(),
               // Stacked overlapping avatars aligned to the right
@@ -633,7 +716,7 @@ class _SeenByMenuRowState extends State<_SeenByMenuRow> {
                 height: totalAvatarSize,
                 child: Stack(
                   children: [
-                    for (int i = displayReceipts.length - 1; i >= 0; i--)
+                    for (int i = displayEntries.length - 1; i >= 0; i--)
                       Positioned(
                         left: i * step,
                         child: Container(
@@ -645,8 +728,8 @@ class _SeenByMenuRowState extends State<_SeenByMenuRow> {
                                 : theme.colorScheme.surfaceContainer,
                           ),
                           child: Avatar(
-                            mxContent: displayReceipts[i].user.avatarUrl,
-                            name: displayReceipts[i].user.calcDisplayname(),
+                            mxContent: displayEntries[i].receipt.user.avatarUrl,
+                            name: displayEntries[i].receipt.user.calcDisplayname(),
                             size: avatarSize,
                           ),
                         ),
@@ -658,6 +741,7 @@ class _SeenByMenuRowState extends State<_SeenByMenuRow> {
           ),
         ),
       ),
+      ),
     );
   }
 }
@@ -666,7 +750,7 @@ class _SeenBySubmenuOverlay extends StatelessWidget {
   final double left;
   final double top;
   final bool openRight;
-  final List<Receipt> receipts;
+  final List<_SeenEntry> entries;
   final VoidCallback onMouseEnter;
   final VoidCallback onMouseExit;
 
@@ -674,7 +758,7 @@ class _SeenBySubmenuOverlay extends StatelessWidget {
     required this.left,
     required this.top,
     required this.openRight,
-    required this.receipts,
+    required this.entries,
     required this.onMouseEnter,
     required this.onMouseExit,
   });
@@ -710,15 +794,18 @@ class _SeenBySubmenuOverlay extends StatelessWidget {
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(
                     minWidth: 200,
-                    maxWidth: 220,
+                    maxWidth: 240,
+                    maxHeight: 360,
                   ),
                   child: Padding(
                     padding: const EdgeInsets.symmetric(vertical: 6),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: receipts
-                          .map((r) => _SeenByUserRow(receipt: r))
-                          .toList(),
+                    child: SingleChildScrollView(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: entries
+                            .map((e) => _SeenByUserRow(entry: e))
+                            .toList(),
+                      ),
                     ),
                   ),
                 ),
@@ -732,22 +819,51 @@ class _SeenBySubmenuOverlay extends StatelessWidget {
 }
 
 class _SeenByUserRow extends StatelessWidget {
-  final Receipt receipt;
+  final _SeenEntry entry;
 
-  const _SeenByUserRow({required this.receipt});
+  const _SeenByUserRow({required this.entry});
 
   void _openProfile(BuildContext context) => UserDialog.show(
         context: context,
         profile: Profile(
-          userId: receipt.user.id,
-          displayName: receipt.user.displayName,
-          avatarUrl: receipt.user.avatarUrl,
+          userId: entry.receipt.user.id,
+          displayName: entry.receipt.user.displayName,
+          avatarUrl: entry.receipt.user.avatarUrl,
         ),
       );
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final r = entry.reaction;
+    final displayTime = r?.time != null
+        ? r!.time!.localizedTime(context)
+        : entry.receipt.time.localizedTime(context);
+
+    Widget rightWidget;
+    if (r != null) {
+      if (r.key.startsWith('mxc://')) {
+        rightWidget = MxcImage(
+          uri: Uri.parse(r.key),
+          width: 20,
+          height: 20,
+          animated: false,
+          isThumbnail: false,
+        );
+      } else {
+        final display = r.key.characters.length > 2
+            ? r.key.characters.getRange(0, 2).toString()
+            : r.key;
+        rightWidget = Text(display, style: const TextStyle(fontSize: 18));
+      }
+    } else {
+      rightWidget = Icon(
+        TablerIcons.checks,
+        size: 15,
+        color: theme.colorScheme.onSurface.withValues(alpha: 0.35),
+      );
+    }
+
     return InkWell(
       onTap: () => _openProfile(context),
       child: Padding(
@@ -755,8 +871,8 @@ class _SeenByUserRow extends StatelessWidget {
         child: Row(
           children: [
             Avatar(
-              mxContent: receipt.user.avatarUrl,
-              name: receipt.user.calcDisplayname(),
+              mxContent: entry.receipt.user.avatarUrl,
+              name: entry.receipt.user.calcDisplayname(),
               size: 32,
               onTap: () => _openProfile(context),
             ),
@@ -767,7 +883,7 @@ class _SeenByUserRow extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    receipt.user.calcDisplayname(),
+                    entry.receipt.user.calcDisplayname(),
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w500,
@@ -777,7 +893,7 @@ class _SeenByUserRow extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                   Text(
-                    receipt.time.localizedTime(context),
+                    displayTime,
                     style: TextStyle(
                       fontSize: 11,
                       color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
@@ -786,6 +902,8 @@ class _SeenByUserRow extends StatelessWidget {
                 ],
               ),
             ),
+            const SizedBox(width: 8),
+            rightWidget,
           ],
         ),
       ),
