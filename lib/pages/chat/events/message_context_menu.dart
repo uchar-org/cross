@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 
 import 'package:matrix/matrix.dart';
 
+import 'package:fluffychat/config/app_config.dart';
 import 'package:fluffychat/l10n/l10n.dart';
 import 'package:fluffychat/pages/chat/chat.dart';
 import 'package:fluffychat/utils/date_time_extension.dart';
@@ -74,8 +75,13 @@ class _MessageContextMenuState extends State<MessageContextMenu>
   late final AnimationController _likeAnimController;
   late final Animation<double> _likeScale;
   late final Animation<double> _likeOpacity;
-  bool _showLikeAnim = false;
+  String? _animEmoji;
   bool _isHovered = false;
+  OverlayEntry? _emojiPickerOverlay;
+  Timer? _emojiPickerTimer;
+  final _likeButtonKey = GlobalKey();
+
+  bool get _buttonVisible => _isHovered || _emojiPickerOverlay != null;
 
   @override
   void initState() {
@@ -112,6 +118,8 @@ class _MessageContextMenuState extends State<MessageContextMenu>
   @override
   void dispose() {
     _likeAnimController.dispose();
+    _emojiPickerTimer?.cancel();
+    _emojiPickerOverlay?.remove();
     super.dispose();
   }
 
@@ -413,10 +421,15 @@ class _MessageContextMenuState extends State<MessageContextMenu>
     widget.controller.closeContextMenu = removeOverlay;
   }
 
-  void _onDoubleTap() {
-    HapticFeedback.mediumImpact();
-    const likeEmoji = '👍';
-    final existingReactions = widget.event
+  void _triggerAnim(String emoji) {
+    setState(() => _animEmoji = emoji);
+    _likeAnimController.forward(from: 0).then((_) {
+      if (mounted) setState(() => _animEmoji = null);
+    });
+  }
+
+  void _toggleReaction(String emoji) {
+    final existing = widget.event
         .aggregatedEvents(widget.timeline, RelationshipTypes.reaction)
         .where(
           (e) =>
@@ -424,21 +437,66 @@ class _MessageContextMenuState extends State<MessageContextMenu>
               e.content
                       .tryGetMap<String, Object?>('m.relates_to')
                       ?.tryGet<String>('key') ==
-                  likeEmoji,
+                  emoji,
         );
-    if (existingReactions.isNotEmpty) {
-      widget.event.room.redactEvent(existingReactions.first.eventId);
+    if (existing.isNotEmpty) {
+      widget.event.room.redactEvent(existing.first.eventId);
     } else {
-      widget.event.room.sendReaction(widget.event.eventId, likeEmoji);
-      setState(() => _showLikeAnim = true);
-      _likeAnimController.forward(from: 0).then((_) {
-        if (mounted) setState(() => _showLikeAnim = false);
-      });
+      widget.event.room.sendReaction(widget.event.eventId, emoji);
+      _triggerAnim(emoji);
     }
+  }
+
+  void _onDoubleTap() {
+    HapticFeedback.mediumImpact();
+    _toggleReaction('👍');
+  }
+
+  void _openEmojiPicker() {
+    _emojiPickerTimer?.cancel();
+    if (_emojiPickerOverlay != null) return;
+
+    final box =
+        _likeButtonKey.currentContext?.findRenderObject() as RenderBox?;
+    if (box == null) return;
+    final pos = box.localToGlobal(Offset.zero);
+    final size = box.size;
+
+    _emojiPickerOverlay = OverlayEntry(
+      builder: (_) => _EmojiExpandOverlay(
+        anchorPos: pos,
+        anchorSize: size,
+        reactions:
+            AppConfig.defaultReactions.where((e) => e != '👍').toList(),
+        onSelect: (emoji) {
+          _closeEmojiPicker();
+          _toggleReaction(emoji);
+        },
+        onMouseEnter: _cancelCloseEmojiPicker,
+        onMouseExit: _scheduleCloseEmojiPicker,
+      ),
+    );
+    Overlay.of(context, rootOverlay: true).insert(_emojiPickerOverlay!);
+    setState(() {});
+  }
+
+  void _scheduleCloseEmojiPicker() {
+    _emojiPickerTimer?.cancel();
+    _emojiPickerTimer =
+        Timer(const Duration(milliseconds: 180), _closeEmojiPicker);
+  }
+
+  void _cancelCloseEmojiPicker() => _emojiPickerTimer?.cancel();
+
+  void _closeEmojiPicker() {
+    _emojiPickerOverlay?.remove();
+    _emojiPickerOverlay = null;
+    if (mounted) setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final isDesktopOrWeb = PlatformInfos.isDesktop || PlatformInfos.isWeb;
     final canDoubleTap = widget.event.status.isSent &&
         widget.controller.room.canSendDefaultMessages;
@@ -446,18 +504,6 @@ class _MessageContextMenuState extends State<MessageContextMenu>
         widget.event.status.isSent &&
         !widget.event.redacted &&
         widget.controller.room.canSendDefaultMessages;
-
-    const likeEmoji = '👍';
-    final alreadyLiked = widget.event
-        .aggregatedEvents(widget.timeline, RelationshipTypes.reaction)
-        .any(
-          (e) =>
-              e.senderId == widget.event.room.client.userID &&
-              e.content
-                      .tryGetMap<String, Object?>('m.relates_to')
-                      ?.tryGet<String>('key') ==
-                  likeEmoji,
-        );
 
     return MouseRegion(
       onEnter: showHoverBtn ? (_) => setState(() => _isHovered = true) : null,
@@ -479,7 +525,7 @@ class _MessageContextMenuState extends State<MessageContextMenu>
           clipBehavior: Clip.none,
           children: [
             widget.child,
-            if (_showLikeAnim)
+            if (_animEmoji != null)
               Positioned.fill(
                 child: IgnorePointer(
                   child: Center(
@@ -489,9 +535,9 @@ class _MessageContextMenuState extends State<MessageContextMenu>
                         opacity: _likeOpacity.value,
                         child: Transform.scale(
                           scale: _likeScale.value,
-                          child: const Text(
-                            '👍',
-                            style: TextStyle(fontSize: 48),
+                          child: Text(
+                            _animEmoji!,
+                            style: const TextStyle(fontSize: 48),
                           ),
                         ),
                       ),
@@ -505,13 +551,42 @@ class _MessageContextMenuState extends State<MessageContextMenu>
                 left: widget.ownMessage ? 4 : null,
                 right: widget.ownMessage ? null : 4,
                 child: AnimatedOpacity(
-                  opacity: _isHovered ? 1.0 : 0.0,
+                  opacity: _buttonVisible ? 1.0 : 0.0,
                   duration: const Duration(milliseconds: 120),
                   child: IgnorePointer(
-                    ignoring: !_isHovered,
-                    child: _LikeHoverButton(
-                      liked: alreadyLiked,
-                      onTap: _onDoubleTap,
+                    ignoring: !_buttonVisible,
+                    child: MouseRegion(
+                      onEnter: (_) => _openEmojiPicker(),
+                      onExit: (_) => _scheduleCloseEmojiPicker(),
+                      child: Material(
+                        key: _likeButtonKey,
+                        elevation: 2,
+                        borderRadius: BorderRadius.only(
+                          topLeft: _emojiPickerOverlay != null
+                              ? Radius.zero
+                              : const Radius.circular(20),
+                          topRight: _emojiPickerOverlay != null
+                              ? Radius.zero
+                              : const Radius.circular(20),
+                          bottomLeft: const Radius.circular(20),
+                          bottomRight: const Radius.circular(20),
+                        ),
+                        color: theme.colorScheme.surfaceContainer,
+                        clipBehavior: Clip.antiAlias,
+                        child: InkWell(
+                          onTap: _onDoubleTap,
+                          child: const Padding(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
+                            child: Text(
+                              '👍',
+                              style: TextStyle(fontSize: 16),
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
                   ),
                 ),
@@ -523,28 +598,89 @@ class _MessageContextMenuState extends State<MessageContextMenu>
   }
 }
 
-class _LikeHoverButton extends StatelessWidget {
-  final bool liked;
-  final VoidCallback onTap;
-  const _LikeHoverButton({required this.liked, required this.onTap});
+
+class _EmojiExpandOverlay extends StatelessWidget {
+  final Offset anchorPos;
+  final Size anchorSize;
+  final List<String> reactions;
+  final void Function(String) onSelect;
+  final VoidCallback onMouseEnter;
+  final VoidCallback onMouseExit;
+
+  const _EmojiExpandOverlay({
+    required this.anchorPos,
+    required this.anchorSize,
+    required this.reactions,
+    required this.onSelect,
+    required this.onMouseEnter,
+    required this.onMouseExit,
+  });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Material(
-      elevation: 2,
-      borderRadius: BorderRadius.circular(20),
-      color: liked
-          ? theme.colorScheme.primaryContainer
-          : theme.colorScheme.surfaceContainer,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(20),
-        onTap: onTap,
-        child: const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-          child: Text('👍', style: TextStyle(fontSize: 16)),
+    final left = anchorPos.dx;
+    final bottom = MediaQuery.sizeOf(context).height - anchorPos.dy;
+
+    return Stack(
+      children: [
+        Positioned(
+          left: left,
+          bottom: bottom,
+          child: MouseRegion(
+            onEnter: (_) => onMouseEnter(),
+            onExit: (_) => onMouseExit(),
+            child: TweenAnimationBuilder<double>(
+              tween: Tween(begin: 0.0, end: 1.0),
+              duration: const Duration(milliseconds: 160),
+              curve: Curves.easeOutCubic,
+              builder: (_, t, child) => Opacity(
+                opacity: t,
+                child: Transform.scale(
+                  scale: 0.8 + 0.2 * t,
+                  alignment: Alignment.bottomCenter,
+                  child: child,
+                ),
+              ),
+              child: Material(
+                elevation: 2,
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(20),
+                  topRight: Radius.circular(20),
+                ),
+                color: theme.colorScheme.surfaceContainer,
+                clipBehavior: Clip.antiAlias,
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxHeight: 240),
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.only(top: 6, bottom: 2),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: reactions
+                          .map(
+                            (emoji) => InkWell(
+                              onTap: () => onSelect(emoji),
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 4,
+                                ),
+                                child: Text(
+                                  emoji,
+                                  style: const TextStyle(fontSize: 16),
+                                ),
+                              ),
+                            ),
+                          )
+                          .toList(),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
         ),
-      ),
+      ],
     );
   }
 }

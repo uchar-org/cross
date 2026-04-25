@@ -46,7 +46,7 @@ abstract class AppConfig {
   static const String changelogUrl = 'https://uchar.uz/';
   static const String donationUrl = 'https://ko-fi.com/krille';
 
-  static const Set<String> defaultReactions = {'👍', '❤️', '😂', '😮', '😢'};
+  static const Set<String> defaultReactions = {'🤝', '👍', '🔥', '🗿', '😁', '😭'};
 
   static final Uri newIssueUrl = Uri(
     scheme: 'https',
