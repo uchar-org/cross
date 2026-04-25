@@ -547,9 +547,9 @@ class _MessageContextMenuState extends State<MessageContextMenu>
               ),
             if (showHoverBtn)
               Positioned(
-                bottom: 4,
-                left: widget.ownMessage ? 4 : null,
-                right: widget.ownMessage ? null : 4,
+                bottom: -4,
+                left: widget.ownMessage ? -16 : null,
+                right: widget.ownMessage ? null : -16,
                 child: AnimatedOpacity(
                   opacity: _buttonVisible ? 1.0 : 0.0,
                   duration: const Duration(milliseconds: 120),
