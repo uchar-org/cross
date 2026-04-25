@@ -459,8 +459,10 @@ class _ContextMenuOverlayState extends State<_ContextMenuOverlay>
     const menuWidth = 220.0;
     const itemHeight = 44.0;
     const seenByRowHeight = 40.0;
+    const editedAtRowHeight = 30.0;
     final menuHeight = widget.items.length * itemHeight +
-        (widget.seenEntries.isNotEmpty ? seenByRowHeight + 1 : 0);
+        (widget.seenEntries.isNotEmpty ? seenByRowHeight + 1 : 0) +
+        (widget.editedAt != null ? editedAtRowHeight + 1 : 0);
 
     var left = widget.position.dx;
     var top = widget.position.dy;
