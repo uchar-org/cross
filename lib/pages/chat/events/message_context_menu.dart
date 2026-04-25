@@ -49,11 +49,12 @@ class _SeenEntry {
   bool get hasReaction => reaction != null;
 }
 
-class MessageContextMenu extends StatelessWidget {
+class MessageContextMenu extends StatefulWidget {
   final Event event;
   final Widget child;
   final ChatController controller;
   final Timeline timeline;
+  final bool ownMessage;
 
   const MessageContextMenu({
     super.key,
@@ -61,26 +62,77 @@ class MessageContextMenu extends StatelessWidget {
     required this.child,
     required this.controller,
     required this.timeline,
+    required this.ownMessage,
   });
 
+  @override
+  State<MessageContextMenu> createState() => _MessageContextMenuState();
+}
+
+class _MessageContextMenuState extends State<MessageContextMenu>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _likeAnimController;
+  late final Animation<double> _likeScale;
+  late final Animation<double> _likeOpacity;
+  bool _showLikeAnim = false;
+  bool _isHovered = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _likeAnimController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 700),
+    );
+    _likeScale = TweenSequence<double>([
+      TweenSequenceItem(
+        tween: Tween(begin: 0.2, end: 1.3)
+            .chain(CurveTween(curve: Curves.easeOutCubic)),
+        weight: 40,
+      ),
+      TweenSequenceItem(
+        tween: Tween(begin: 1.3, end: 1.0)
+            .chain(CurveTween(curve: Curves.easeInOut)),
+        weight: 20,
+      ),
+      TweenSequenceItem(tween: ConstantTween(1.0), weight: 20),
+      TweenSequenceItem(
+        tween: Tween(begin: 1.0, end: 0.0)
+            .chain(CurveTween(curve: Curves.easeIn)),
+        weight: 20,
+      ),
+    ]).animate(_likeAnimController);
+    _likeOpacity = TweenSequence<double>([
+      TweenSequenceItem(tween: Tween(begin: 0.0, end: 1.0), weight: 15),
+      TweenSequenceItem(tween: ConstantTween(1.0), weight: 65),
+      TweenSequenceItem(tween: Tween(begin: 1.0, end: 0.0), weight: 20),
+    ]).animate(_likeAnimController);
+  }
+
+  @override
+  void dispose() {
+    _likeAnimController.dispose();
+    super.dispose();
+  }
+
   bool get _canEdit {
-    if (controller.room.isArchived || !event.status.isSent) return false;
-    final clients = Matrix.of(controller.context).currentBundle;
-    return clients != null && clients.any((cl) => event.senderId == cl!.userID);
+    if (widget.controller.room.isArchived || !widget.event.status.isSent) return false;
+    final clients = Matrix.of(widget.controller.context).currentBundle;
+    return clients != null && clients.any((cl) => widget.event.senderId == cl!.userID);
   }
 
   bool get _canRedact {
-    if (controller.room.isArchived || !event.status.isSent) return false;
-    final clients = Matrix.of(controller.context).currentBundle;
-    return event.canRedact ||
-        (clients != null && clients.any((cl) => event.senderId == cl!.userID));
+    if (widget.controller.room.isArchived || !widget.event.status.isSent) return false;
+    final clients = Matrix.of(widget.controller.context).currentBundle;
+    return widget.event.canRedact ||
+        (clients != null && clients.any((cl) => widget.event.senderId == cl!.userID));
   }
 
   bool get _canPin {
-    return !controller.room.isArchived &&
-        controller.room.canChangeStateEvent(EventTypes.RoomPinnedEvents) &&
-        event.status.isSent &&
-        controller.activeThreadId == null;
+    return !widget.controller.room.isArchived &&
+        widget.controller.room.canChangeStateEvent(EventTypes.RoomPinnedEvents) &&
+        widget.event.status.isSent &&
+        widget.controller.activeThreadId == null;
   }
 
   bool get _canSave {
@@ -90,25 +142,26 @@ class MessageContextMenu extends StatelessWidget {
       MessageTypes.Sticker,
       MessageTypes.Audio,
       MessageTypes.File,
-    }.contains(event.messageType);
+    }.contains(widget.event.messageType);
   }
 
-  bool get _isPinned => controller.room.pinnedEventIds.contains(event.eventId);
+  bool get _isPinned =>
+      widget.controller.room.pinnedEventIds.contains(widget.event.eventId);
 
   void _onSelected(BuildContext context, _ContextAction action) {
     switch (action) {
       case _ContextAction.reply:
-        controller.replyAction(replyTo: event);
+        widget.controller.replyAction(replyTo: widget.event);
         break;
       case _ContextAction.replyInThread:
-        controller.enterThread(event.eventId);
+        widget.controller.enterThread(widget.event.eventId);
         break;
       case _ContextAction.edit:
-        controller.selectSingleEvent(event);
-        controller.editSelectedEventAction();
+        widget.controller.selectSingleEvent(widget.event);
+        widget.controller.editSelectedEventAction();
         break;
       case _ContextAction.copy:
-        final displayEvent = event.getDisplayEvent(timeline);
+        final displayEvent = widget.event.getDisplayEvent(widget.timeline);
         Clipboard.setData(
           ClipboardData(
             text: displayEvent.calcLocalizedBodyFallback(
@@ -120,43 +173,43 @@ class MessageContextMenu extends StatelessWidget {
         );
         break;
       case _ContextAction.forward:
-        controller.selectSingleEvent(event);
-        controller.forwardEventsAction();
+        widget.controller.selectSingleEvent(widget.event);
+        widget.controller.forwardEventsAction();
         break;
       case _ContextAction.pin:
-        controller.selectSingleEvent(event);
-        controller.pinEvent();
-        controller.clearSelectedEvents();
+        widget.controller.selectSingleEvent(widget.event);
+        widget.controller.pinEvent();
+        widget.controller.clearSelectedEvents();
         break;
       case _ContextAction.download:
-        event.saveFile(context);
+        widget.event.saveFile(context);
         break;
       case _ContextAction.delete:
-        controller.selectSingleEvent(event);
-        controller.redactEventsAction();
+        widget.controller.selectSingleEvent(widget.event);
+        widget.controller.redactEventsAction();
         break;
       case _ContextAction.select:
-        controller.onSelectMessage(event);
+        widget.controller.onSelectMessage(widget.event);
         break;
       case _ContextAction.info:
-        controller.selectSingleEvent(event);
-        controller.showEventInfo();
-        controller.clearSelectedEvents();
+        widget.controller.selectSingleEvent(widget.event);
+        widget.controller.showEventInfo();
+        widget.controller.clearSelectedEvents();
         break;
       case _ContextAction.report:
-        controller.selectSingleEvent(event);
-        controller.reportEventAction();
+        widget.controller.selectSingleEvent(widget.event);
+        widget.controller.reportEventAction();
         break;
     }
   }
 
   List<_ContextMenuItem> _buildItems(BuildContext context) {
     final l10n = L10n.of(context);
-    final room = controller.room;
+    final room = widget.controller.room;
     final canSendMessages = room.canSendDefaultMessages;
     final items = <_ContextMenuItem>[];
 
-    if (canSendMessages && event.status.isSent) {
+    if (canSendMessages && widget.event.status.isSent) {
       items.add(_ContextMenuItem(
         action: _ContextAction.reply,
         icon: TablerIcons.arrow_back_up,
@@ -165,8 +218,8 @@ class MessageContextMenu extends StatelessWidget {
     }
 
     if (canSendMessages &&
-        event.status.isSent &&
-        controller.activeThreadId == null) {
+        widget.event.status.isSent &&
+        widget.controller.activeThreadId == null) {
       items.add(_ContextMenuItem(
         action: _ContextAction.replyInThread,
         icon: TablerIcons.message,
@@ -174,7 +227,7 @@ class MessageContextMenu extends StatelessWidget {
       ));
     }
 
-    if (_canEdit && event.messageType == MessageTypes.Text) {
+    if (_canEdit && widget.event.messageType == MessageTypes.Text) {
       items.add(_ContextMenuItem(
         action: _ContextAction.edit,
         icon: TablerIcons.pencil,
@@ -183,7 +236,7 @@ class MessageContextMenu extends StatelessWidget {
     }
 
     if ({MessageTypes.Text, MessageTypes.Notice, MessageTypes.Emote}
-        .contains(event.messageType)) {
+        .contains(widget.event.messageType)) {
       items.add(_ContextMenuItem(
         action: _ContextAction.copy,
         icon: TablerIcons.copy,
@@ -191,7 +244,7 @@ class MessageContextMenu extends StatelessWidget {
       ));
     }
 
-    if (event.status.isSent) {
+    if (widget.event.status.isSent) {
       items.add(_ContextMenuItem(
         action: _ContextAction.forward,
         icon: TablerIcons.corner_down_right,
@@ -236,7 +289,8 @@ class MessageContextMenu extends StatelessWidget {
       label: l10n.messageInfo,
     ));
 
-    if (event.status.isSent && event.senderId != room.client.userID) {
+    if (widget.event.status.isSent &&
+        widget.event.senderId != room.client.userID) {
       items.add(_ContextMenuItem(
         action: _ContextAction.report,
         icon: TablerIcons.shield,
@@ -249,18 +303,19 @@ class MessageContextMenu extends StatelessWidget {
   }
 
   void _showContextMenu(BuildContext context, Offset position) {
-    if (event.redacted) return;
+    if (widget.event.redacted) return;
 
     final items = _buildItems(context);
     if (items.isEmpty) return;
 
-    // Close any previously open context menu
-    controller.closeContextMenu?.call();
+    widget.controller.closeContextMenu?.call();
 
-    final isOwnMessage = event.senderId == event.room.client.userID;
+    final isOwnMessage =
+        widget.event.senderId == widget.event.room.client.userID;
 
     final reactionsByUser = <String, List<_UserReaction>>{};
-    for (final re in event.aggregatedEvents(timeline, RelationshipTypes.reaction)) {
+    for (final re in widget.event
+        .aggregatedEvents(widget.timeline, RelationshipTypes.reaction)) {
       final key = re.content
           .tryGetMap<String, dynamic>('m.relates_to')
           ?.tryGet<String>('key');
@@ -273,19 +328,20 @@ class MessageContextMenu extends StatelessWidget {
 
     final seenEntries = isOwnMessage
         ? () {
-            final seenUsers = event.room.getSeenByUsers(
-              timeline,
-              eventId: event.eventId,
+            final seenUsers = widget.event.room.getSeenByUsers(
+              widget.timeline,
+              eventId: widget.event.eventId,
             );
             final otherUserReceipts =
-                event.room.receiptState.global.otherUsers;
+                widget.event.room.receiptState.global.otherUsers;
             final entries = <_SeenEntry>[];
 
-            final ownUserId = event.room.client.userID;
+            final ownUserId = widget.event.room.client.userID;
             if (ownUserId != null) {
               final ownReactions = reactionsByUser[ownUserId] ?? [];
               if (ownReactions.isNotEmpty) {
-                final ownUser = event.room.unsafeGetUserFromMemoryOrFallback(ownUserId);
+                final ownUser = widget.event.room
+                    .unsafeGetUserFromMemoryOrFallback(ownUserId);
                 for (final r in ownReactions) {
                   entries.add(_SeenEntry(
                     receipt: Receipt(ownUser, r.time ?? DateTime.now()),
@@ -297,8 +353,7 @@ class MessageContextMenu extends StatelessWidget {
 
             for (final user in seenUsers) {
               final time =
-                  otherUserReceipts[user.id]?.timestamp ??
-                  DateTime.now();
+                  otherUserReceipts[user.id]?.timestamp ?? DateTime.now();
               final receipt = Receipt(user, time);
               final userReactions = reactionsByUser[user.id] ?? [];
               if (userReactions.isNotEmpty) {
@@ -323,7 +378,7 @@ class MessageContextMenu extends StatelessWidget {
 
     void removeOverlay() {
       overlayEntry.remove();
-      controller.closeContextMenu = null;
+      widget.controller.closeContextMenu = null;
     }
 
     Future<void> animateClose() async {
@@ -334,8 +389,9 @@ class MessageContextMenu extends StatelessWidget {
       removeOverlay();
     }
 
-    final editedAt = event.hasAggregatedEvents(timeline, RelationshipTypes.edit)
-        ? event.getDisplayEvent(timeline).originServerTs
+    final editedAt = widget.event.hasAggregatedEvents(
+            widget.timeline, RelationshipTypes.edit)
+        ? widget.event.getDisplayEvent(widget.timeline).originServerTs
         : null;
 
     overlayEntry = OverlayEntry(
@@ -354,29 +410,141 @@ class MessageContextMenu extends StatelessWidget {
     );
 
     Overlay.of(context, rootOverlay: true).insert(overlayEntry);
-    controller.closeContextMenu = removeOverlay;
+    widget.controller.closeContextMenu = removeOverlay;
+  }
+
+  void _onDoubleTap() {
+    HapticFeedback.mediumImpact();
+    const likeEmoji = '👍';
+    final existingReactions = widget.event
+        .aggregatedEvents(widget.timeline, RelationshipTypes.reaction)
+        .where(
+          (e) =>
+              e.senderId == widget.event.room.client.userID &&
+              e.content
+                      .tryGetMap<String, Object?>('m.relates_to')
+                      ?.tryGet<String>('key') ==
+                  likeEmoji,
+        );
+    if (existingReactions.isNotEmpty) {
+      widget.event.room.redactEvent(existingReactions.first.eventId);
+    } else {
+      widget.event.room.sendReaction(widget.event.eventId, likeEmoji);
+      setState(() => _showLikeAnim = true);
+      _likeAnimController.forward(from: 0).then((_) {
+        if (mounted) setState(() => _showLikeAnim = false);
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final isDesktopOrWeb = PlatformInfos.isDesktop || PlatformInfos.isWeb;
+    final canDoubleTap = widget.event.status.isSent &&
+        widget.controller.room.canSendDefaultMessages;
+    final showHoverBtn = isDesktopOrWeb &&
+        widget.event.status.isSent &&
+        !widget.event.redacted &&
+        widget.controller.room.canSendDefaultMessages;
 
-    return GestureDetector(
-      onDoubleTap: event.status.isSent && controller.room.canSendDefaultMessages
-          ? () => controller.replyAction(replyTo: event)
-          : null,
-      onSecondaryTapUp: (details) {
-        _showContextMenu(context, details.globalPosition);
-      },
-      onLongPressStart: isDesktopOrWeb
-          ? null
-          : controller.selectedEvents.isNotEmpty
-              ? null
-              : (details) {
-                  HapticFeedback.heavyImpact();
-                  _showContextMenu(context, details.globalPosition);
-                },
-      child: child,
+    const likeEmoji = '👍';
+    final alreadyLiked = widget.event
+        .aggregatedEvents(widget.timeline, RelationshipTypes.reaction)
+        .any(
+          (e) =>
+              e.senderId == widget.event.room.client.userID &&
+              e.content
+                      .tryGetMap<String, Object?>('m.relates_to')
+                      ?.tryGet<String>('key') ==
+                  likeEmoji,
+        );
+
+    return MouseRegion(
+      onEnter: showHoverBtn ? (_) => setState(() => _isHovered = true) : null,
+      onExit: showHoverBtn ? (_) => setState(() => _isHovered = false) : null,
+      child: GestureDetector(
+        onDoubleTap: canDoubleTap ? _onDoubleTap : null,
+        onSecondaryTapUp: (details) {
+          _showContextMenu(context, details.globalPosition);
+        },
+        onLongPressStart: isDesktopOrWeb
+            ? null
+            : widget.controller.selectedEvents.isNotEmpty
+                ? null
+                : (details) {
+                    HapticFeedback.heavyImpact();
+                    _showContextMenu(context, details.globalPosition);
+                  },
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            widget.child,
+            if (_showLikeAnim)
+              Positioned.fill(
+                child: IgnorePointer(
+                  child: Center(
+                    child: AnimatedBuilder(
+                      animation: _likeAnimController,
+                      builder: (context, _) => Opacity(
+                        opacity: _likeOpacity.value,
+                        child: Transform.scale(
+                          scale: _likeScale.value,
+                          child: const Text(
+                            '👍',
+                            style: TextStyle(fontSize: 48),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            if (showHoverBtn)
+              Positioned(
+                bottom: 4,
+                left: widget.ownMessage ? 4 : null,
+                right: widget.ownMessage ? null : 4,
+                child: AnimatedOpacity(
+                  opacity: _isHovered ? 1.0 : 0.0,
+                  duration: const Duration(milliseconds: 120),
+                  child: IgnorePointer(
+                    ignoring: !_isHovered,
+                    child: _LikeHoverButton(
+                      liked: alreadyLiked,
+                      onTap: _onDoubleTap,
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _LikeHoverButton extends StatelessWidget {
+  final bool liked;
+  final VoidCallback onTap;
+  const _LikeHoverButton({required this.liked, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Material(
+      elevation: 2,
+      borderRadius: BorderRadius.circular(20),
+      color: liked
+          ? theme.colorScheme.primaryContainer
+          : theme.colorScheme.surfaceContainer,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(20),
+        onTap: onTap,
+        child: const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          child: Text('👍', style: TextStyle(fontSize: 16)),
+        ),
+      ),
     );
   }
 }

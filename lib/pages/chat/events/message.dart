@@ -436,6 +436,7 @@ class Message extends StatelessWidget {
                                             event: event,
                                             controller: controller,
                                             timeline: timeline,
+                                            ownMessage: ownMessage,
                                             child: AnimatedOpacity(
                                               opacity: animateIn
                                                   ? 0
