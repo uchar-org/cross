@@ -145,6 +145,7 @@ abstract class ClientManager {
       sendTimelineEventTimeout: Duration(
         seconds: AppSettings.sendTimelineEventTimeout.value,
       ),
+      roomPreviewLastEvents: {EventTypes.Reaction},
     );
   }
 
