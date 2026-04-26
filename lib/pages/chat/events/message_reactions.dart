@@ -168,27 +168,75 @@ class _Reaction extends StatelessWidget {
       );
     }
 
-    return InkWell(
-      onTap: () => onTap != null ? onTap!() : null,
-      onLongPress: () => onLongPress != null ? onLongPress!() : null,
-      borderRadius: BorderRadius.circular(AppConfig.borderRadius / 2),
-      child: Container(
-        decoration: BoxDecoration(
-          color: reacted == true
-              ? theme.colorScheme.primaryContainer
-              : theme.colorScheme.surfaceContainerHigh,
-          border: Border.all(
+    final tooltipMessage = _buildTooltipMessage();
+
+    return Tooltip(
+      richMessage: tooltipMessage,
+      decoration: BoxDecoration(
+        color: theme.colorScheme.inverseSurface,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      textStyle: TextStyle(
+        color: theme.colorScheme.onInverseSurface,
+        fontSize: 11,
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      waitDuration: const Duration(milliseconds: 300),
+      preferBelow: false,
+      child: InkWell(
+        onTap: () => onTap != null ? onTap!() : null,
+        onLongPress: () => onLongPress != null ? onLongPress!() : null,
+        borderRadius: BorderRadius.circular(AppConfig.borderRadius / 2),
+        child: Container(
+          decoration: BoxDecoration(
             color: reacted == true
-                ? theme.colorScheme.primary
+                ? theme.colorScheme.primaryContainer
                 : theme.colorScheme.surfaceContainerHigh,
-            width: 1,
+            border: Border.all(
+              color: reacted == true
+                  ? theme.colorScheme.primary
+                  : theme.colorScheme.surfaceContainerHigh,
+              width: 1,
+            ),
+            borderRadius: BorderRadius.circular(AppConfig.borderRadius / 2),
           ),
-          borderRadius: BorderRadius.circular(AppConfig.borderRadius / 2),
+          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+          child: content,
         ),
-        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-        child: content,
       ),
     );
+  }
+
+  InlineSpan? _buildTooltipMessage() {
+    final list = reactors;
+    if (list == null || list.isEmpty) return null;
+    final spans = <InlineSpan>[];
+    for (int i = 0; i < list.length; i++) {
+      if (i > 0) spans.add(const TextSpan(text: '\n'));
+      final user = list[i];
+      final homeserver = user.stateKey?.contains(':') == true
+          ? user.stateKey!.split(':').skip(1).join(':')
+          : null;
+      spans.add(
+        TextSpan(
+          children: [
+            TextSpan(
+              text: user.displayName ?? user.stateKey ?? '',
+              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+            ),
+            if (homeserver != null)
+              TextSpan(
+                text: '\n$homeserver',
+                style: const TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.normal,
+                ),
+              ),
+          ],
+        ),
+      );
+    }
+    return TextSpan(children: spans);
   }
 }
 
