@@ -170,6 +170,30 @@ class _Reaction extends StatelessWidget {
 
     final tooltipMessage = _buildTooltipMessage();
 
+    final reactionWidget = InkWell(
+      onTap: () => onTap != null ? onTap!() : null,
+      onLongPress: () => onLongPress != null ? onLongPress!() : null,
+      borderRadius: BorderRadius.circular(AppConfig.borderRadius / 2),
+      child: Container(
+        decoration: BoxDecoration(
+          color: reacted == true
+              ? theme.colorScheme.primaryContainer
+              : theme.colorScheme.surfaceContainerHigh,
+          border: Border.all(
+            color: reacted == true
+                ? theme.colorScheme.primary
+                : theme.colorScheme.surfaceContainerHigh,
+            width: 1,
+          ),
+          borderRadius: BorderRadius.circular(AppConfig.borderRadius / 2),
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+        child: content,
+      ),
+    );
+
+    if (tooltipMessage == null) return reactionWidget;
+
     return Tooltip(
       richMessage: tooltipMessage,
       decoration: BoxDecoration(
@@ -183,27 +207,7 @@ class _Reaction extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       waitDuration: const Duration(milliseconds: 300),
       preferBelow: false,
-      child: InkWell(
-        onTap: () => onTap != null ? onTap!() : null,
-        onLongPress: () => onLongPress != null ? onLongPress!() : null,
-        borderRadius: BorderRadius.circular(AppConfig.borderRadius / 2),
-        child: Container(
-          decoration: BoxDecoration(
-            color: reacted == true
-                ? theme.colorScheme.primaryContainer
-                : theme.colorScheme.surfaceContainerHigh,
-            border: Border.all(
-              color: reacted == true
-                  ? theme.colorScheme.primary
-                  : theme.colorScheme.surfaceContainerHigh,
-              width: 1,
-            ),
-            borderRadius: BorderRadius.circular(AppConfig.borderRadius / 2),
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-          child: content,
-        ),
-      ),
+      child: reactionWidget,
     );
   }
 

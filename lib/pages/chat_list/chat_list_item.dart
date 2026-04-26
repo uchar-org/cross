@@ -387,6 +387,61 @@ class ChatListItem extends StatelessWidget {
     String? directChatMatrixId,
     bool unread,
   ) {
+    if (lastEvent?.type == EventTypes.Reaction &&
+        lastEvent?.senderId == room.client.userID) {
+      final relatedId = lastEvent!.content
+          .tryGetMap<String, Object?>('m.relates_to')
+          ?.tryGet<String>('event_id');
+      return FutureBuilder<Event?>(
+        key: ValueKey('own_reaction_preview_$relatedId'),
+        future: relatedId != null ? room.getEventById(relatedId) : null,
+        builder: (context, snapshot) {
+          final related = snapshot.data;
+          if (related == null) return const SizedBox.shrink();
+          final relatedNeedSender =
+              room.getState(EventTypes.RoomMember, related.senderId) == null;
+          return FutureBuilder<String?>(
+            key: ValueKey('related_body_${related.eventId}'),
+            future: relatedNeedSender
+                ? related.calcLocalizedBody(
+                    MatrixLocals(L10n.of(context)),
+                    hideReply: true,
+                    hideEdit: true,
+                    plaintextBody: true,
+                    removeMarkdown: true,
+                    withSenderNamePrefix:
+                        !isDirectChat ||
+                        directChatMatrixId != related.senderId,
+                  )
+                : null,
+            initialData: related.calcLocalizedBodyFallback(
+              MatrixLocals(L10n.of(context)),
+              hideReply: true,
+              hideEdit: true,
+              plaintextBody: true,
+              removeMarkdown: true,
+              withSenderNamePrefix:
+                  !isDirectChat || directChatMatrixId != related.senderId,
+            ),
+            builder: (context, snapshot) => Text(
+              snapshot.data ?? L10n.of(context).noMessagesYet,
+              softWrap: false,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: unread || room.hasNewMessages
+                    ? theme.colorScheme.onSurface
+                    : theme.colorScheme.outline,
+                decoration: related.redacted
+                    ? TextDecoration.lineThrough
+                    : null,
+              ),
+            ),
+          );
+        },
+      );
+    }
+
     final msgType = lastEvent?.messageType;
     final isImage = msgType == MessageTypes.Image;
     final isVideo = msgType == MessageTypes.Video;
