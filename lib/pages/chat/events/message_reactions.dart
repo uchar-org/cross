@@ -54,6 +54,7 @@ class MessageReactions extends StatelessWidget {
             reactionKey: r.key,
             count: r.count,
             reacted: r.reacted,
+            reactors: r.reactors,
             onTap: () {
               if (r.reacted) {
                 final evt = allReactionEvents.firstWhereOrNull(
@@ -97,6 +98,7 @@ class _Reaction extends StatelessWidget {
   final bool? reacted;
   final void Function()? onTap;
   final void Function()? onLongPress;
+  final List<User>? reactors;
 
   const _Reaction({
     required this.reactionKey,
@@ -104,6 +106,7 @@ class _Reaction extends StatelessWidget {
     required this.reacted,
     required this.onTap,
     required this.onLongPress,
+    this.reactors,
   });
 
   @override
@@ -148,7 +151,26 @@ class _Reaction extends StatelessWidget {
         ),
       );
     }
-    return InkWell(
+    final reactor = count == 1 ? reactors?.firstOrNull : null;
+    if (reactor != null) {
+      content = Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          content,
+          const SizedBox(width: 4),
+          Avatar(
+            mxContent: reactor.avatarUrl,
+            name: reactor.displayName ?? reactor.stateKey,
+            client: Matrix.of(context).client,
+            size: 16,
+          ),
+        ],
+      );
+    }
+
+    final tooltipMessage = _buildTooltipMessage();
+
+    final reactionWidget = InkWell(
       onTap: () => onTap != null ? onTap!() : null,
       onLongPress: () => onLongPress != null ? onLongPress!() : null,
       borderRadius: BorderRadius.circular(AppConfig.borderRadius / 2),
@@ -169,6 +191,56 @@ class _Reaction extends StatelessWidget {
         child: content,
       ),
     );
+
+    if (tooltipMessage == null) return reactionWidget;
+
+    return Tooltip(
+      richMessage: tooltipMessage,
+      decoration: BoxDecoration(
+        color: theme.colorScheme.inverseSurface,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      textStyle: TextStyle(
+        color: theme.colorScheme.onInverseSurface,
+        fontSize: 11,
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      waitDuration: const Duration(milliseconds: 300),
+      preferBelow: false,
+      child: reactionWidget,
+    );
+  }
+
+  InlineSpan? _buildTooltipMessage() {
+    final list = reactors;
+    if (list == null || list.isEmpty) return null;
+    final spans = <InlineSpan>[];
+    for (int i = 0; i < list.length; i++) {
+      if (i > 0) spans.add(const TextSpan(text: '\n'));
+      final user = list[i];
+      final homeserver = user.stateKey?.contains(':') == true
+          ? user.stateKey!.split(':').skip(1).join(':')
+          : null;
+      spans.add(
+        TextSpan(
+          children: [
+            TextSpan(
+              text: user.displayName ?? user.stateKey ?? '',
+              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+            ),
+            if (homeserver != null)
+              TextSpan(
+                text: '\n$homeserver',
+                style: const TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.normal,
+                ),
+              ),
+          ],
+        ),
+      );
+    }
+    return TextSpan(children: spans);
   }
 }
 
